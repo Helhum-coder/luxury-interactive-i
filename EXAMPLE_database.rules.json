@@ -1,0 +1,71 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    
+    "users": {
+      "$uid": {
+        ".read": "$uid === auth.uid",
+        ".write": "$uid === auth.uid",
+        
+        "consoles": {
+          "$consoleId": {
+            "messages": {
+              "$messageId": {
+                ".validate": "newData.hasChildren(['type', 'content', 'timestamp', 'consoleId'])"
+              }
+            }
+          }
+        },
+        
+        "dashboards": {
+          "$dashboardId": {
+            ".validate": "newData.hasChildren(['id', 'type', 'title', 'data', 'position'])"
+          }
+        },
+        
+        "strategies": {
+          "$strategyId": {
+            ".validate": "newData.hasChildren(['productName', 'targetAudience', 'campaigns'])"
+          }
+        },
+        
+        "sessions": {
+          "$sessionId": {
+            ".read": true,
+            ".write": true
+          }
+        }
+      }
+    },
+    
+    "live-consoles": {
+      "$sessionId": {
+        ".read": "auth != null",
+        ".write": "auth != null",
+        
+        "commands": {
+          "$commandId": {
+            ".validate": "newData.hasChildren(['timestamp'])"
+          }
+        },
+        
+        "participants": {
+          "$userId": {
+            ".read": true,
+            ".write": "auth.uid === $userId"
+          }
+        }
+      }
+    },
+    
+    "shared-dashboards": {
+      "$dashboardId": {
+        ".read": "auth != null",
+        ".write": "auth != null && (data.child('createdBy').val() === auth.uid || !data.exists())",
+        
+        ".validate": "newData.hasChildren(['createdBy', 'createdAt'])"
+      }
+    }
+  }
+}

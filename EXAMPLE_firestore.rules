@@ -1,0 +1,64 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId);
+      
+      match /consoles/{consoleId}/messages/{messageId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && 
+                      request.resource.data.keys().hasAll(['type', 'content', 'timestamp', 'consoleId']) &&
+                      request.resource.data.type in ['input', 'output', 'info', 'success', 'error', 'warning'];
+        allow update, delete: if isOwner(userId);
+      }
+      
+      match /dashboards/{dashboardId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && 
+                      request.resource.data.keys().hasAll(['id', 'type', 'title', 'data', 'position']) &&
+                      request.resource.data.type in ['line', 'bar', 'pie', 'area', 'radar', 'gauge', 'metric', 'status'];
+        allow update, delete: if isOwner(userId);
+      }
+      
+      match /strategies/{strategyId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && 
+                      request.resource.data.keys().hasAll(['productName', 'targetAudience', 'campaigns']);
+        allow update, delete: if isOwner(userId);
+      }
+      
+      match /sessions/{sessionId} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+    
+    match /public/dashboards/{dashboardId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && 
+                    request.resource.data.createdBy == request.auth.uid;
+      allow update, delete: if isAuthenticated() && 
+                            resource.data.createdBy == request.auth.uid;
+    }
+    
+    match /shared/sessions/{sessionId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && 
+                    request.resource.data.createdBy == request.auth.uid;
+      allow update: if isAuthenticated() && 
+                    (resource.data.createdBy == request.auth.uid || 
+                     request.auth.uid in resource.data.participants);
+      allow delete: if isAuthenticated() && 
+                    resource.data.createdBy == request.auth.uid;
+    }
+  }
+}

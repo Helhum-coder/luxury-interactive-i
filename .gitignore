@@ -25,6 +25,8 @@ dist-ssr
 *.sw?
 
 .env
+.env.local
+.env.production
 **/agent-eval-report*
 packages
 pids
@@ -32,3 +34,11 @@ pids
 .devcontainer/
 
 .spark-workbench-id
+
+# Firebase
+.firebase/
+firebase-debug.log
+firebaserc
+.firebaserc
+*-service-account-*.json
+firebase-adminsdk-*.json
