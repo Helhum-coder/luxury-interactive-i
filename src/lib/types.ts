@@ -10,10 +10,23 @@ export interface ConsoleMessage {
 
 export interface DashboardWidget {
   id: string
-  type: 'chart' | 'metric' | 'table' | 'status' | 'map'
+  type: 'line' | 'bar' | 'pie' | 'area' | 'radar' | 'gauge' | 'metric' | 'status'
   title: string
   data: any
   position: { x: number; y: number; w: number; h: number }
+  chartConfig?: {
+    color?: string
+    animate?: boolean
+    showGrid?: boolean
+    horizontal?: boolean
+    innerRadius?: number
+    showLabels?: boolean
+    stacked?: boolean
+    levels?: number
+    min?: number
+    max?: number
+    unit?: string
+  }
 }
 
 export interface Dashboard {

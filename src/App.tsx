@@ -69,7 +69,8 @@ function App() {
 - help: Show this help message
 - clear: Clear console
 - status: Show system status
-- generate dashboard [type]: Generate a dashboard (e.g., analytics, financial, performance)
+- generate dashboard [type]: Generate a dashboard with D3 visualizations (e.g., analytics, financial, performance)
+- demo charts: Generate a demo dashboard showcasing all chart types
 - analyze [topic]: Analyze data on a topic
 - deploy [project]: Deploy a project
 - monitor: Start system monitoring
@@ -80,6 +81,183 @@ function App() {
 
     if (lowerCommand === 'clear') {
       clearConsole(consoleId)
+      return
+    }
+
+    if (lowerCommand === 'demo charts') {
+      addMessage(consoleId, 'info', 'Generating comprehensive chart demo...')
+      
+      setTimeout(() => {
+        const demoWidgets: DashboardWidget[] = [
+          {
+            id: `demo-line-${Date.now()}`,
+            type: 'line',
+            title: 'Revenue Trend (Line Chart)',
+            data: Array.from({ length: 15 }, (_, i) => ({
+              x: i,
+              y: Math.floor(Math.random() * 60 + 40 + i * 3)
+            })),
+            position: { x: 0, y: 0, w: 4, h: 2 },
+            chartConfig: { 
+              color: 'oklch(0.85 0.18 90)', 
+              showGrid: true, 
+              animate: true 
+            }
+          },
+          {
+            id: `demo-bar-${Date.now()}`,
+            type: 'bar',
+            title: 'Sales by Category (Bar Chart)',
+            data: [
+              { label: 'Electronics', value: 145, color: 'oklch(0.85 0.18 90)' },
+              { label: 'Fashion', value: 98, color: 'oklch(0.75 0.15 85)' },
+              { label: 'Food', value: 122, color: 'oklch(0.35 0.15 300)' },
+              { label: 'Sports', value: 87, color: 'oklch(0.65 0.20 180)' },
+              { label: 'Books', value: 76, color: 'oklch(0.70 0.18 270)' }
+            ],
+            position: { x: 4, y: 0, w: 4, h: 2 },
+            chartConfig: { animate: true }
+          },
+          {
+            id: `demo-pie-${Date.now()}`,
+            type: 'pie',
+            title: 'Market Share (Donut Chart)',
+            data: [
+              { label: 'Product A', value: 35, color: 'oklch(0.85 0.18 90)' },
+              { label: 'Product B', value: 28, color: 'oklch(0.75 0.15 85)' },
+              { label: 'Product C', value: 22, color: 'oklch(0.35 0.15 300)' },
+              { label: 'Product D', value: 15, color: 'oklch(0.65 0.20 180)' }
+            ],
+            position: { x: 8, y: 0, w: 4, h: 2 },
+            chartConfig: { 
+              innerRadius: 70, 
+              animate: true, 
+              showLabels: true 
+            }
+          },
+          {
+            id: `demo-area-${Date.now()}`,
+            type: 'area',
+            title: 'Revenue vs Expenses (Area Chart)',
+            data: [
+              {
+                name: 'Revenue',
+                data: Array.from({ length: 12 }, (_, i) => ({ 
+                  x: i, 
+                  y: Math.floor(Math.random() * 40 + 60 + i * 2) 
+                })),
+                color: 'oklch(0.85 0.18 90)'
+              },
+              {
+                name: 'Expenses',
+                data: Array.from({ length: 12 }, (_, i) => ({ 
+                  x: i, 
+                  y: Math.floor(Math.random() * 30 + 30 + i * 1.5) 
+                })),
+                color: 'oklch(0.55 0.22 25)'
+              },
+              {
+                name: 'Profit',
+                data: Array.from({ length: 12 }, (_, i) => ({ 
+                  x: i, 
+                  y: Math.floor(Math.random() * 20 + 20 + i * 0.5) 
+                })),
+                color: 'oklch(0.35 0.15 300)'
+              }
+            ],
+            position: { x: 0, y: 2, w: 6, h: 2 },
+            chartConfig: { 
+              showGrid: true, 
+              animate: true 
+            }
+          },
+          {
+            id: `demo-radar-${Date.now()}`,
+            type: 'radar',
+            title: 'Performance Radar',
+            data: [
+              { axis: 'Speed', value: 85 },
+              { axis: 'Quality', value: 92 },
+              { axis: 'Security', value: 78 },
+              { axis: 'Usability', value: 88 },
+              { axis: 'Features', value: 75 },
+              { axis: 'Support', value: 90 }
+            ],
+            position: { x: 6, y: 2, w: 3, h: 2 },
+            chartConfig: { 
+              color: 'oklch(0.35 0.15 300)', 
+              levels: 5,
+              animate: true 
+            }
+          },
+          {
+            id: `demo-gauge-${Date.now()}`,
+            type: 'gauge',
+            title: 'System Load (Gauge)',
+            data: { 
+              value: 78, 
+              label: 'CPU USAGE',
+              unit: '%'
+            },
+            position: { x: 9, y: 2, w: 3, h: 2 },
+            chartConfig: { 
+              min: 0,
+              max: 100,
+              animate: true 
+            }
+          },
+          {
+            id: `demo-bar-horizontal-${Date.now()}`,
+            type: 'bar',
+            title: 'Top Products (Horizontal)',
+            data: [
+              { label: 'Widget Pro', value: 234 },
+              { label: 'Gadget Max', value: 198 },
+              { label: 'Tool Elite', value: 176 },
+              { label: 'Device Plus', value: 145 }
+            ],
+            position: { x: 0, y: 4, w: 4, h: 2 },
+            chartConfig: { 
+              color: 'oklch(0.75 0.15 85)',
+              animate: true,
+              horizontal: true
+            }
+          },
+          {
+            id: `demo-metric-${Date.now()}`,
+            type: 'metric',
+            title: 'Key Performance Indicators',
+            data: {
+              'Total Revenue': '$127,450',
+              'Active Users': '12,847',
+              'Conversion Rate': '3.42%',
+              'Avg Order Value': '$89.32',
+              'Customer Satisfaction': '4.8/5.0'
+            },
+            position: { x: 4, y: 4, w: 4, h: 2 }
+          },
+          {
+            id: `demo-status-${Date.now()}`,
+            type: 'status',
+            title: 'Infrastructure Status',
+            data: {
+              'Web Servers': 'Operational',
+              'Database': 'Healthy',
+              'Cache Layer': 'Optimal',
+              'API Gateway': 'Active',
+              'CDN': 'Protected',
+              'Monitoring': 'Active'
+            },
+            position: { x: 8, y: 4, w: 4, h: 2 }
+          }
+        ]
+        
+        setDashboards(() => demoWidgets)
+        addMessage(consoleId, 'success', `Chart demo generated with ${demoWidgets.length} visualizations`)
+        toast.success('Demo Dashboard Created!', { 
+          description: 'Showcasing Line, Bar, Pie, Area, Radar, and Gauge charts' 
+        })
+      }, 1000)
       return
     }
 
@@ -97,46 +275,150 @@ function App() {
       addMessage(consoleId, 'info', `Generating ${type} dashboard...`)
       
       setTimeout(() => {
+        const generateLineData = () => 
+          Array.from({ length: 12 }, (_, i) => ({
+            x: i,
+            y: Math.floor(Math.random() * 80 + 20)
+          }))
+
+        const generateBarData = () => [
+          { label: 'Mon', value: Math.floor(Math.random() * 100 + 50) },
+          { label: 'Tue', value: Math.floor(Math.random() * 100 + 50) },
+          { label: 'Wed', value: Math.floor(Math.random() * 100 + 50) },
+          { label: 'Thu', value: Math.floor(Math.random() * 100 + 50) },
+          { label: 'Fri', value: Math.floor(Math.random() * 100 + 50) }
+        ]
+
+        const generatePieData = () => [
+          { label: 'Desktop', value: Math.floor(Math.random() * 50 + 30), color: 'oklch(0.85 0.18 90)' },
+          { label: 'Mobile', value: Math.floor(Math.random() * 50 + 30), color: 'oklch(0.75 0.15 85)' },
+          { label: 'Tablet', value: Math.floor(Math.random() * 30 + 10), color: 'oklch(0.35 0.15 300)' },
+          { label: 'Other', value: Math.floor(Math.random() * 20 + 5), color: 'oklch(0.65 0.20 180)' }
+        ]
+
+        const generateAreaData = () => [
+          {
+            name: 'Revenue',
+            data: Array.from({ length: 10 }, (_, i) => ({ x: i, y: Math.floor(Math.random() * 60 + 40) })),
+            color: 'oklch(0.85 0.18 90)'
+          },
+          {
+            name: 'Costs',
+            data: Array.from({ length: 10 }, (_, i) => ({ x: i, y: Math.floor(Math.random() * 40 + 20) })),
+            color: 'oklch(0.55 0.22 25)'
+          }
+        ]
+
+        const generateRadarData = () => [
+          { axis: 'Speed', value: Math.floor(Math.random() * 50 + 50) },
+          { axis: 'Quality', value: Math.floor(Math.random() * 50 + 50) },
+          { axis: 'Security', value: Math.floor(Math.random() * 50 + 50) },
+          { axis: 'UX', value: Math.floor(Math.random() * 50 + 50) },
+          { axis: 'Performance', value: Math.floor(Math.random() * 50 + 50) }
+        ]
+
         const newWidgets: DashboardWidget[] = [
           {
             id: `widget-${Date.now()}-1`,
-            type: 'metric',
-            title: `${type.toUpperCase()} Overview`,
-            data: {
-              'Total Users': Math.floor(Math.random() * 10000 + 5000),
-              'Active Sessions': Math.floor(Math.random() * 1000 + 500),
-              'Conversion Rate': `${(Math.random() * 5 + 2).toFixed(2)}%`
-            },
-            position: { x: 0, y: 0, w: 4, h: 2 }
+            type: 'line',
+            title: `${type.toUpperCase()} Trend`,
+            data: generateLineData(),
+            position: { x: 0, y: 0, w: 4, h: 2 },
+            chartConfig: { 
+              color: 'oklch(0.85 0.18 90)', 
+              showGrid: true, 
+              animate: true 
+            }
           },
           {
             id: `widget-${Date.now()}-2`,
-            type: 'chart',
-            title: 'Performance Metrics',
-            data: {
-              'Response Time': `${Math.floor(Math.random() * 100 + 50)}ms`,
-              'Throughput': `${Math.floor(Math.random() * 500 + 200)}req/s`,
-              'Error Rate': `${(Math.random() * 1).toFixed(2)}%`
-            },
-            position: { x: 4, y: 0, w: 4, h: 2 }
+            type: 'bar',
+            title: 'Weekly Performance',
+            data: generateBarData(),
+            position: { x: 4, y: 0, w: 4, h: 2 },
+            chartConfig: { 
+              color: 'oklch(0.75 0.15 85)', 
+              animate: true 
+            }
           },
           {
             id: `widget-${Date.now()}-3`,
+            type: 'pie',
+            title: 'Traffic Distribution',
+            data: generatePieData(),
+            position: { x: 8, y: 0, w: 4, h: 2 },
+            chartConfig: { 
+              innerRadius: 60, 
+              animate: true, 
+              showLabels: true 
+            }
+          },
+          {
+            id: `widget-${Date.now()}-4`,
+            type: 'gauge',
+            title: 'System Performance',
+            data: { 
+              value: Math.floor(Math.random() * 40 + 60), 
+              label: 'EFFICIENCY',
+              unit: '%'
+            },
+            position: { x: 0, y: 2, w: 4, h: 2 },
+            chartConfig: { 
+              animate: true 
+            }
+          },
+          {
+            id: `widget-${Date.now()}-5`,
+            type: 'area',
+            title: 'Financial Overview',
+            data: generateAreaData(),
+            position: { x: 4, y: 2, w: 4, h: 2 },
+            chartConfig: { 
+              showGrid: true, 
+              animate: true 
+            }
+          },
+          {
+            id: `widget-${Date.now()}-6`,
+            type: 'radar',
+            title: 'Quality Metrics',
+            data: generateRadarData(),
+            position: { x: 8, y: 2, w: 4, h: 2 },
+            chartConfig: { 
+              color: 'oklch(0.35 0.15 300)', 
+              animate: true 
+            }
+          },
+          {
+            id: `widget-${Date.now()}-7`,
+            type: 'metric',
+            title: 'Key Metrics',
+            data: {
+              'Total Users': Math.floor(Math.random() * 10000 + 5000),
+              'Active Sessions': Math.floor(Math.random() * 1000 + 500),
+              'Conversion Rate': `${(Math.random() * 5 + 2).toFixed(2)}%`,
+              'Revenue': `$${Math.floor(Math.random() * 50000 + 25000).toLocaleString()}`
+            },
+            position: { x: 0, y: 4, w: 4, h: 2 }
+          },
+          {
+            id: `widget-${Date.now()}-8`,
             type: 'status',
             title: 'System Health',
             data: {
               'Database': 'Healthy',
               'API Gateway': 'Operational',
               'Cache': 'Optimal',
-              'CDN': 'Active'
+              'CDN': 'Active',
+              'Security': 'Protected'
             },
-            position: { x: 0, y: 2, w: 4, h: 2 }
+            position: { x: 4, y: 4, w: 4, h: 2 }
           }
         ]
         
-        setDashboards((current) => [...newWidgets, ...(current || [])].slice(0, 12))
+        setDashboards((current) => [...newWidgets, ...(current || [])].slice(0, 24))
         addMessage(consoleId, 'success', `Dashboard generated successfully with ${newWidgets.length} widgets`)
-        toast.success('Dashboard generated!', { description: `${newWidgets.length} widgets created` })
+        toast.success('Dashboard generated!', { description: `${newWidgets.length} advanced visualizations created` })
       }, 1500)
       return
     }

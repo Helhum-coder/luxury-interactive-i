@@ -29,7 +29,7 @@ export default function MarketingEngine({ onStrategyGenerated }: MarketingEngine
     setIsGenerating(true)
 
     try {
-      const prompt = window.spark.llmPrompt`You are an expert marketing strategist. Create a comprehensive advertising and marketing strategy for the following project:
+      const promptText = `You are an expert marketing strategist. Create a comprehensive advertising and marketing strategy for the following project:
 
 Project Name: ${projectName}
 Target Audience: ${targetAudience}
@@ -62,7 +62,7 @@ Format:
   }
 }`
 
-      const result = await window.spark.llm(prompt, 'gpt-4o', true)
+      const result = await window.spark.llm(promptText, 'gpt-4o', true)
       const parsed = JSON.parse(result)
       
       const strategy: MarketingStrategy = {
