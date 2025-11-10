@@ -3,6 +3,7 @@ import { useKV } from '@github/spark/hooks'
 import Console from '@/components/Console'
 import DashboardDisplay from '@/components/DashboardDisplay'
 import MarketingEngine from '@/components/MarketingEngine'
+import GitIntegrationManager from '@/components/GitIntegrationManager'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -14,7 +15,8 @@ import {
   Sparkle, 
   Cpu,
   Lightning,
-  CirclesFour
+  CirclesFour,
+  GitBranch
 } from '@phosphor-icons/react'
 import { ConsoleType, ConsoleMessage, DashboardWidget, MarketingStrategy } from '@/lib/types'
 import { toast } from 'sonner'
@@ -594,6 +596,13 @@ function App() {
                 <Sparkle size={18} weight="fill" className="mr-2" />
                 AI MARKETING
               </TabsTrigger>
+              <TabsTrigger 
+                value="git"
+                className="font-orbitron tracking-wide data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
+                <GitBranch size={18} weight="fill" className="mr-2" />
+                GIT INTEGRATION
+              </TabsTrigger>
             </TabsList>
           </div>
 
@@ -627,6 +636,12 @@ function App() {
           <TabsContent value="marketing" className="flex-1 m-0 overflow-hidden">
             <Card className="h-full border-2 border-border/50 console-glow rounded-none bg-card/50">
               <MarketingEngine onStrategyGenerated={handleStrategyGenerated} />
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="git" className="flex-1 m-0 overflow-hidden">
+            <Card className="h-full border-2 border-border/50 console-glow rounded-none bg-card/50">
+              <GitIntegrationManager />
             </Card>
           </TabsContent>
         </Tabs>

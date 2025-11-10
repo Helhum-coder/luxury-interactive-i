@@ -1,16 +1,56 @@
-# 🌟 LUXE IDE - Premium Command Center
+# 🌟 LUXE IDE - Premium Command Center + Git Integration
 
-A luxury-grade, interactive development environment featuring 5 interconnected console systems, distributed dashboard generation with D3 visualizations, and an AI-powered marketing strategy engine.
+A luxury-grade, interactive development environment featuring 5 interconnected console systems, distributed dashboard generation with D3 visualizations, an AI-powered marketing strategy engine, and a comprehensive Git integration manager for hybrid repository systems.
 
 ## ✨ Features
 
 - **5 Interactive Consoles**: System, Development, Analytics, Marketing, and Control
+- **Git Integration Manager**: Visual tool for managing hybrid repository systems with live conflict resolution
 - **Dynamic Dashboard Generation**: Create beautiful D3-based visualizations with simple commands
 - **AI Marketing Engine**: Generate comprehensive advertising strategies with expert-level insights
 - **Real-time Data Visualization**: Line, Bar, Pie, Area, Radar, Gauge charts and more
 - **Persistent Storage**: All data saved using Spark's KV storage
 - **Luxury Design**: Premium UI with sophisticated animations and high-end aesthetics
 - **Built-in Functionality**: Complete IDE features with cross-platform compatibility
+
+## 🔀 Git Integration Manager
+
+### What Problem Does It Solve?
+
+Your repository has evolved into a **"living system"** - a hybrid architecture where multiple git branches serve as active deployment endpoints for different production services. This is more complex than traditional git repositories, and the Git Integration Manager helps you:
+
+- **Visualize your hybrid system** - See how master/main branches serve different purposes
+- **Detect conflicts** - Automatically find merge conflicts, deployment issues, and workflow problems
+- **Resolve issues** - Get specific resolution strategies with one-click fixes
+- **Monitor integrations** - Track Firebase, GitHub Actions, live servers, and VS Code status
+- **Execute commands** - Run git operations through a visual interface
+- **Document architecture** - Help others understand your sophisticated setup
+
+### Your System Architecture
+
+```
+master branch  →  Live Server + Firebase Hosting (Production)
+main branch    →  GitHub Actions + Workflows + Firebase Functions (Automation)
+```
+
+**Both branches are production branches.** They collaborate, not compete.
+
+### Quick Access
+
+1. Open LUXE IDE
+2. Click **"GIT INTEGRATION"** tab
+3. Explore:
+   - **Overview**: System architecture and quick actions
+   - **Branches**: View branch purposes and integrations
+   - **Conflicts**: Detect and resolve issues
+   - **Integrations**: Monitor Firebase, GitHub Actions, etc.
+   - **Commands**: Execute git operations visually
+
+### Documentation
+
+- **📖 [Quick Start Guide](./GIT_QUICKSTART.md)** - Get started in 2 minutes
+- **📘 [Integration Guide](./GIT_INTEGRATION_GUIDE.md)** - Complete conflict resolution strategies
+- **📚 [System Architecture](./SYSTEM_ARCHITECTURE.md)** - Understand your hybrid system
 
 ## 🚀 Quick Start (Local Development)
 
@@ -98,6 +138,16 @@ Use the AI Marketing tab to:
 4. Get multi-channel campaigns
 5. Receive trend analysis and recommendations
 
+### Git Integration
+
+Use the Git Integration tab to:
+1. Visualize your hybrid repository architecture
+2. Detect merge conflicts and deployment issues
+3. Get specific resolution strategies
+4. Monitor live integrations (Firebase, GitHub Actions)
+5. Execute git commands through visual interface
+6. Understand and explain your system to others
+
 ## 🛠️ Tech Stack
 
 - **Frontend**: React 19 + TypeScript
@@ -120,12 +170,16 @@ spark-template/
 │   │   ├── Console.tsx         # Console component
 │   │   ├── DashboardDisplay.tsx # Dashboard renderer
 │   │   ├── MarketingEngine.tsx # AI marketing generator
+│   │   ├── GitIntegrationManager.tsx # Git conflict resolver
 │   │   ├── WidgetCard.tsx      # Individual dashboard widgets
 │   │   └── widgets/            # Chart components (D3)
 │   ├── lib/
 │   │   ├── types.ts            # TypeScript definitions
 │   │   └── utils.ts            # Utility functions
 │   └── index.css               # Theme and styles
+├── GIT_QUICKSTART.md           # Git integration quick start
+├── GIT_INTEGRATION_GUIDE.md    # Complete git conflict guide
+├── SYSTEM_ARCHITECTURE.md      # Hybrid system documentation
 ├── FIREBASE_QUICKSTART.md      # Quick deployment guide
 ├── FIREBASE_INTEGRATION_GUIDE.md # Detailed Firebase setup
 ├── DEPLOYMENT_CHECKLIST.md     # Comprehensive checklist
@@ -210,6 +264,9 @@ npm run build
 
 ## 📖 Documentation
 
+- [Git Quick Start](./GIT_QUICKSTART.md) - Understand your hybrid system in 2 minutes
+- [Git Integration Guide](./GIT_INTEGRATION_GUIDE.md) - Complete conflict resolution
+- [System Architecture](./SYSTEM_ARCHITECTURE.md) - Deep dive into your setup
 - [Product Requirements Document](./PRD.md) - Complete feature specifications
 - [Firebase Quick Start](./FIREBASE_QUICKSTART.md) - Get deployed in minutes
 - [Integration Guide](./FIREBASE_INTEGRATION_GUIDE.md) - Deep dive into Firebase

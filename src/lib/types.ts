@@ -2,7 +2,7 @@ export type ConsoleType = 'system' | 'development' | 'analytics' | 'marketing' |
 
 export interface ConsoleMessage {
   id: string
-  type: 'input' | 'output' | 'error' | 'success' | 'info'
+  type: 'input' | 'output' | 'error' | 'success' | 'info' | 'warning'
   content: string
   timestamp: number
   consoleId: ConsoleType
@@ -14,38 +14,7 @@ export interface DashboardWidget {
   title: string
   data: any
   position: { x: number; y: number; w: number; h: number }
-  chartConfig?: {
-    color?: string
-    animate?: boolean
-    showGrid?: boolean
-    horizontal?: boolean
-    innerRadius?: number
-    showLabels?: boolean
-    stacked?: boolean
-    levels?: number
-    min?: number
-    max?: number
-    unit?: string
-  }
-}
-
-export interface Dashboard {
-  id: string
-  name: string
-  widgets: DashboardWidget[]
-  createdAt: number
-}
-
-export interface MarketingStrategy {
-  id: string
-  projectName: string
-  targetAudience: string
-  channels: string[]
-  campaigns: Campaign[]
-  budget: number
-  timeline: string
-  kpis: string[]
-  generatedAt: number
+  chartConfig?: any
 }
 
 export interface Campaign {
@@ -57,9 +26,43 @@ export interface Campaign {
   expectedROI: string
 }
 
-export interface SystemStatus {
-  cpu: number
-  memory: number
-  network: number
-  status: 'online' | 'warning' | 'error'
+export interface MarketingStrategy {
+  id: string
+  projectName: string
+  targetAudience: string
+  channels: string[]
+  campaigns: Campaign[]
+  budgetAllocation: string
+  timeline: string
+  kpis: string[]
+  timestamp: number
+}
+
+export interface GitBranch {
+  name: string
+  type: 'master' | 'main' | 'feature' | 'other'
+  purpose: string
+  integrations: string[]
+  status: 'active' | 'synced' | 'conflict' | 'ahead' | 'behind'
+  lastCommit?: string
+  deploymentTarget?: string
+}
+
+export interface GitConflict {
+  id: string
+  type: 'merge' | 'rebase' | 'deployment' | 'workflow'
+  branches: string[]
+  files: string[]
+  description: string
+  severity: 'low' | 'medium' | 'high' | 'critical'
+  resolutionStrategy: string[]
+}
+
+export interface IntegrationStatus {
+  name: string
+  type: 'firebase' | 'github' | 'live-server' | 'workflow' | 'vscode'
+  status: 'operational' | 'warning' | 'error' | 'unknown'
+  branch: string
+  url?: string
+  lastSync?: number
 }

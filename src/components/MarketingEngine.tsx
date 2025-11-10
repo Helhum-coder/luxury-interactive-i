@@ -78,10 +78,10 @@ Format:
           tactics: c.tactics || [],
           expectedROI: c.expectedROI
         })),
-        budget: 50000,
+        budgetAllocation: parsed.strategy.budgetAllocation || '$50,000 total budget',
         timeline: parsed.strategy.timeline || '3-6 months',
         kpis: parsed.strategy.kpis || [],
-        generatedAt: Date.now()
+        timestamp: Date.now()
       }
 
       setCurrentStrategy(strategy)

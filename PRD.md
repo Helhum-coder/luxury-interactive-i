@@ -1,6 +1,6 @@
 # Planning Guide
 
-A luxury-grade, interactive development environment that serves as a sophisticated command center, featuring 5 interconnected console systems, distributed dashboard generation, and an AI-powered advertising strategy engine that creates masterful marketing campaigns with precision and distinction.
+A luxury-grade, interactive development environment that serves as a sophisticated command center, featuring 5 interconnected console systems, distributed dashboard generation, an AI-powered advertising strategy engine, and a comprehensive Git integration manager for hybrid repository systems with live conflict resolution.
 
 **Experience Qualities**: 
 1. **Opulent Sophistication** - Every interaction should evoke the feeling of handling premium, high-end technology with refined aesthetics and smooth transitions
@@ -46,6 +46,13 @@ This IDE represents a sophisticated ecosystem where multiple consoles work in ha
 - **Trigger**: Present from initial load throughout all interactions
 - **Progression**: Continuous environmental experience → subtle animations respond to user actions → elegant transitions between states → satisfying feedback on interactions → ambient details enhance immersion
 - **Success criteria**: Every interaction feels premium, animations are fluid and purposeful, and the overall experience conveys luxury and sophistication
+
+### Git Integration & Conflict Resolution Manager
+- **Functionality**: Comprehensive tool for managing hybrid git repository systems with multiple active branches (master/main), detecting and resolving conflicts, monitoring live integrations (Firebase, GitHub Actions, live servers), and executing git operations through an intuitive interface
+- **Purpose**: Helps developers understand, manage, and resolve conflicts in "living" repository systems where git branches serve as active deployment endpoints, solving the problem where traditional git models don't apply
+- **Trigger**: User accesses Git Integration tab, or system detects branch/deployment conflicts
+- **Progression**: User views system architecture → identifies branch purposes and integration points → detects conflicts → reviews resolution strategies → applies fixes → syncs branches → monitors deployment status → documents changes
+- **Success criteria**: Users can visualize their hybrid system, understand why it's complex, detect and resolve conflicts with confidence, sync branches safely, and explain the architecture to others
 
 ## Edge Case Handling
 - **Console Conflicts**: If multiple consoles attempt conflicting operations, priority system resolves with visual feedback
