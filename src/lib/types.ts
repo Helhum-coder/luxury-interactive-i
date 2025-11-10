@@ -43,9 +43,12 @@ export interface GitBranch {
   type: 'master' | 'main' | 'feature' | 'other'
   purpose: string
   integrations: string[]
-  status: 'active' | 'synced' | 'conflict' | 'ahead' | 'behind'
+  status: 'active' | 'synced' | 'conflict' | 'ahead' | 'behind' | 'syncing'
   lastCommit?: string
   deploymentTarget?: string
+  commitsAhead?: number
+  commitsBehind?: number
+  lastSyncTime?: number
 }
 
 export interface GitConflict {
@@ -61,8 +64,20 @@ export interface GitConflict {
 export interface IntegrationStatus {
   name: string
   type: 'firebase' | 'github' | 'live-server' | 'workflow' | 'vscode'
-  status: 'operational' | 'warning' | 'error' | 'unknown'
+  status: 'operational' | 'warning' | 'error' | 'unknown' | 'syncing'
   branch: string
   url?: string
   lastSync?: number
+  syncFrequency?: number
+  autoSync?: boolean
+}
+
+export interface SyncEvent {
+  id: string
+  timestamp: number
+  type: 'sync' | 'push' | 'pull' | 'merge' | 'conflict-detected' | 'conflict-resolved'
+  branch: string
+  status: 'started' | 'in-progress' | 'success' | 'failed'
+  message: string
+  details?: any
 }
