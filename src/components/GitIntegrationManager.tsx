@@ -24,16 +24,22 @@ import {
   Sparkle,
   Clock,
   Activity,
-  Broadcast
+  Broadcast,
+  GithubLogo
 } from '@phosphor-icons/react'
 import { GitBranch as GitBranchType, GitConflict, IntegrationStatus, SyncEvent } from '@/lib/types'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
+import GitHubAuth from './GitHubAuth'
+import RepositoryViewer from './RepositoryViewer'
+import { githubAPI } from '@/lib/github-api'
 
 export default function GitIntegrationManager() {
   const [autoSync, setAutoSync] = useKV<boolean>('git-auto-sync', false)
   const [syncInterval, setSyncInterval] = useKV<number>('git-sync-interval', 30000)
   const [isLiveSyncing, setIsLiveSyncing] = useState(false)
+  const [githubToken, setGithubToken] = useKV<string | null>('github-access-token', null)
+  const [isGitHubAuthenticated, setIsGitHubAuthenticated] = useState(false)
   
   const [branches, setBranches] = useKV<GitBranchType[]>('git-branches', [
     {
@@ -107,6 +113,29 @@ export default function GitIntegrationManager() {
   const [syncEvents, setSyncEvents] = useKV<SyncEvent[]>('sync-events', [])
   const [commandInput, setCommandInput] = useState('')
   const [commandHistory, setCommandHistory] = useKV<string[]>('command-history', [])
+
+  useEffect(() => {
+    if (githubToken) {
+      githubAPI.setAccessToken(githubToken)
+      setIsGitHubAuthenticated(true)
+    }
+  }, [githubToken])
+
+  const handleGitHubAuthenticated = (token: string) => {
+    setGithubToken(() => token)
+    githubAPI.setAccessToken(token)
+    setIsGitHubAuthenticated(true)
+    toast.success('GitHub connected!', {
+      description: 'You can now access real repository data'
+    })
+  }
+
+  const handleGitHubLogout = () => {
+    setGithubToken(() => null)
+    githubAPI.clearAccessToken()
+    setIsGitHubAuthenticated(false)
+    toast.info('Disconnected from GitHub')
+  }
 
   const addSyncEvent = useCallback((
     type: SyncEvent['type'],
@@ -541,6 +570,15 @@ export default function GitIntegrationManager() {
             <Database size={16} weight="fill" className="mr-2" />
             Overview
           </TabsTrigger>
+          <TabsTrigger value="github" className="font-orbitron">
+            <GithubLogo size={16} weight="fill" className="mr-2" />
+            GitHub OAuth
+            {isGitHubAuthenticated && (
+              <Badge className="ml-2 bg-accent/20 text-accent text-[10px] h-4 px-1">
+                CONNECTED
+              </Badge>
+            )}
+          </TabsTrigger>
           <TabsTrigger value="live-sync" className="font-orbitron">
             <Broadcast size={16} weight="fill" className="mr-2" />
             Live Sync
@@ -665,6 +703,53 @@ export default function GitIntegrationManager() {
                 </Button>
               </div>
             </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="github" className="flex-1 mt-4 overflow-auto">
+          <div className="space-y-4">
+            <GitHubAuth
+              onAuthenticated={handleGitHubAuthenticated}
+              isAuthenticated={isGitHubAuthenticated}
+              onLogout={handleGitHubLogout}
+            />
+
+            {isGitHubAuthenticated && githubToken && (
+              <RepositoryViewer accessToken={githubToken} />
+            )}
+
+            {!isGitHubAuthenticated && (
+              <Card className="p-12 border-2 border-border/50 bg-card/50 text-center">
+                <GithubLogo size={64} weight="fill" className="text-muted-foreground mx-auto mb-4" />
+                <h3 className="font-orbitron font-bold text-xl mb-2">GitHub Integration</h3>
+                <p className="text-muted-foreground max-w-md mx-auto mb-6">
+                  Connect to GitHub to fetch real repository data, view branches, commits, and synchronize with live repositories.
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto text-left">
+                  <div className="p-4 bg-muted/20 border border-border/30 rounded-lg">
+                    <GitBranch size={24} weight="fill" className="text-accent mb-2" />
+                    <h4 className="font-orbitron font-semibold text-sm mb-1">Real Branches</h4>
+                    <p className="text-xs text-muted-foreground">
+                      View all branches from your repositories with protection status
+                    </p>
+                  </div>
+                  <div className="p-4 bg-muted/20 border border-border/30 rounded-lg">
+                    <GitCommit size={24} weight="fill" className="text-accent mb-2" />
+                    <h4 className="font-orbitron font-semibold text-sm mb-1">Commit History</h4>
+                    <p className="text-xs text-muted-foreground">
+                      Access complete commit logs with author details and timestamps
+                    </p>
+                  </div>
+                  <div className="p-4 bg-muted/20 border border-border/30 rounded-lg">
+                    <ArrowsClockwise size={24} weight="fill" className="text-accent mb-2" />
+                    <h4 className="font-orbitron font-semibold text-sm mb-1">Live Sync</h4>
+                    <p className="text-xs text-muted-foreground">
+                      Keep your local view synchronized with remote repositories
+                    </p>
+                  </div>
+                </div>
+              </Card>
+            )}
           </div>
         </TabsContent>
 

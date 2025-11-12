@@ -48,11 +48,11 @@ This IDE represents a sophisticated ecosystem where multiple consoles work in ha
 - **Success criteria**: Every interaction feels premium, animations are fluid and purposeful, and the overall experience conveys luxury and sophistication
 
 ### Git Integration & Conflict Resolution Manager
-- **Functionality**: Comprehensive tool for managing hybrid git repository systems with multiple active branches (master/main), detecting and resolving conflicts, monitoring live integrations (Firebase, GitHub Actions, live servers), and executing git operations through an intuitive interface
-- **Purpose**: Helps developers understand, manage, and resolve conflicts in "living" repository systems where git branches serve as active deployment endpoints, solving the problem where traditional git models don't apply
-- **Trigger**: User accesses Git Integration tab, or system detects branch/deployment conflicts
-- **Progression**: User views system architecture → identifies branch purposes and integration points → detects conflicts → reviews resolution strategies → applies fixes → syncs branches → monitors deployment status → documents changes
-- **Success criteria**: Users can visualize their hybrid system, understand why it's complex, detect and resolve conflicts with confidence, sync branches safely, and explain the architecture to others
+- **Functionality**: Comprehensive tool for managing hybrid git repository systems with multiple active branches (master/main), detecting and resolving conflicts, monitoring live integrations (Firebase, GitHub Actions, live servers), executing git operations, and **connecting to real GitHub repositories via OAuth to fetch actual branch data, commit history, and repository information**
+- **Purpose**: Helps developers understand, manage, and resolve conflicts in "living" repository systems where git branches serve as active deployment endpoints, solving the problem where traditional git models don't apply, while providing **real-time access to GitHub repository data**
+- **Trigger**: User accesses Git Integration tab, or system detects branch/deployment conflicts, **or user connects their GitHub account to access real repository data**
+- **Progression**: **User authenticates with GitHub OAuth → views their actual repositories → selects a repository** → views system architecture → identifies branch purposes and integration points → **examines real commit history** → detects conflicts → reviews resolution strategies → applies fixes → syncs branches → monitors deployment status → documents changes
+- **Success criteria**: Users can visualize their hybrid system, understand why it's complex, detect and resolve conflicts with confidence, sync branches safely, explain the architecture to others, **and seamlessly access real GitHub repository data including branches, commits, and repository metadata**
 
 ## Edge Case Handling
 - **Console Conflicts**: If multiple consoles attempt conflicting operations, priority system resolves with visual feedback
