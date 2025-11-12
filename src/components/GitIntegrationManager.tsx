@@ -25,6 +25,8 @@ import {
   Clock,
   Activity,
   Broadcast,
+  Bell,
+  BellRinging,
   GithubLogo
 } from '@phosphor-icons/react'
 import { GitBranch as GitBranchType, GitConflict, IntegrationStatus, SyncEvent } from '@/lib/types'
@@ -32,6 +34,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
 import GitHubAuth from './GitHubAuth'
 import RepositoryViewer from './RepositoryViewer'
+import WebhookManager from './WebhookManager'
 import { githubAPI } from '@/lib/github-api'
 
 export default function GitIntegrationManager() {
@@ -40,6 +43,7 @@ export default function GitIntegrationManager() {
   const [isLiveSyncing, setIsLiveSyncing] = useState(false)
   const [githubToken, setGithubToken] = useKV<string | null>('github-access-token', null)
   const [isGitHubAuthenticated, setIsGitHubAuthenticated] = useState(false)
+  const [webhookMonitoring, setWebhookMonitoring] = useKV<boolean>('webhook-monitoring', false)
   
   const [branches, setBranches] = useKV<GitBranchType[]>('git-branches', [
     {
@@ -570,6 +574,10 @@ export default function GitIntegrationManager() {
             <Database size={16} weight="fill" className="mr-2" />
             Overview
           </TabsTrigger>
+          <TabsTrigger value="webhooks" className="font-orbitron">
+            <Broadcast size={16} weight="fill" className="mr-2" />
+            Webhooks
+          </TabsTrigger>
           <TabsTrigger value="github" className="font-orbitron">
             <GithubLogo size={16} weight="fill" className="mr-2" />
             GitHub OAuth
@@ -580,7 +588,7 @@ export default function GitIntegrationManager() {
             )}
           </TabsTrigger>
           <TabsTrigger value="live-sync" className="font-orbitron">
-            <Broadcast size={16} weight="fill" className="mr-2" />
+            <Activity size={16} weight="fill" className="mr-2" />
             Live Sync
             {isLiveSyncing && (
               <Badge className="ml-2 bg-accent/20 text-accent text-[10px] h-4 px-1">
@@ -622,6 +630,22 @@ export default function GitIntegrationManager() {
                     Your repository is a living, distributed deployment system with multiple active integration points.
                   </p>
                 </div>
+
+                {webhookMonitoring && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-4 bg-accent/10 border border-accent/30 rounded-lg"
+                  >
+                    <div className="flex items-center gap-3 mb-2">
+                      <BellRinging size={24} weight="fill" className="text-accent" />
+                      <span className="font-orbitron font-bold text-accent">WEBHOOK MONITORING ACTIVE</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Real-time repository events are being monitored. Auto-sync will trigger on configured events.
+                    </p>
+                  </motion.div>
+                )}
 
                 <div className="space-y-2">
                   {branches?.map((branch) => (
@@ -693,17 +717,34 @@ export default function GitIntegrationManager() {
                 <p className="text-xs text-muted-foreground mb-3">
                   This is NOT a standard git repository. It's a hybrid deployment system where both master and main branches serve live infrastructure.
                 </p>
-                <Button
-                  onClick={() => window.open('/GIT_INTEGRATION_GUIDE.md', '_blank')}
-                  variant="outline"
-                  className="w-full text-xs border-accent/50 hover:bg-accent/20"
-                >
-                  <FileCode size={16} weight="fill" className="mr-2" />
-                  Read Full Integration Guide
-                </Button>
+                <div className="space-y-2">
+                  <Button
+                    onClick={() => window.open('/GIT_INTEGRATION_GUIDE.md', '_blank')}
+                    variant="outline"
+                    className="w-full text-xs border-accent/50 hover:bg-accent/20"
+                  >
+                    <FileCode size={16} weight="fill" className="mr-2" />
+                    Read Git Integration Guide
+                  </Button>
+                  <Button
+                    onClick={() => window.open('/WEBHOOK_INTEGRATION_GUIDE.md', '_blank')}
+                    variant="outline"
+                    className="w-full text-xs border-primary/50 hover:bg-primary/20"
+                  >
+                    <Bell size={16} weight="fill" className="mr-2" />
+                    Webhook Integration Guide
+                  </Button>
+                </div>
               </div>
             </Card>
           </div>
+        </TabsContent>
+
+        <TabsContent value="webhooks" className="flex-1 mt-4 overflow-hidden">
+          <WebhookManager 
+            onTriggerSync={performBranchSync}
+            branches={branches || []}
+          />
         </TabsContent>
 
         <TabsContent value="github" className="flex-1 mt-4 overflow-auto">

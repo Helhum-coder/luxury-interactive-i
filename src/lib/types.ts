@@ -133,3 +133,36 @@ export interface GitHubUser {
   bio: string | null
   public_repos: number
 }
+
+export interface WebhookEvent {
+  id: string
+  timestamp: number
+  event_type: 'push' | 'pull_request' | 'create' | 'delete' | 'release' | 'issues' | 'workflow_run' | 'deployment'
+  repository: string
+  branch: string
+  actor: string
+  payload: any
+  processed: boolean
+  auto_synced: boolean
+}
+
+export interface WebhookConfig {
+  id: string
+  repository: string
+  events: string[]
+  active: boolean
+  auto_sync: boolean
+  created_at: number
+  last_delivery?: number
+  delivery_count: number
+}
+
+export interface WebhookDelivery {
+  id: string
+  webhook_id: string
+  timestamp: number
+  event_type: string
+  status: 'success' | 'failed' | 'pending'
+  response_time_ms: number
+  payload_size: number
+}
