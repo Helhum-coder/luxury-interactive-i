@@ -6,6 +6,7 @@ import MarketingEngine from '@/components/MarketingEngine'
 import GitIntegrationManager from '@/components/GitIntegrationManager'
 import NotificationCenter from '@/components/NotificationCenter'
 import VersionDetector from '@/components/VersionDetector'
+import VersionHistoryTimeline from '@/components/VersionHistoryTimeline'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -21,7 +22,8 @@ import {
   CirclesFour,
   GitBranch,
   Bell,
-  Package
+  Package,
+  ClockCounterClockwise
 } from '@phosphor-icons/react'
 import { ConsoleType, ConsoleMessage, DashboardWidget, MarketingStrategy } from '@/lib/types'
 import { detectLocalVersion } from '@/lib/version-detector'
@@ -674,6 +676,13 @@ function App() {
                 <Package size={18} weight="fill" className="mr-2" />
                 VERSIONS
               </TabsTrigger>
+              <TabsTrigger 
+                value="history"
+                className="font-orbitron tracking-wide data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
+                <ClockCounterClockwise size={18} weight="fill" className="mr-2" />
+                VERSION HISTORY
+              </TabsTrigger>
             </TabsList>
           </div>
 
@@ -723,6 +732,12 @@ function App() {
           <TabsContent value="versions" className="flex-1 m-0 overflow-hidden">
             <Card className="h-full border-2 border-border/50 console-glow rounded-none bg-card/50">
               <VersionDetector />
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="history" className="flex-1 m-0 overflow-hidden">
+            <Card className="h-full border-2 border-border/50 console-glow rounded-none bg-card/50">
+              <VersionHistoryTimeline />
             </Card>
           </TabsContent>
         </Tabs>
