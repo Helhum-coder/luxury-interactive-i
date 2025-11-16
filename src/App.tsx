@@ -1,13 +1,15 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useKV } from '@github/spark/hooks'
 import Console from '@/components/Console'
 import DashboardDisplay from '@/components/DashboardDisplay'
 import MarketingEngine from '@/components/MarketingEngine'
 import GitIntegrationManager from '@/components/GitIntegrationManager'
 import NotificationCenter from '@/components/NotificationCenter'
+import VersionDetector from '@/components/VersionDetector'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import { Toaster } from '@/components/ui/sonner'
 import { 
   Terminal, 
@@ -18,14 +20,17 @@ import {
   Lightning,
   CirclesFour,
   GitBranch,
-  Bell
+  Bell,
+  Package
 } from '@phosphor-icons/react'
 import { ConsoleType, ConsoleMessage, DashboardWidget, MarketingStrategy } from '@/lib/types'
+import { detectLocalVersion } from '@/lib/version-detector'
 import { toast } from 'sonner'
 import { motion } from 'framer-motion'
 
 function App() {
   const [activeConsole, setActiveConsole] = useState<ConsoleType>('system')
+  const [appVersion, setAppVersion] = useState<string>('0.0.0')
   const [consoleMessages, setConsoleMessages] = useKV<Record<ConsoleType, ConsoleMessage[]>>(
     'console-messages',
     {
@@ -38,6 +43,18 @@ function App() {
   )
   const [dashboards, setDashboards] = useKV<DashboardWidget[]>('dashboards', [])
   const [strategies, setStrategies] = useKV<MarketingStrategy[]>('marketing-strategies', [])
+
+  useEffect(() => {
+    const loadVersion = async () => {
+      try {
+        const versionInfo = await detectLocalVersion()
+        setAppVersion(versionInfo.appVersion)
+      } catch (error) {
+        console.error('Failed to detect version:', error)
+      }
+    }
+    loadVersion()
+  }, [])
 
   const addMessage = (consoleId: ConsoleType, type: ConsoleMessage['type'], content: string) => {
     const message: ConsoleMessage = {
@@ -73,6 +90,8 @@ function App() {
 - help: Show this help message
 - clear: Clear console
 - status: Show system status
+- version: Show version information
+- detect versions: Detect and show all package versions
 - generate dashboard [type]: Generate a dashboard with D3 visualizations (e.g., analytics, financial, performance)
 - demo charts: Generate a demo dashboard showcasing all chart types
 - analyze [topic]: Analyze data on a topic
@@ -271,6 +290,37 @@ function App() {
       addMessage(consoleId, 'output', `Memory: ${Math.floor(Math.random() * 40 + 30)}%`)
       addMessage(consoleId, 'output', `Network: ${Math.floor(Math.random() * 50 + 50)}Mbps`)
       addMessage(consoleId, 'output', `Active Processes: ${Math.floor(Math.random() * 20 + 10)}`)
+      return
+    }
+
+    if (lowerCommand === 'version' || lowerCommand === 'detect versions') {
+      addMessage(consoleId, 'info', 'Detecting version information...')
+      
+      try {
+        const versionInfo = await detectLocalVersion()
+        addMessage(consoleId, 'success', `Application Version: v${versionInfo.appVersion}`)
+        
+        if (versionInfo.cliVersions.vite) {
+          addMessage(consoleId, 'output', `├─ Vite: v${versionInfo.cliVersions.vite}`)
+        }
+        if (versionInfo.cliVersions.typescript) {
+          addMessage(consoleId, 'output', `├─ TypeScript: v${versionInfo.cliVersions.typescript}`)
+        }
+        if (versionInfo.cliVersions.react) {
+          addMessage(consoleId, 'output', `├─ React: v${versionInfo.cliVersions.react}`)
+        }
+        
+        addMessage(consoleId, 'output', `└─ Total Dependencies: ${versionInfo.dependencies.length}`)
+        addMessage(consoleId, 'success', 'Version detection complete')
+        
+        setAppVersion(versionInfo.appVersion)
+        toast.success('Version detected!', {
+          description: `v${versionInfo.appVersion} with ${versionInfo.dependencies.length} packages`
+        })
+      } catch (error) {
+        addMessage(consoleId, 'error', 'Failed to detect version information')
+        console.error(error)
+      }
       return
     }
 
@@ -545,9 +595,14 @@ function App() {
               <h1 className="font-orbitron font-bold text-3xl tracking-wider text-glow uppercase">
                 LUXE IDE
               </h1>
-              <p className="text-muted-foreground text-sm tracking-wide">
-                Premium Command Center · v2.0
-              </p>
+              <div className="flex items-center gap-2 mt-1">
+                <p className="text-muted-foreground text-sm tracking-wide">
+                  Premium Command Center
+                </p>
+                <Badge variant="outline" className="border-accent/50 text-accent font-mono text-xs">
+                  v{appVersion}
+                </Badge>
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -612,6 +667,13 @@ function App() {
                 <Bell size={18} weight="fill" className="mr-2" />
                 NOTIFICATIONS
               </TabsTrigger>
+              <TabsTrigger 
+                value="versions"
+                className="font-orbitron tracking-wide data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
+                <Package size={18} weight="fill" className="mr-2" />
+                VERSIONS
+              </TabsTrigger>
             </TabsList>
           </div>
 
@@ -656,6 +718,12 @@ function App() {
 
           <TabsContent value="notifications" className="flex-1 p-6 m-0 overflow-hidden">
             <NotificationCenter />
+          </TabsContent>
+
+          <TabsContent value="versions" className="flex-1 m-0 overflow-hidden">
+            <Card className="h-full border-2 border-border/50 console-glow rounded-none bg-card/50">
+              <VersionDetector />
+            </Card>
           </TabsContent>
         </Tabs>
       </div>
