@@ -61,6 +61,13 @@ This IDE represents a sophisticated ecosystem where multiple consoles work in ha
 - **Progression**: User configures webhook for repository → selects event types to monitor → enables auto-sync → webhook event occurs (push, PR, etc.) → system receives and processes event → filters based on configuration → triggers automatic branch sync → updates integration targets → logs sync activity → notifies user of completion
 - **Success criteria**: Webhook events are received and processed in real-time, auto-sync triggers reliably for configured events, sync activity is logged and visible, users can create/manage multiple webhook configurations, and system performance remains optimal under event load
 
+### Advanced Notification Center with Customizable Alerts
+- **Functionality**: Centralized notification hub with intelligent filtering, categorization, priority-based alerts, customizable rules, and multi-channel notification delivery (visual, audio, toast); notifications generated from all system events including webhooks, syncs, deployments, console operations, and marketing engine activities
+- **Purpose**: Provides unified awareness of all system activity with sophisticated filtering to reduce noise and ensure critical information reaches users through appropriate channels based on priority and context
+- **Trigger**: Any system event occurs (webhook event, sync completion, dashboard generation, marketing strategy completion, console command execution, error detection), or user accesses Notifications tab
+- **Progression**: System event occurs → event categorized by type, priority, and source → notification created with metadata → rules engine evaluates notification → applies matching rule actions (sound, toast, highlight, archive) → notification appears in center → user filters/searches notifications → user interacts with actionable notifications → user archives or deletes → analytics track notification patterns
+- **Success criteria**: All system events generate appropriate notifications, filtering is responsive and intuitive, priority levels accurately reflect urgency, notification rules correctly route alerts, sound/toast notifications work reliably, search and archive functions perform well, notification history provides audit trail, and system remains performant with high notification volumes
+
 ## Edge Case Handling
 - **Console Conflicts**: If multiple consoles attempt conflicting operations, priority system resolves with visual feedback
 - **Dashboard Overflow**: When too much data is generated, intelligent summarization and drill-down capabilities are provided

@@ -36,9 +36,10 @@ import { toast } from 'sonner'
 interface WebhookManagerProps {
   onTriggerSync?: (branch: string) => void
   branches?: GitBranchType[]
+  onNotification?: (type: string, title: string, message: string, options?: any) => void
 }
 
-export default function WebhookManager({ onTriggerSync, branches }: WebhookManagerProps) {
+export default function WebhookManager({ onTriggerSync, branches, onNotification }: WebhookManagerProps) {
   const [webhookConfigs, setWebhookConfigs] = useKV<WebhookConfig[]>('webhook-configs', [])
   const [webhookEvents, setWebhookEvents] = useKV<WebhookEvent[]>('webhook-events', [])
   const [webhookDeliveries, setWebhookDeliveries] = useKV<WebhookDelivery[]>('webhook-deliveries', [])
@@ -90,6 +91,15 @@ export default function WebhookManager({ onTriggerSync, branches }: WebhookManag
 
     setWebhookEvents((current) => [event, ...(current || [])].slice(0, 100))
 
+    if (onNotification) {
+      onNotification('webhook', `${type} Event`, `${event.actor} triggered ${type} on ${event.branch}`, {
+        category: 'Webhook',
+        priority: 'medium',
+        source: 'Webhook',
+        metadata: event
+      })
+    }
+
     const delivery: WebhookDelivery = {
       id: `delivery-${Date.now()}`,
       webhook_id: webhookConfigs?.[0]?.id || 'default',
@@ -137,8 +147,29 @@ export default function WebhookManager({ onTriggerSync, branches }: WebhookManag
         onTriggerSync(event.branch)
       }
 
+      if (onNotification) {
+        onNotification('sync', 'Auto-Sync Triggered', `Synchronizing ${event.branch}`, {
+          category: 'Git',
+          priority: 'high',
+          source: 'Webhook',
+          actionable: true,
+          actions: [
+            { label: 'View Branch', type: 'primary', action: 'view-branch' },
+            { label: 'Cancel Sync', type: 'danger', action: 'cancel-sync' }
+          ]
+        })
+      }
+
       toast.success(`Auto-sync triggered for ${event.branch}`, {
         description: `${event.event_type} event from ${event.actor}`
+      })
+    }
+
+    if (onNotification) {
+      onNotification('info', 'Webhook Processed', `${event.event_type} from ${event.repository}`, {
+        category: 'Webhook',
+        priority: 'low',
+        source: 'Webhook'
       })
     }
 
@@ -185,6 +216,14 @@ export default function WebhookManager({ onTriggerSync, branches }: WebhookManag
 
     setWebhookConfigs((current) => [newConfig, ...(current || [])])
     
+    if (onNotification) {
+      onNotification('success', 'Webhook Configured', `Now monitoring ${selectedRepository} for ${selectedEvents.length} event types`, {
+        category: 'System',
+        priority: 'medium',
+        source: 'System'
+      })
+    }
+    
     toast.success('Webhook configured!', {
       description: `Listening to ${selectedEvents.length} event types`
     })
@@ -213,10 +252,24 @@ export default function WebhookManager({ onTriggerSync, branches }: WebhookManag
     setIsMonitoring(() => enabled)
     
     if (enabled) {
+      if (onNotification) {
+        onNotification('success', 'Monitoring Started', 'Real-time webhook monitoring is now active', {
+          category: 'System',
+          priority: 'high',
+          source: 'System'
+        })
+      }
       toast.success('Webhook monitoring started', {
         description: 'Real-time events will trigger automatic syncs'
       })
     } else {
+      if (onNotification) {
+        onNotification('info', 'Monitoring Paused', 'Webhook monitoring has been paused', {
+          category: 'System',
+          priority: 'low',
+          source: 'System'
+        })
+      }
       toast.info('Webhook monitoring paused')
     }
   }

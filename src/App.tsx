@@ -4,6 +4,7 @@ import Console from '@/components/Console'
 import DashboardDisplay from '@/components/DashboardDisplay'
 import MarketingEngine from '@/components/MarketingEngine'
 import GitIntegrationManager from '@/components/GitIntegrationManager'
+import NotificationCenter from '@/components/NotificationCenter'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -16,7 +17,8 @@ import {
   Cpu,
   Lightning,
   CirclesFour,
-  GitBranch
+  GitBranch,
+  Bell
 } from '@phosphor-icons/react'
 import { ConsoleType, ConsoleMessage, DashboardWidget, MarketingStrategy } from '@/lib/types'
 import { toast } from 'sonner'
@@ -603,6 +605,13 @@ function App() {
                 <GitBranch size={18} weight="fill" className="mr-2" />
                 GIT INTEGRATION
               </TabsTrigger>
+              <TabsTrigger 
+                value="notifications"
+                className="font-orbitron tracking-wide data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
+                <Bell size={18} weight="fill" className="mr-2" />
+                NOTIFICATIONS
+              </TabsTrigger>
             </TabsList>
           </div>
 
@@ -643,6 +652,10 @@ function App() {
             <Card className="h-full border-2 border-border/50 console-glow rounded-none bg-card/50">
               <GitIntegrationManager />
             </Card>
+          </TabsContent>
+
+          <TabsContent value="notifications" className="flex-1 p-6 m-0 overflow-hidden">
+            <NotificationCenter />
           </TabsContent>
         </Tabs>
       </div>
