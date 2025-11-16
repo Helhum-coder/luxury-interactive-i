@@ -12,6 +12,7 @@ import BranchTimelineViewer from '@/components/BranchTimelineViewer'
 import PortSecurityManager from '@/components/PortSecurityManager'
 import PublishEnabler from '@/components/PublishEnabler'
 import CICDPipelineManager from '@/components/CICDPipelineManager'
+import ClusterAccessDiagnostic from '@/components/ClusterAccessDiagnostic'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -33,7 +34,8 @@ import {
   FlowArrow,
   ShieldCheck,
   RocketLaunch,
-  CirclesThreePlus
+  CirclesThreePlus,
+  CloudArrowUp
 } from '@phosphor-icons/react'
 import { ConsoleType, ConsoleMessage, DashboardWidget, MarketingStrategy } from '@/lib/types'
 import { detectLocalVersion } from '@/lib/version-detector'
@@ -728,6 +730,13 @@ function App() {
                 <CirclesThreePlus size={18} weight="fill" className="mr-2" />
                 CI/CD PIPELINES
               </TabsTrigger>
+              <TabsTrigger 
+                value="cluster"
+                className="font-orbitron tracking-wide data-[state=active]:bg-destructive data-[state=active]:text-destructive-foreground"
+              >
+                <CloudArrowUp size={18} weight="fill" className="mr-2" />
+                CLUSTER ACCESS
+              </TabsTrigger>
             </TabsList>
           </div>
 
@@ -811,6 +820,12 @@ function App() {
           <TabsContent value="cicd" className="flex-1 m-0 overflow-hidden">
             <Card className="h-full border-2 border-accent/50 console-glow-active rounded-none bg-card/50">
               <CICDPipelineManager />
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="cluster" className="flex-1 m-0 overflow-hidden">
+            <Card className="h-full border-2 border-destructive/50 console-glow-active rounded-none bg-card/50">
+              <ClusterAccessDiagnostic />
             </Card>
           </TabsContent>
         </Tabs>
