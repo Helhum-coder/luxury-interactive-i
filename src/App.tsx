@@ -11,6 +11,7 @@ import CommitComparisonTool from '@/components/CommitComparisonTool'
 import BranchTimelineViewer from '@/components/BranchTimelineViewer'
 import PortSecurityManager from '@/components/PortSecurityManager'
 import PublishEnabler from '@/components/PublishEnabler'
+import CICDPipelineManager from '@/components/CICDPipelineManager'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -31,7 +32,8 @@ import {
   GitDiff,
   FlowArrow,
   ShieldCheck,
-  RocketLaunch
+  RocketLaunch,
+  CirclesThreePlus
 } from '@phosphor-icons/react'
 import { ConsoleType, ConsoleMessage, DashboardWidget, MarketingStrategy } from '@/lib/types'
 import { detectLocalVersion } from '@/lib/version-detector'
@@ -719,6 +721,13 @@ function App() {
                 <RocketLaunch size={18} weight="fill" className="mr-2" />
                 PUBLISH
               </TabsTrigger>
+              <TabsTrigger 
+                value="cicd"
+                className="font-orbitron tracking-wide data-[state=active]:bg-accent data-[state=active]:text-accent-foreground"
+              >
+                <CirclesThreePlus size={18} weight="fill" className="mr-2" />
+                CI/CD PIPELINES
+              </TabsTrigger>
             </TabsList>
           </div>
 
@@ -796,6 +805,12 @@ function App() {
           <TabsContent value="publish" className="flex-1 m-0 overflow-hidden">
             <Card className="h-full border-2 border-accent/50 console-glow-active rounded-none bg-card/50">
               <PublishEnabler />
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="cicd" className="flex-1 m-0 overflow-hidden">
+            <Card className="h-full border-2 border-accent/50 console-glow-active rounded-none bg-card/50">
+              <CICDPipelineManager />
             </Card>
           </TabsContent>
         </Tabs>

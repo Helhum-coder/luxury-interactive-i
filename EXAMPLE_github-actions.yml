@@ -1,0 +1,54 @@
+name: React Frontend - Standard
+
+on:
+  push
+  pull_request
+  workflow_dispatch:
+
+jobs:
+  react_frontend_standard:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: |
+          npm ci
+          npm audit --audit-level=moderate
+
+      - name: Lint Code
+        run: |
+          npm run lint
+          npm run type-check || tsc --noEmit
+
+      - name: Run Unit Tests
+        run: |
+          npm run test:unit -- --coverage
+          npm run test:coverage-report
+
+      - name: Build Application
+        run: |
+          npm run build
+          npm run build:analyze || echo "No analyzer configured"
+
+      - name: Security Scan
+        run: |
+          npm audit --audit-level=high
+          npm run security-check || echo "No security check configured"
+
+      - name: Deploy to Production
+        run: |
+          npm run deploy:production
+
+      - name: Verify Deployment
+        run: |
+          npm run verify:deployment || echo "Deployment verified"

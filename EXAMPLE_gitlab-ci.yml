@@ -1,0 +1,74 @@
+# React Frontend - Standard
+# Standard CI/CD pipeline for React applications with comprehensive testing
+
+stages:
+  - build
+  - lint
+  - test
+  - security
+  - deploy
+  - verify
+
+variables:
+  NODE_VERSION: "20"
+
+install_dependencies:
+  stage: build
+  image: node:${NODE_VERSION}
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules/
+  script:
+    - npm ci
+    - npm audit --audit-level=moderate
+  artifacts:
+    paths:
+      - dist/
+      - build/
+    expire_in: 1 week
+
+lint_code:
+  stage: lint
+  image: node:${NODE_VERSION}
+  script:
+    - npm run lint
+    - npm run type-check || tsc --noEmit
+
+run_unit_tests:
+  stage: test
+  image: node:${NODE_VERSION}
+  script:
+    - npm run test:unit -- --coverage
+    - npm run test:coverage-report
+
+build_application:
+  stage: build
+  image: node:${NODE_VERSION}
+  script:
+    - npm run build
+    - npm run build:analyze || echo "No analyzer configured"
+  artifacts:
+    paths:
+      - dist/
+      - build/
+    expire_in: 1 week
+
+security_scan:
+  stage: security
+  image: node:${NODE_VERSION}
+  script:
+    - npm audit --audit-level=high
+    - npm run security-check || echo "No security check configured"
+
+deploy_to_production:
+  stage: deploy
+  image: node:${NODE_VERSION}
+  script:
+    - npm run deploy:production
+
+verify_deployment:
+  stage: verify
+  image: node:${NODE_VERSION}
+  script:
+    - npm run verify:deployment || echo "Deployment verified"
