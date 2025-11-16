@@ -75,6 +75,13 @@ This IDE represents a sophisticated ecosystem where multiple consoles work in ha
 - **Progression**: User authenticates with GitHub → selects repository → optionally selects specific branch → views timeline visualization → filters by author/time/search → switches between timeline/graph/list views → examines commit details → clicks commit to view on GitHub → analyzes statistics (total commits, authors, branches, activity patterns) → exports or shares findings
 - **Success criteria**: Timeline loads and displays commits efficiently even with large histories, D3 graph renders branch relationships accurately with smooth animations, filtering is instant and intuitive, all three view modes provide distinct value, commit statistics are accurate and meaningful, and the visual design maintains luxury aesthetic with smooth transitions
 
+### Visual Branch Timeline with Merge & Divergence
+- **Functionality**: Sophisticated D3.js-powered visual timeline displaying commits across multiple branches simultaneously, with clear visualization of branch divergence points, merge commits, and branch relationships; includes interactive commit nodes, merge path animations, branch color coding, chronological time axis, commit detail panel, and demo mode for exploration without GitHub connection
+- **Purpose**: Enables developers to understand complex branch structures at a glance, identify merge points and potential conflicts, track when branches diverged from main development lines, and comprehend the overall git history flow with visual clarity
+- **Trigger**: User accesses Branch Timeline tab, or selects "View Timeline" from Git Integration panel
+- **Progression**: User authenticates with GitHub (or uses demo mode) → selects repository → system fetches branches and commit history → D3 renders visual timeline with branches as vertical lanes → commits appear as nodes positioned chronologically → merge lines connect parent commits across branches → user hovers over commits to see details → clicks commit to view full information in side panel → searches/filters commits → adjusts max commits per branch → refreshes data → analyzes branch topology and merge patterns
+- **Success criteria**: Timeline accurately represents branch structure and chronology, merge commits clearly show source and target branches, visual design uses color and positioning effectively to distinguish branches, interactions are smooth with sub-100ms response, commit details are comprehensive and accessible, filtering works instantly, demo mode provides realistic sample data, and the visualization scales gracefully from 2-8 branches with 10-100 commits each
+
 ## Edge Case Handling
 - **Console Conflicts**: If multiple consoles attempt conflicting operations, priority system resolves with visual feedback
 - **Dashboard Overflow**: When too much data is generated, intelligent summarization and drill-down capabilities are provided
@@ -84,6 +91,8 @@ This IDE represents a sophisticated ecosystem where multiple consoles work in ha
 - **Large Commit Histories**: Timeline virtualization and pagination handle repositories with thousands of commits efficiently
 - **Branch Complexity**: Graph visualization intelligently groups and simplifies complex branch structures for readability
 - **API Rate Limits**: Intelligent caching and rate limit detection prevent GitHub API throttling with graceful degradation
+- **Timeline Performance**: D3 visualizations use canvas rendering fallback for repositories with extremely high commit volumes
+- **Merge Complexity**: Visual timeline intelligently handles octopus merges and complex branching patterns with clear visual indicators
 
 ## Design Direction
 The design should evoke feelings of prestige, power, and refined luxury - think high-end automotive interfaces meets premium financial terminals. It should feel cutting-edge yet timeless, with rich, deep colors suggesting wealth and sophistication, metallic accents conveying precision and quality, and subtle lighting effects creating depth and atmosphere. The interface should be rich rather than minimal, embracing ornamental details that enhance rather than distract, creating an immersive environment that feels like operating in a luxurious command center.
