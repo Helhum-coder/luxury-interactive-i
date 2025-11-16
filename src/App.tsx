@@ -793,8 +793,10 @@ function App() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="publish" className="flex-1 p-6 m-0 overflow-hidden">
-            <PublishEnabler />
+          <TabsContent value="publish" className="flex-1 m-0 overflow-hidden">
+            <Card className="h-full border-2 border-accent/50 console-glow-active rounded-none bg-card/50">
+              <PublishEnabler />
+            </Card>
           </TabsContent>
         </Tabs>
       </div>
