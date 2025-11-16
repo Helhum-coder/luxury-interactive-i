@@ -226,3 +226,40 @@ export interface DiffLine {
   oldLineNumber?: number
   newLineNumber?: number
 }
+
+export interface PortConfig {
+  id: string
+  port: number
+  name: string
+  description: string
+  visibility: 'private' | 'public' | 'organization'
+  status: 'active' | 'blocked' | 'pending'
+  approvedBy: string
+  approvedAt: number
+  requiresApproval: boolean
+  allowedIPs: string[]
+  createdAt: number
+  lastModified: number
+  webhookId?: string
+  autoSecured?: boolean
+}
+
+export interface WebhookPortConfig {
+  webhookId: string
+  port: number
+  securedPort: boolean
+  autoSecured: boolean
+  securedAt?: number
+  securedBy?: string
+}
+
+export interface PortSecurityEvent {
+  id: string
+  timestamp: number
+  eventType: 'port-secured' | 'port-blocked' | 'port-released' | 'unauthorized-access-blocked'
+  port: number
+  webhookId?: string
+  triggeredBy: string
+  reason: string
+  metadata?: any
+}

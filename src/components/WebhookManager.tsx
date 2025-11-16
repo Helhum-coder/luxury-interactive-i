@@ -37,9 +37,10 @@ interface WebhookManagerProps {
   onTriggerSync?: (branch: string) => void
   branches?: GitBranchType[]
   onNotification?: (type: string, title: string, message: string, options?: any) => void
+  onWebhookCreated?: (config: WebhookConfig) => void
 }
 
-export default function WebhookManager({ onTriggerSync, branches, onNotification }: WebhookManagerProps) {
+export default function WebhookManager({ onTriggerSync, branches, onNotification, onWebhookCreated }: WebhookManagerProps) {
   const [webhookConfigs, setWebhookConfigs] = useKV<WebhookConfig[]>('webhook-configs', [])
   const [webhookEvents, setWebhookEvents] = useKV<WebhookEvent[]>('webhook-events', [])
   const [webhookDeliveries, setWebhookDeliveries] = useKV<WebhookDelivery[]>('webhook-deliveries', [])
@@ -216,16 +217,25 @@ export default function WebhookManager({ onTriggerSync, branches, onNotification
 
     setWebhookConfigs((current) => [newConfig, ...(current || [])])
     
+    if (onWebhookCreated) {
+      onWebhookCreated(newConfig)
+    }
+    
     if (onNotification) {
-      onNotification('success', 'Webhook Configured', `Now monitoring ${selectedRepository} for ${selectedEvents.length} event types`, {
+      onNotification('success', 'Webhook Configured', `Now monitoring ${selectedRepository} for ${selectedEvents.length} event types. Port security automatically applied.`, {
         category: 'System',
-        priority: 'medium',
-        source: 'System'
+        priority: 'high',
+        source: 'Webhook',
+        actionable: true,
+        actions: [
+          { label: 'View Ports', type: 'primary', action: 'view-ports' },
+          { label: 'Configure', type: 'secondary', action: 'configure-webhook' }
+        ]
       })
     }
     
     toast.success('Webhook configured!', {
-      description: `Listening to ${selectedEvents.length} event types`
+      description: `Listening to ${selectedEvents.length} event types · Ports auto-secured`
     })
 
     setSelectedRepository('')

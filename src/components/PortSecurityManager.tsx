@@ -9,6 +9,13 @@ import { Switch } from '@/components/ui/switch'
 import { Separator } from '@/components/ui/separator'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import QuickPortSetup from '@/components/QuickPortSetup'
+import { WebhookConfig, PortConfig as PortConfigType, WebhookPortConfig, PortSecurityEvent } from '@/lib/types'
+import { 
+  detectWebhookPortRequirements,
+  generateWebhookPort,
+  createPortSecurityPayload,
+  detectThirdPartyAccess
+} from '@/lib/port-webhook-integration'
 import { 
   Dialog,
   DialogContent,
@@ -35,7 +42,9 @@ import {
   Bell,
   CheckCircle,
   WarningCircle,
-  Info
+  Info,
+  Broadcast,
+  Lightning
 } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -53,6 +62,8 @@ interface PortConfig {
   allowedIPs: string[]
   createdAt: number
   lastModified: number
+  webhookId?: string
+  autoSecured?: boolean
 }
 
 interface PortAccessRequest {
@@ -79,6 +90,9 @@ export default function PortSecurityManager() {
   const [accessRequests, setAccessRequests] = useKV<PortAccessRequest[]>('port-access-requests', [])
   const [securityLogs, setSecurityLogs] = useKV<SecurityLog[]>('port-security-logs', [])
   const [masterPassword, setMasterPassword] = useKV<string>('port-master-password', '')
+  const [webhookConfigs, setWebhookConfigs] = useKV<WebhookConfig[]>('webhook-configs', [])
+  const [webhookPortMappings, setWebhookPortMappings] = useKV<WebhookPortConfig[]>('webhook-port-mappings', [])
+  const [portSecurityEvents, setPortSecurityEvents] = useKV<PortSecurityEvent[]>('port-security-events', [])
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [passwordInput, setPasswordInput] = useState('')
   const [showPasswordDialog, setShowPasswordDialog] = useState(true)
@@ -86,6 +100,7 @@ export default function PortSecurityManager() {
   const [selectedPort, setSelectedPort] = useState<PortConfig | null>(null)
   const [autoBlockThirdParty, setAutoBlockThirdParty] = useKV<boolean>('auto-block-third-party', true)
   const [notifyOnAccess, setNotifyOnAccess] = useKV<boolean>('notify-on-access', true)
+  const [autoSecureWebhookPorts, setAutoSecureWebhookPorts] = useKV<boolean>('auto-secure-webhook-ports', true)
   const [user, setUser] = useState<any>(null)
   const [showQuickSetup, setShowQuickSetup] = useState(false)
 
@@ -116,6 +131,65 @@ export default function PortSecurityManager() {
     }
     loadUser()
   }, [])
+
+  useEffect(() => {
+    if (!autoSecureWebhookPorts || !webhookConfigs || webhookConfigs.length === 0) return
+
+    webhookConfigs.forEach((config) => {
+      if (!config.active) return
+
+      const requiredPorts = detectWebhookPortRequirements(config)
+      
+      if (requiredPorts.length === 0 && config.events.length > 0) {
+        const defaultPort = generateWebhookPort('webhooks')
+        requiredPorts.push(defaultPort)
+      }
+
+      requiredPorts.forEach((port) => {
+        const existingPort = (ports || []).find(p => p.port === port)
+        const existingMapping = (webhookPortMappings || []).find(m => m.webhookId === config.id && m.port === port)
+
+        if (!existingPort && !existingMapping) {
+          const portConfig = createPortSecurityPayload(port, config, user)
+          portConfig.id = `port-${Date.now()}-${Math.random()}`
+          portConfig.webhookId = config.id
+          portConfig.autoSecured = true
+
+          setPorts((current) => [...(current || []), portConfig])
+
+          const mapping: WebhookPortConfig = {
+            webhookId: config.id,
+            port,
+            securedPort: true,
+            autoSecured: true,
+            securedAt: Date.now(),
+            securedBy: user?.login || 'System'
+          }
+          setWebhookPortMappings((current) => [...(current || []), mapping])
+
+          const securityEvent: PortSecurityEvent = {
+            id: `event-${Date.now()}-${Math.random()}`,
+            timestamp: Date.now(),
+            eventType: 'port-secured',
+            port,
+            webhookId: config.id,
+            triggeredBy: user?.login || 'System',
+            reason: `Auto-secured for webhook: ${config.repository}`,
+            metadata: { config }
+          }
+          setPortSecurityEvents((current) => [securityEvent, ...(current || [])].slice(0, 100))
+
+          addSecurityLog('created', port, `Port ${port} auto-secured for webhook: ${config.repository}`, user?.login || 'System')
+          
+          if (notifyOnAccess) {
+            toast.success('Webhook Port Secured', {
+              description: `Port ${port} automatically secured for ${config.repository}`
+            })
+          }
+        }
+      })
+    })
+  }, [webhookConfigs, autoSecureWebhookPorts, ports, webhookPortMappings, user, notifyOnAccess])
 
   useEffect(() => {
     if (!masterPassword) {
@@ -298,6 +372,36 @@ export default function PortSecurityManager() {
     toast.error('Request Denied', { description: `Access denied to port ${request.port}` })
   }
 
+  const handleBlockThirdPartyAccess = (accessLog: any) => {
+    const detection = detectThirdPartyAccess(accessLog)
+    
+    if (detection.shouldBlock) {
+      const securityEvent: PortSecurityEvent = {
+        id: `event-${Date.now()}-${Math.random()}`,
+        timestamp: Date.now(),
+        eventType: 'unauthorized-access-blocked',
+        port: accessLog.port,
+        triggeredBy: user?.login || 'System',
+        reason: detection.reason,
+        metadata: { accessLog }
+      }
+      setPortSecurityEvents((current) => [securityEvent, ...(current || [])].slice(0, 100))
+      
+      addSecurityLog('blocked', accessLog.port, detection.reason, user?.login || 'System')
+      
+      if (notifyOnAccess) {
+        toast.error('Third-Party Access Blocked', {
+          description: detection.reason
+        })
+      }
+    }
+  }
+
+  const getWebhookInfo = (webhookId?: string) => {
+    if (!webhookId || !webhookConfigs) return null
+    return webhookConfigs.find(w => w.id === webhookId)
+  }
+
   const getStatusIcon = (status: PortConfig['status']) => {
     switch (status) {
       case 'active':
@@ -468,9 +572,24 @@ export default function PortSecurityManager() {
                                 >
                                   {port.status}
                                 </Badge>
+                                {port.autoSecured && (
+                                  <Badge className="bg-accent/20 text-accent border-accent/30 text-xs flex items-center gap-1">
+                                    <Broadcast size={10} weight="fill" />
+                                    AUTO-SECURED
+                                  </Badge>
+                                )}
                               </div>
                               <p className="text-sm font-medium mb-1">{port.name}</p>
                               <p className="text-xs text-muted-foreground mb-2">{port.description}</p>
+                              {port.webhookId && (
+                                <div className="mb-2 p-2 bg-accent/5 rounded border border-accent/20">
+                                  <div className="flex items-center gap-2 text-xs">
+                                    <Lightning size={12} weight="fill" className="text-accent" />
+                                    <span className="text-accent font-medium">Webhook Integration:</span>
+                                    <span className="font-mono">{getWebhookInfo(port.webhookId)?.repository || 'Unknown'}</span>
+                                  </div>
+                                </div>
+                              )}
                               <div className="flex items-center gap-4 text-xs text-muted-foreground">
                                 <span>Approved by: {port.approvedBy}</span>
                                 <span>•</span>
@@ -615,6 +734,60 @@ export default function PortSecurityManager() {
                     }}
                   />
                 </div>
+                <Separator />
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label className="font-orbitron text-sm flex items-center gap-1">
+                      <Broadcast size={14} weight="fill" />
+                      Auto-Secure Webhook Ports
+                    </Label>
+                    <p className="text-xs text-muted-foreground">
+                      Automatically secure ports for incoming webhooks
+                    </p>
+                  </div>
+                  <Switch
+                    checked={autoSecureWebhookPorts}
+                    onCheckedChange={(checked) => {
+                      setAutoSecureWebhookPorts(() => checked)
+                      addSecurityLog('modified', 0, `Webhook auto-secure ${checked ? 'enabled' : 'disabled'}`, user?.login || 'Owner')
+                      toast.success(
+                        checked ? 'Webhook Auto-Security Enabled' : 'Webhook Auto-Security Disabled',
+                        { description: checked ? 'New webhook ports will be automatically secured' : 'Manual port configuration required' }
+                      )
+                    }}
+                  />
+                </div>
+                {webhookPortMappings && webhookPortMappings.length > 0 && (
+                  <>
+                    <Separator />
+                    <div className="pt-2">
+                      <Label className="font-orbitron text-xs text-muted-foreground mb-2 block">
+                        WEBHOOK PORT MAPPINGS
+                      </Label>
+                      <div className="space-y-2">
+                        {webhookPortMappings.slice(0, 5).map((mapping) => {
+                          const webhookInfo = getWebhookInfo(mapping.webhookId)
+                          return (
+                            <div key={`${mapping.webhookId}-${mapping.port}`} className="flex items-center justify-between text-xs p-2 bg-accent/5 rounded border border-accent/20">
+                              <div className="flex items-center gap-2">
+                                <Lightning size={12} weight="fill" className="text-accent" />
+                                <span className="font-mono">Port {mapping.port}</span>
+                              </div>
+                              <span className="text-muted-foreground truncate max-w-[150px]">
+                                {webhookInfo?.repository || 'Unknown'}
+                              </span>
+                            </div>
+                          )
+                        })}
+                        {webhookPortMappings.length > 5 && (
+                          <p className="text-xs text-muted-foreground text-center">
+                            +{webhookPortMappings.length - 5} more
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </>
+                )}
               </CardContent>
             </Card>
 
