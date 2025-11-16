@@ -14,6 +14,7 @@ import PublishEnabler from '@/components/PublishEnabler'
 import CICDPipelineManager from '@/components/CICDPipelineManager'
 import ClusterAccessDiagnostic from '@/components/ClusterAccessDiagnostic'
 import ClusterHealthMonitor from '@/components/ClusterHealthMonitor'
+import APIIntegrationManager from '@/components/APIIntegrationManager'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -37,7 +38,8 @@ import {
   RocketLaunch,
   CirclesThreePlus,
   CloudArrowUp,
-  Activity
+  Activity,
+  Plugs
 } from '@phosphor-icons/react'
 import { ConsoleType, ConsoleMessage, DashboardWidget, MarketingStrategy } from '@/lib/types'
 import { detectLocalVersion } from '@/lib/version-detector'
@@ -746,6 +748,13 @@ function App() {
                 <Activity size={18} weight="fill" className="mr-2" />
                 CLUSTER HEALTH
               </TabsTrigger>
+              <TabsTrigger 
+                value="api"
+                className="font-orbitron tracking-wide data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
+                <Plugs size={18} weight="fill" className="mr-2" />
+                API INTEGRATION
+              </TabsTrigger>
             </TabsList>
           </div>
 
@@ -841,6 +850,12 @@ function App() {
           <TabsContent value="health" className="flex-1 m-0 overflow-hidden">
             <Card className="h-full border-2 border-accent/50 console-glow-active rounded-none bg-card/50">
               <ClusterHealthMonitor />
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="api" className="flex-1 m-0 overflow-hidden">
+            <Card className="h-full border-2 border-primary/50 console-glow rounded-none bg-card/50">
+              <APIIntegrationManager />
             </Card>
           </TabsContent>
         </Tabs>
