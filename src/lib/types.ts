@@ -176,3 +176,53 @@ export interface WebhookDelivery {
   response_time_ms: number
   payload_size: number
 }
+
+export interface CommitComparison {
+  baseCommit: GitHubCommit
+  headCommit: GitHubCommit
+  files: CommitFileChange[]
+  stats: CommitStats
+  ahead_by: number
+  behind_by: number
+  merge_base_commit?: string
+}
+
+export interface CommitFileChange {
+  filename: string
+  status: 'added' | 'removed' | 'modified' | 'renamed'
+  additions: number
+  deletions: number
+  changes: number
+  patch?: string
+  previous_filename?: string
+  blob_url?: string
+  raw_url?: string
+}
+
+export interface CommitStats {
+  total_additions: number
+  total_deletions: number
+  total_changes: number
+  files_changed: number
+  commits_count: number
+}
+
+export interface CommitDiff {
+  hunks: DiffHunk[]
+  language?: string
+}
+
+export interface DiffHunk {
+  oldStart: number
+  oldLines: number
+  newStart: number
+  newLines: number
+  lines: DiffLine[]
+}
+
+export interface DiffLine {
+  type: 'context' | 'addition' | 'deletion'
+  content: string
+  oldLineNumber?: number
+  newLineNumber?: number
+}

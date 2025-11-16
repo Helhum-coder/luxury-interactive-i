@@ -81,6 +81,48 @@ export class GitHubAPI {
       return null
     }
   }
+
+  async getCommit(owner: string, repo: string, sha: string): Promise<GitHubCommit> {
+    return this.request<GitHubCommit>(`/repos/${owner}/${repo}/commits/${sha}`)
+  }
+
+  async compareCommits(owner: string, repo: string, base: string, head: string): Promise<{
+    base_commit: GitHubCommit
+    merge_base_commit: { sha: string; commit: any }
+    commits: GitHubCommit[]
+    files: Array<{
+      sha: string
+      filename: string
+      status: string
+      additions: number
+      deletions: number
+      changes: number
+      patch?: string
+      previous_filename?: string
+      blob_url: string
+      raw_url: string
+      contents_url: string
+    }>
+    stats: {
+      total: number
+      additions: number
+      deletions: number
+    }
+    ahead_by: number
+    behind_by: number
+  }> {
+    return this.request(`/repos/${owner}/${repo}/compare/${base}...${head}`)
+  }
+
+  async getFileContent(owner: string, repo: string, path: string, ref?: string): Promise<{
+    content: string
+    encoding: string
+    sha: string
+    size: number
+  }> {
+    const refParam = ref ? `?ref=${ref}` : ''
+    return this.request(`/repos/${owner}/${repo}/contents/${path}${refParam}`)
+  }
 }
 
 export const githubAPI = new GitHubAPI()
