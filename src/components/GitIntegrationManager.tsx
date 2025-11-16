@@ -27,9 +27,13 @@ import {
   Broadcast,
   Bell,
   BellRinging,
-  GithubLogo
+  GithubLogo,
+  Tag,
+  Package,
+  Cpu,
+  Code
 } from '@phosphor-icons/react'
-import { GitBranch as GitBranchType, GitConflict, IntegrationStatus, SyncEvent } from '@/lib/types'
+import { GitBranch as GitBranchType, GitConflict, IntegrationStatus, SyncEvent, ProjectVersion } from '@/lib/types'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
 import GitHubAuth from './GitHubAuth'
@@ -44,6 +48,7 @@ export default function GitIntegrationManager() {
   const [githubToken, setGithubToken] = useKV<string | null>('github-access-token', null)
   const [isGitHubAuthenticated, setIsGitHubAuthenticated] = useState(false)
   const [webhookMonitoring, setWebhookMonitoring] = useKV<boolean>('webhook-monitoring', false)
+  const [projectVersions, setProjectVersions] = useKV<Record<string, ProjectVersion>>('project-versions', {})
   
   const [branches, setBranches] = useKV<GitBranchType[]>('git-branches', [
     {
@@ -677,66 +682,136 @@ export default function GitIntegrationManager() {
               </div>
             </Card>
 
-            <Card className="p-6 border-2 border-border/50 console-glow bg-card/50">
-              <h3 className="font-orbitron font-semibold text-lg mb-4 text-accent">
-                Quick Actions
-              </h3>
-              <div className="space-y-3">
-                <Button
-                  onClick={() => executeCommand('sync')}
-                  className="w-full justify-start bg-primary/20 hover:bg-primary/30 text-foreground border border-primary/30"
-                >
-                  <ArrowsClockwise size={18} weight="fill" className="mr-2" />
-                  Sync master ← main (Merge workflows)
-                </Button>
-                <Button
-                  onClick={() => executeCommand('merge main master')}
-                  className="w-full justify-start bg-secondary/20 hover:bg-secondary/30 text-foreground border border-secondary/30"
-                >
-                  <GitMerge size={18} weight="fill" className="mr-2" />
-                  Merge main into master
-                </Button>
-                <Button
-                  onClick={() => executeCommand('deploy master')}
-                  className="w-full justify-start bg-accent/20 hover:bg-accent/30 text-foreground border border-accent/30"
-                >
-                  <Lightning size={18} weight="fill" className="mr-2" />
-                  Deploy to Firebase (master)
-                </Button>
-                <Button
-                  onClick={() => window.open('https://console.firebase.google.com/u/0/project/device-streaming-f6c287f6/overview', '_blank')}
-                  className="w-full justify-start bg-card hover:bg-card/80 text-foreground border border-border/50"
-                >
-                  <Globe size={18} weight="fill" className="mr-2" />
-                  Open Firebase Console
-                </Button>
-              </div>
+            <div className="space-y-4">
+              <Card className="p-6 border-2 border-border/50 console-glow bg-card/50">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-orbitron font-semibold text-lg text-accent flex items-center gap-2">
+                    <Tag size={24} weight="fill" />
+                    Project Versions
+                  </h3>
+                </div>
+                
+                {projectVersions && Object.keys(projectVersions).length > 0 ? (
+                  <ScrollArea className="h-[200px]">
+                    <div className="space-y-3">
+                      {Object.values(projectVersions).map((version) => (
+                        <div
+                          key={version.projectId}
+                          className="p-3 bg-muted/20 border border-border/30 rounded-lg"
+                        >
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="font-orbitron font-semibold text-sm">{version.projectName}</span>
+                            {version.autoDetected && (
+                              <Badge variant="outline" className="text-[10px] h-4">
+                                AUTO
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="space-y-1">
+                            {version.cliVersion && (
+                              <div className="flex items-center gap-2 text-xs">
+                                <Cpu size={12} weight="fill" className="text-accent" />
+                                <span className="text-muted-foreground">CLI:</span>
+                                <Badge variant="outline" className="text-[10px] h-4 bg-accent/10 border-accent/50 text-accent">
+                                  {version.cliVersion}
+                                </Badge>
+                              </div>
+                            )}
+                            {version.appVersion && (
+                              <div className="flex items-center gap-2 text-xs">
+                                <Package size={12} weight="fill" className="text-primary" />
+                                <span className="text-muted-foreground">App:</span>
+                                <Badge variant="outline" className="text-[10px] h-4 bg-primary/10 border-primary/50 text-primary-foreground">
+                                  {version.appVersion}
+                                </Badge>
+                              </div>
+                            )}
+                            {version.frameworkVersion && (
+                              <div className="flex items-center gap-2 text-xs">
+                                <Code size={12} weight="fill" className="text-secondary-foreground" />
+                                <span className="text-muted-foreground">Framework:</span>
+                                <Badge variant="outline" className="text-[10px] h-4 bg-secondary/10 border-secondary/50">
+                                  {version.frameworkVersion}
+                                </Badge>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-8 text-center">
+                    <Tag size={48} weight="fill" className="text-muted-foreground mb-3" />
+                    <p className="text-sm text-muted-foreground mb-2">No version information yet</p>
+                    <p className="text-xs text-muted-foreground">
+                      Add version info in the GitHub OAuth tab
+                    </p>
+                  </div>
+                )}
+              </Card>
 
-              <div className="mt-6 p-4 bg-muted/20 border border-border/30 rounded-lg">
-                <h4 className="font-orbitron font-semibold text-sm mb-2">Understanding Your System</h4>
-                <p className="text-xs text-muted-foreground mb-3">
-                  This is NOT a standard git repository. It's a hybrid deployment system where both master and main branches serve live infrastructure.
-                </p>
-                <div className="space-y-2">
+              <Card className="p-6 border-2 border-border/50 console-glow bg-card/50">
+                <h3 className="font-orbitron font-semibold text-lg mb-4 text-accent">
+                  Quick Actions
+                </h3>
+                <div className="space-y-3">
                   <Button
-                    onClick={() => window.open('/GIT_INTEGRATION_GUIDE.md', '_blank')}
-                    variant="outline"
-                    className="w-full text-xs border-accent/50 hover:bg-accent/20"
+                    onClick={() => executeCommand('sync')}
+                    className="w-full justify-start bg-primary/20 hover:bg-primary/30 text-foreground border border-primary/30"
                   >
-                    <FileCode size={16} weight="fill" className="mr-2" />
-                    Read Git Integration Guide
+                    <ArrowsClockwise size={18} weight="fill" className="mr-2" />
+                    Sync master ← main (Merge workflows)
                   </Button>
                   <Button
-                    onClick={() => window.open('/WEBHOOK_INTEGRATION_GUIDE.md', '_blank')}
-                    variant="outline"
-                    className="w-full text-xs border-primary/50 hover:bg-primary/20"
+                    onClick={() => executeCommand('merge main master')}
+                    className="w-full justify-start bg-secondary/20 hover:bg-secondary/30 text-foreground border border-secondary/30"
                   >
-                    <Bell size={16} weight="fill" className="mr-2" />
-                    Webhook Integration Guide
+                    <GitMerge size={18} weight="fill" className="mr-2" />
+                    Merge main into master
+                  </Button>
+                  <Button
+                    onClick={() => executeCommand('deploy master')}
+                    className="w-full justify-start bg-accent/20 hover:bg-accent/30 text-foreground border border-accent/30"
+                  >
+                    <Lightning size={18} weight="fill" className="mr-2" />
+                    Deploy to Firebase (master)
+                  </Button>
+                  <Button
+                    onClick={() => window.open('https://console.firebase.google.com/u/0/project/device-streaming-f6c287f6/overview', '_blank')}
+                    className="w-full justify-start bg-card hover:bg-card/80 text-foreground border border-border/50"
+                  >
+                    <Globe size={18} weight="fill" className="mr-2" />
+                    Open Firebase Console
                   </Button>
                 </div>
-              </div>
-            </Card>
+
+                <div className="mt-6 p-4 bg-muted/20 border border-border/30 rounded-lg">
+                  <h4 className="font-orbitron font-semibold text-sm mb-2">Understanding Your System</h4>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    This is NOT a standard git repository. It's a hybrid deployment system where both master and main branches serve live infrastructure.
+                  </p>
+                  <div className="space-y-2">
+                    <Button
+                      onClick={() => window.open('/GIT_INTEGRATION_GUIDE.md', '_blank')}
+                      variant="outline"
+                      className="w-full text-xs border-accent/50 hover:bg-accent/20"
+                    >
+                      <FileCode size={16} weight="fill" className="mr-2" />
+                      Read Git Integration Guide
+                    </Button>
+                    <Button
+                      onClick={() => window.open('/WEBHOOK_INTEGRATION_GUIDE.md', '_blank')}
+                      variant="outline"
+                      className="w-full text-xs border-primary/50 hover:bg-primary/20"
+                    >
+                      <Bell size={16} weight="fill" className="mr-2" />
+                      Webhook Integration Guide
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            </div>
           </div>
         </TabsContent>
 

@@ -97,6 +97,16 @@ export interface GitHubRepository {
   open_issues_count: number
 }
 
+export interface ProjectVersion {
+  projectId: string
+  projectName: string
+  cliVersion?: string
+  appVersion?: string
+  frameworkVersion?: string
+  lastUpdated: number
+  autoDetected: boolean
+}
+
 export interface GitHubBranch {
   name: string
   commit: {
