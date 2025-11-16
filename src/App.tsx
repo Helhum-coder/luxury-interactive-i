@@ -10,6 +10,7 @@ import VersionHistoryTimeline from '@/components/VersionHistoryTimeline'
 import CommitComparisonTool from '@/components/CommitComparisonTool'
 import BranchTimelineViewer from '@/components/BranchTimelineViewer'
 import PortSecurityManager from '@/components/PortSecurityManager'
+import PublishEnabler from '@/components/PublishEnabler'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -29,7 +30,8 @@ import {
   ClockCounterClockwise,
   GitDiff,
   FlowArrow,
-  ShieldCheck
+  ShieldCheck,
+  RocketLaunch
 } from '@phosphor-icons/react'
 import { ConsoleType, ConsoleMessage, DashboardWidget, MarketingStrategy } from '@/lib/types'
 import { detectLocalVersion } from '@/lib/version-detector'
@@ -710,6 +712,13 @@ function App() {
                 <ShieldCheck size={18} weight="fill" className="mr-2" />
                 PORT SECURITY
               </TabsTrigger>
+              <TabsTrigger 
+                value="publish"
+                className="font-orbitron tracking-wide data-[state=active]:bg-accent data-[state=active]:text-accent-foreground"
+              >
+                <RocketLaunch size={18} weight="fill" className="mr-2" />
+                PUBLISH
+              </TabsTrigger>
             </TabsList>
           </div>
 
@@ -782,6 +791,10 @@ function App() {
             <Card className="h-full border-2 border-accent/50 console-glow-active rounded-none bg-card/50">
               <PortSecurityManager />
             </Card>
+          </TabsContent>
+
+          <TabsContent value="publish" className="flex-1 p-6 m-0 overflow-hidden">
+            <PublishEnabler />
           </TabsContent>
         </Tabs>
       </div>

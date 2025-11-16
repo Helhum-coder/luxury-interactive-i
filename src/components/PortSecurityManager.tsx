@@ -93,9 +93,9 @@ export default function PortSecurityManager() {
   const [webhookConfigs, setWebhookConfigs] = useKV<WebhookConfig[]>('webhook-configs', [])
   const [webhookPortMappings, setWebhookPortMappings] = useKV<WebhookPortConfig[]>('webhook-port-mappings', [])
   const [portSecurityEvents, setPortSecurityEvents] = useKV<PortSecurityEvent[]>('port-security-events', [])
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(true)
   const [passwordInput, setPasswordInput] = useState('')
-  const [showPasswordDialog, setShowPasswordDialog] = useState(true)
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false)
   const [newPortDialog, setNewPortDialog] = useState(false)
   const [selectedPort, setSelectedPort] = useState<PortConfig | null>(null)
   const [autoBlockThirdParty, setAutoBlockThirdParty] = useKV<boolean>('auto-block-third-party', true)
@@ -196,10 +196,11 @@ export default function PortSecurityManager() {
       const defaultPassword = `luxe-${Date.now()}-${Math.random().toString(36).substring(7)}`
       setMasterPassword(() => defaultPassword)
       addSecurityLog('created', 0, 'Master password system initialized', 'System')
-      toast.success('Security Initialized', {
-        description: 'Your master password has been generated. Please save it securely.'
+      toast.success('Security Initialized - No Password Required', {
+        description: 'All features unlocked. You have full access to all functionality.'
       })
     }
+    setIsAuthenticated(true)
   }, [masterPassword, setMasterPassword])
 
   const addSecurityLog = (
