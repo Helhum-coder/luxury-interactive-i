@@ -16,10 +16,13 @@ import {
   FileTs,
   FileHtml,
   FileCss,
-  X
+  X,
+  FileText,
+  Cube
 } from '@phosphor-icons/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
+import { marked } from 'marked'
 
 type ConversionFormat = 
   | 'json-to-typescript' 
@@ -30,6 +33,8 @@ type ConversionFormat =
   | 'typescript-to-javascript'
   | 'jsx-to-html'
   | 'tailwind-to-css'
+  | 'markdown-to-html'
+  | 'yaml-to-json'
 
 interface ConversionOption {
   value: ConversionFormat
@@ -50,6 +55,24 @@ const CONVERSION_OPTIONS: ConversionOption[] = [
     to: 'TypeScript',
     icon: <FileCode size={20} weight="duotone" />,
     color: 'text-yellow-600'
+  },
+  {
+    value: 'markdown-to-html',
+    label: 'Markdown to HTML',
+    description: 'Convert Markdown documents to formatted HTML',
+    from: 'Markdown',
+    to: 'HTML',
+    icon: <FileText size={20} weight="duotone" />,
+    color: 'text-indigo-600'
+  },
+  {
+    value: 'yaml-to-json',
+    label: 'YAML to JSON',
+    description: 'Convert YAML configuration to JSON format',
+    from: 'YAML',
+    to: 'JSON',
+    icon: <Cube size={20} weight="duotone" />,
+    color: 'text-purple-600'
   },
   {
     value: 'html-to-jsx',
@@ -422,6 +445,175 @@ export function FileConverterInterface({ onClose }: { onClose?: () => void }) {
     return css
   }
 
+  const markdownToHtml = async (markdown: string): Promise<string> => {
+    try {
+      marked.setOptions({
+        gfm: true,
+        breaks: true,
+      })
+      
+      const htmlContent = await marked.parse(markdown)
+      
+      const fullHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Converted Markdown</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      line-height: 1.6;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+      color: #333;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.5em;
+      margin-bottom: 0.5em;
+      font-weight: 600;
+    }
+    h1 { font-size: 2em; border-bottom: 2px solid #eee; padding-bottom: 0.3em; }
+    h2 { font-size: 1.5em; border-bottom: 1px solid #eee; padding-bottom: 0.3em; }
+    h3 { font-size: 1.25em; }
+    code {
+      background: #f4f4f4;
+      padding: 0.2em 0.4em;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9em;
+    }
+    pre {
+      background: #f4f4f4;
+      padding: 1em;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+    pre code {
+      background: transparent;
+      padding: 0;
+    }
+    blockquote {
+      border-left: 4px solid #ddd;
+      padding-left: 1em;
+      margin-left: 0;
+      color: #666;
+      font-style: italic;
+    }
+    a {
+      color: #0066cc;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 1em 0;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 0.5em;
+      text-align: left;
+    }
+    th {
+      background: #f4f4f4;
+      font-weight: 600;
+    }
+    ul, ol {
+      padding-left: 2em;
+    }
+    li {
+      margin: 0.25em 0;
+    }
+  </style>
+</head>
+<body>
+${htmlContent}
+</body>
+</html>`
+      
+      return fullHtml
+    } catch (error) {
+      throw new Error('Failed to convert Markdown. Please check your syntax.')
+    }
+  }
+
+  const yamlToJson = (yaml: string): string => {
+    try {
+      const lines = yaml.trim().split('\n')
+      const result: any = {}
+      const stack: Array<{ obj: any; indent: number }> = [{ obj: result, indent: -1 }]
+      
+      for (let line of lines) {
+        if (line.trim().startsWith('#') || line.trim() === '') continue
+        
+        const indent = line.search(/\S/)
+        const trimmedLine = line.trim()
+        
+        while (stack.length > 1 && indent <= stack[stack.length - 1].indent) {
+          stack.pop()
+        }
+        
+        const current = stack[stack.length - 1].obj
+        
+        if (trimmedLine.startsWith('- ')) {
+          const value = trimmedLine.substring(2).trim()
+          
+          if (!Array.isArray(current)) {
+            const lastKey = Object.keys(current).pop()
+            if (lastKey && !Array.isArray(current[lastKey])) {
+              current[lastKey] = []
+            }
+          }
+          
+          const targetArray = Array.isArray(current) ? current : current[Object.keys(current).pop()!]
+          
+          if (value.includes(':')) {
+            const obj: any = {}
+            const [k, v] = value.split(':').map(s => s.trim())
+            obj[k] = parseValue(v)
+            targetArray.push(obj)
+            stack.push({ obj, indent })
+          } else {
+            targetArray.push(parseValue(value))
+          }
+        } else if (trimmedLine.includes(':')) {
+          const colonIndex = trimmedLine.indexOf(':')
+          const key = trimmedLine.substring(0, colonIndex).trim()
+          const value = trimmedLine.substring(colonIndex + 1).trim()
+          
+          if (value === '' || value === '|' || value === '>') {
+            current[key] = {}
+            stack.push({ obj: current[key], indent })
+          } else {
+            current[key] = parseValue(value)
+          }
+        }
+      }
+      
+      function parseValue(value: string): any {
+        if (value === 'true' || value === 'yes' || value === 'on') return true
+        if (value === 'false' || value === 'no' || value === 'off') return false
+        if (value === 'null' || value === '~') return null
+        if (value.startsWith('"') && value.endsWith('"')) return value.slice(1, -1)
+        if (value.startsWith("'") && value.endsWith("'")) return value.slice(1, -1)
+        if (!isNaN(Number(value)) && value !== '') return Number(value)
+        return value
+      }
+      
+      return JSON.stringify(result, null, 2)
+    } catch (error) {
+      throw new Error('Invalid YAML format. Please check your syntax.')
+    }
+  }
+
   const handleConvert = async () => {
     if (!inputText.trim()) {
       toast.error('Please enter some content to convert')
@@ -438,6 +630,12 @@ export function FileConverterInterface({ onClose }: { onClose?: () => void }) {
       switch (conversionType) {
         case 'json-to-typescript':
           result = jsonToTypeScript(inputText)
+          break
+        case 'markdown-to-html':
+          result = await markdownToHtml(inputText)
+          break
+        case 'yaml-to-json':
+          result = yamlToJson(inputText)
           break
         case 'html-to-jsx':
           result = htmlToJsx(inputText)
@@ -499,7 +697,9 @@ export function FileConverterInterface({ onClose }: { onClose?: () => void }) {
       'CSS': 'css',
       'JSON': 'json',
       'Tailwind': 'txt',
-      'XML': 'xml'
+      'XML': 'xml',
+      'Markdown': 'md',
+      'YAML': 'yaml'
     }
     const extension = extensionMap[selectedOption?.to || 'txt'] || 'txt'
     const fileName = `converted-${Date.now()}.${extension}`
@@ -637,7 +837,13 @@ export function FileConverterInterface({ onClose }: { onClose?: () => void }) {
                         <Badge variant="secondary">{inputText.length} characters</Badge>
                       </div>
                       <Textarea
-                        placeholder={`Paste your ${selectedOption?.from} code here...\n\nExample: Try pasting JSON, HTML, CSS, or any supported format.`}
+                        placeholder={`Paste your ${selectedOption?.from} code here...\n\n${
+                          conversionType === 'markdown-to-html' 
+                            ? 'Example:\n# My Heading\n\nThis is **bold** and this is *italic*.\n\n- List item 1\n- List item 2'
+                            : conversionType === 'yaml-to-json'
+                            ? 'Example:\nname: John Doe\nage: 30\nhobbies:\n  - reading\n  - coding\naddress:\n  city: New York\n  country: USA'
+                            : 'Try pasting JSON, HTML, CSS, or any supported format.'
+                        }`}
                         value={inputText}
                         onChange={(e) => setInputText(e.target.value)}
                         className="min-h-[500px] font-mono text-sm resize-none"
