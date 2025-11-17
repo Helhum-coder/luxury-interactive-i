@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { Switch } from '@/components/ui/switch'
+import { Label } from '@/components/ui/label'
 import { 
   GlobeHemisphereWest, 
   ShieldCheck, 
@@ -12,9 +14,14 @@ import {
   CheckCircle,
   XCircle,
   ArrowClockwise,
-  Code
+  Code,
+  DownloadSimple,
+  Bell,
+  BellSlash
 } from '@phosphor-icons/react'
 import { motion } from 'framer-motion'
+import { toast } from 'sonner'
+import { useKV } from '@github/spark/hooks'
 
 interface NetworkCheck {
   name: string
@@ -37,8 +44,11 @@ export function NetworkDiagnosticPanel() {
   const [ports, setPorts] = useState<PortInfo[]>([])
   const [isScanning, setIsScanning] = useState(false)
   const [systemInfo, setSystemInfo] = useState<any>(null)
+  const [autoMonitor, setAutoMonitor] = useKV<boolean>('network-auto-monitor', false)
+  const [notificationsEnabled, setNotificationsEnabled] = useKV<boolean>('network-notifications', true)
+  const [lastScanResults, setLastScanResults] = useState<{ successCount: number; errorCount: number } | null>(null)
 
-  const runDiagnostics = async () => {
+  const runDiagnostics = useCallback(async (silent = false) => {
     setIsScanning(true)
     const newChecks: NetworkCheck[] = []
 
@@ -144,12 +154,66 @@ export function NetworkDiagnosticPanel() {
     setPorts(portResults)
     addCheck('Port Scan Complete', 'success', `Scanned ${commonPorts.length} ports`, '')
 
+    const successCount = newChecks.filter(c => c.status === 'success').length
+    const errorCount = newChecks.filter(c => c.status === 'error').length
+    const warningCount = newChecks.filter(c => c.status === 'warning').length
+
+    setLastScanResults({ successCount, errorCount })
+
+    if (!silent && notificationsEnabled) {
+      if (errorCount > 0) {
+        toast.error(`Network scan found ${errorCount} error(s)`, {
+          description: 'Check the diagnostics panel for details'
+        })
+      } else if (warningCount > 0) {
+        toast.warning(`Network scan found ${warningCount} warning(s)`)
+      } else {
+        toast.success('All network checks passed successfully')
+      }
+    }
+
     setIsScanning(false)
-  }
+  }, [notificationsEnabled])
 
   useEffect(() => {
-    runDiagnostics()
+    runDiagnostics(true)
   }, [])
+
+  useEffect(() => {
+    if (autoMonitor) {
+      const interval = setInterval(() => {
+        runDiagnostics(true)
+      }, 60000)
+
+      toast.info('Auto-monitoring enabled', {
+        description: 'Network will be checked every minute'
+      })
+
+      return () => clearInterval(interval)
+    }
+  }, [autoMonitor, runDiagnostics])
+
+  const exportDiagnostics = () => {
+    const report = {
+      timestamp: new Date().toISOString(),
+      checks,
+      ports,
+      systemInfo,
+      summary: lastScanResults
+    }
+
+    const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `network-diagnostics-${new Date().toISOString().split('T')[0]}.json`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+
+    toast.success('Diagnostics exported successfully')
+  }
 
   const getStatusIcon = (status: NetworkCheck['status']) => {
     switch (status) {
@@ -189,11 +253,94 @@ export function NetworkDiagnosticPanel() {
             <p className="text-muted-foreground">Monitor connections, ports, and security</p>
           </div>
         </div>
-        <Button onClick={runDiagnostics} disabled={isScanning}>
-          <ArrowClockwise className={isScanning ? 'animate-spin' : ''} size={16} />
-          {isScanning ? 'Scanning...' : 'Refresh Scan'}
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={exportDiagnostics} disabled={checks.length === 0}>
+            <DownloadSimple size={16} />
+            Export Report
+          </Button>
+          <Button onClick={() => runDiagnostics(false)} disabled={isScanning}>
+            <ArrowClockwise className={isScanning ? 'animate-spin' : ''} size={16} />
+            {isScanning ? 'Scanning...' : 'Refresh Scan'}
+          </Button>
+        </div>
       </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <ArrowClockwise size={24} className="text-primary" />
+                <div>
+                  <Label htmlFor="auto-monitor" className="text-base font-semibold">
+                    Auto-Monitor
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    Scan every minute
+                  </p>
+                </div>
+              </div>
+              <Switch
+                id="auto-monitor"
+                checked={autoMonitor}
+                onCheckedChange={(checked) => setAutoMonitor(checked)}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                {notificationsEnabled ? (
+                  <Bell size={24} className="text-primary" />
+                ) : (
+                  <BellSlash size={24} className="text-muted-foreground" />
+                )}
+                <div>
+                  <Label htmlFor="notifications" className="text-base font-semibold">
+                    Notifications
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    Alert on issues
+                  </p>
+                </div>
+              </div>
+              <Switch
+                id="notifications"
+                checked={notificationsEnabled}
+                onCheckedChange={(checked) => setNotificationsEnabled(checked)}
+              />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {lastScanResults && (
+        <Card className="bg-card/50">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-around">
+              <div className="text-center">
+                <p className="text-3xl font-bold text-green-600">{lastScanResults.successCount}</p>
+                <p className="text-sm text-muted-foreground">Passed</p>
+              </div>
+              <div className="h-12 w-px bg-border" />
+              <div className="text-center">
+                <p className="text-3xl font-bold text-red-600">{lastScanResults.errorCount}</p>
+                <p className="text-sm text-muted-foreground">Failed</p>
+              </div>
+              <div className="h-12 w-px bg-border" />
+              <div className="text-center">
+                <p className="text-sm text-muted-foreground">Last scan</p>
+                <p className="text-sm font-semibold">
+                  {checks.length > 0 ? new Date(checks[checks.length - 1].timestamp).toLocaleTimeString() : 'N/A'}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <Tabs defaultValue="checks" className="w-full">
         <TabsList className="grid w-full grid-cols-3">

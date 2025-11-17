@@ -47,6 +47,27 @@ A comprehensive document viewer that provides organized access to all markdown d
 - **Progression**: Document opens → TOC generated → User clicks TOC item → Smooth scroll to section → Return to top/navigate
 - **Success criteria**: Smooth scrolling, clear navigation, responsive layout
 
+### Network Auto-Monitoring
+- **Functionality**: Continuous automatic network diagnostics that run periodically in the background
+- **Purpose**: Proactively detect network issues without manual intervention
+- **Trigger**: User enables auto-monitor toggle
+- **Progression**: Toggle enabled → Scans run every 60 seconds → Issues detected → User notified → Review diagnostics
+- **Success criteria**: Scans run reliably, minimal performance impact, settings persist
+
+### Diagnostics Export
+- **Functionality**: Download complete network diagnostics report as JSON file
+- **Purpose**: Share or archive network status for troubleshooting and documentation
+- **Trigger**: User clicks "Export Report" button
+- **Progression**: Click export → Report generated → File downloaded → Confirmation shown
+- **Success criteria**: Complete data exported, proper file naming, success feedback
+
+### Network Notifications
+- **Functionality**: Real-time toast notifications when network issues are detected
+- **Purpose**: Immediate awareness of connectivity problems
+- **Trigger**: Network scan completes with errors or warnings
+- **Progression**: Scan runs → Issues detected → Toast appears → User clicks to view → Navigate to diagnostics
+- **Success criteria**: Notifications appear promptly, can be dismissed, not intrusive
+
 ## Edge Case Handling
 - **No Documents Found**: Display helpful empty state with instructions
 - **Search No Results**: Show "no matches found" with suggestion to refine search
