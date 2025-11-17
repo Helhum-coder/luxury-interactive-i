@@ -291,7 +291,7 @@ export default function UnifiedDashboard() {
   return (
     <div className="h-full flex flex-col bg-gradient-to-br from-background via-card/30 to-background">
       <div className="border-b border-border/50 bg-card/50 backdrop-blur-sm p-4">
-        <div className="flex items-center justify-between gap-4 max-w-[1800px] mx-auto">
+        <div className="flex items-center justify-between gap-4 max-w-[1800px] mx-auto flex-wrap">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-3">
               <GitPullRequest size={32} weight="fill" className="text-accent" />
@@ -306,12 +306,26 @@ export default function UnifiedDashboard() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
+            <div className="flex items-center gap-2">
+              <Input
+                placeholder="Repository (owner/repo)"
+                value={selectedRepo}
+                onChange={(e) => setSelectedRepo(e.target.value)}
+                className="w-56 border-accent/30 text-sm"
+              />
+              <Input
+                placeholder="Linear Team ID (optional)"
+                value={selectedTeam}
+                onChange={(e) => setSelectedTeam(e.target.value)}
+                className="w-48 border-accent/30 text-sm"
+              />
+            </div>
             <Input
               placeholder="Search items..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-64 border-accent/30"
+              className="w-48 border-accent/30"
             />
             <Button
               variant="outline"
@@ -605,7 +619,16 @@ export default function UnifiedDashboard() {
                     className="flex flex-col items-center justify-center py-16 text-center"
                   >
                     <CircleNotch size={48} className="text-muted-foreground/30 mb-4" />
-                    <p className="text-muted-foreground">No items found</p>
+                    <p className="text-muted-foreground mb-2">
+                      {!selectedRepo 
+                        ? 'Enter a GitHub repository above (e.g., "octocat/Hello-World")' 
+                        : 'No items found matching your filters'}
+                    </p>
+                    {!selectedRepo && (
+                      <p className="text-xs text-muted-foreground/70">
+                        Repository format: owner/repo-name
+                      </p>
+                    )}
                   </motion.div>
                 )}
               </div>
