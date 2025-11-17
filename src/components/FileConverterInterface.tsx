@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -18,7 +18,9 @@ import {
   FileCss,
   X,
   FileText,
-  Cube
+  Cube,
+  UploadSimple,
+  File
 } from '@phosphor-icons/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
@@ -154,6 +156,9 @@ export function FileConverterInterface({ onClose }: { onClose?: () => void }) {
   const [isConverting, setIsConverting] = useState(false)
   const [history, setHistory] = useState<ConversionHistory[]>([])
   const [activeTab, setActiveTab] = useState<'converter' | 'history'>('converter')
+  const [isDragging, setIsDragging] = useState(false)
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const jsonToTypeScript = (json: string): string => {
     try {
@@ -726,6 +731,56 @@ ${htmlContent}
     toast.info('Swapped input and output')
   }
 
+  const handleFileRead = (file: File) => {
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('File size must be less than 5MB')
+      return
+    }
+
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const content = e.target?.result as string
+      setInputText(content)
+      setUploadedFileName(file.name)
+      toast.success(`File "${file.name}" loaded successfully!`)
+    }
+    reader.onerror = () => {
+      toast.error('Failed to read file')
+    }
+    reader.readAsText(file)
+  }
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      handleFileRead(file)
+    }
+  }
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(true)
+  }
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+    
+    const file = e.dataTransfer.files[0]
+    if (file) {
+      handleFileRead(file)
+    }
+  }
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click()
+  }
+
   const selectedOption = CONVERSION_OPTIONS.find(opt => opt.value === conversionType)
 
   return (
@@ -834,20 +889,95 @@ ${htmlContent}
                           {selectedOption && <span className={selectedOption.color}>{selectedOption.icon}</span>}
                           Input ({selectedOption?.from})
                         </label>
-                        <Badge variant="secondary">{inputText.length} characters</Badge>
+                        <div className="flex items-center gap-2">
+                          {uploadedFileName && (
+                            <Badge variant="outline" className="gap-1">
+                              <File size={14} />
+                              {uploadedFileName}
+                            </Badge>
+                          )}
+                          <Badge variant="secondary">{inputText.length} characters</Badge>
+                        </div>
                       </div>
-                      <Textarea
-                        placeholder={`Paste your ${selectedOption?.from} code here...\n\n${
-                          conversionType === 'markdown-to-html' 
-                            ? 'Example:\n# My Heading\n\nThis is **bold** and this is *italic*.\n\n- List item 1\n- List item 2'
-                            : conversionType === 'yaml-to-json'
-                            ? 'Example:\nname: John Doe\nage: 30\nhobbies:\n  - reading\n  - coding\naddress:\n  city: New York\n  country: USA'
-                            : 'Try pasting JSON, HTML, CSS, or any supported format.'
+                      
+                      <div
+                        onDragOver={handleDragOver}
+                        onDragLeave={handleDragLeave}
+                        onDrop={handleDrop}
+                        className={`relative rounded-lg border-2 border-dashed transition-all ${
+                          isDragging 
+                            ? 'border-primary bg-primary/5 scale-[1.01]' 
+                            : 'border-border hover:border-accent/50'
                         }`}
-                        value={inputText}
-                        onChange={(e) => setInputText(e.target.value)}
-                        className="min-h-[500px] font-mono text-sm resize-none"
-                      />
+                      >
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          onChange={handleFileUpload}
+                          accept=".json,.ts,.tsx,.js,.jsx,.html,.css,.xml,.md,.yaml,.yml,.txt"
+                          className="hidden"
+                        />
+                        
+                        {!inputText ? (
+                          <motion.div 
+                            className="p-8 text-center cursor-pointer"
+                            onClick={handleUploadClick}
+                            whileHover={{ scale: 1.01 }}
+                            animate={isDragging ? { scale: 1.02 } : {}}
+                          >
+                            <div className="inline-flex p-4 bg-accent/10 rounded-full mb-4">
+                              <UploadSimple size={32} weight="duotone" className="text-accent" />
+                            </div>
+                            <h3 className="text-lg font-semibold mb-2">
+                              {isDragging ? 'Drop your file here' : 'Upload a file'}
+                            </h3>
+                            <p className="text-sm text-muted-foreground mb-3">
+                              Drag and drop or click to browse
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              Supported: .json, .ts, .js, .html, .css, .xml, .md, .yaml, .txt
+                            </p>
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="mt-4 gap-2"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleUploadClick()
+                              }}
+                            >
+                              <UploadSimple size={16} />
+                              Choose File
+                            </Button>
+                          </motion.div>
+                        ) : (
+                          <div className="relative">
+                            <Textarea
+                              placeholder={`Paste your ${selectedOption?.from} code here...\n\n${
+                                conversionType === 'markdown-to-html' 
+                                  ? 'Example:\n# My Heading\n\nThis is **bold** and this is *italic*.\n\n- List item 1\n- List item 2'
+                                  : conversionType === 'yaml-to-json'
+                                  ? 'Example:\nname: John Doe\nage: 30\nhobbies:\n  - reading\n  - coding\naddress:\n  city: New York\n  country: USA'
+                                  : 'Try pasting JSON, HTML, CSS, or any supported format.'
+                              }`}
+                              value={inputText}
+                              onChange={(e) => setInputText(e.target.value)}
+                              className="min-h-[400px] font-mono text-sm resize-none border-0"
+                            />
+                            <div className="absolute top-2 right-2">
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="gap-2 bg-background/80 backdrop-blur-sm"
+                                onClick={handleUploadClick}
+                              >
+                                <UploadSimple size={16} />
+                                Upload New
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
 
                     <div className="space-y-3">
