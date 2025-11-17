@@ -2,10 +2,11 @@ import { useState, useEffect, useMemo } from 'react'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
-import { MagnifyingGlass, BookOpen, Folder } from '@phosphor-icons/react'
+import { MagnifyingGlass, BookOpen, Folder, GlobeHemisphereWest } from '@phosphor-icons/react'
 import { motion } from 'framer-motion'
 import { DocumentCard } from '@/components/DocumentCard'
 import { DocumentViewer } from '@/components/DocumentViewer'
+import { NetworkDiagnosticPanel } from '@/components/NetworkDiagnosticPanel'
 import { useRecentDocuments } from '@/hooks/use-recent-documents'
 import { 
   DOCUMENT_FILES, 
@@ -21,6 +22,7 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [loading, setLoading] = useState(true)
+  const [showNetworkDiagnostics, setShowNetworkDiagnostics] = useState(false)
   const { addToRecent } = useRecentDocuments()
 
   useEffect(() => {
@@ -83,6 +85,22 @@ function App() {
     })
   }, [documents, searchQuery, selectedCategory])
 
+  if (showNetworkDiagnostics) {
+    return (
+      <div className="min-h-screen bg-background p-6">
+        <NetworkDiagnosticPanel />
+        <div className="mt-6">
+          <button
+            onClick={() => setShowNetworkDiagnostics(false)}
+            className="text-primary hover:underline"
+          >
+            ← Back to Documents
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   if (selectedDocument) {
     return (
       <DocumentViewer 
@@ -113,7 +131,14 @@ function App() {
                 Browse and search through all project documentation
               </p>
             </div>
-            <div className="ml-auto">
+            <div className="ml-auto flex items-center gap-3">
+              <button
+                onClick={() => setShowNetworkDiagnostics(true)}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors"
+              >
+                <GlobeHemisphereWest size={20} weight="duotone" className="text-primary" />
+                <span className="text-sm font-semibold text-primary">Network Diagnostics</span>
+              </button>
               <Badge variant="secondary" className="text-sm px-3 py-1">
                 {documents.length} documents
               </Badge>

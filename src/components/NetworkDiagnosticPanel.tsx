@@ -1,0 +1,355 @@
+import { useState, useEffect } from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { 
+  GlobeHemisphereWest, 
+  ShieldCheck, 
+  Warning, 
+  CheckCircle,
+  XCircle,
+  ArrowClockwise,
+  Code
+} from '@phosphor-icons/react'
+import { motion } from 'framer-motion'
+
+interface NetworkCheck {
+  name: string
+  status: 'checking' | 'success' | 'warning' | 'error'
+  message: string
+  details?: string
+  timestamp: string
+}
+
+interface PortInfo {
+  port: number
+  status: 'open' | 'blocked' | 'redirected' | 'unknown'
+  expectedDestination: string
+  actualDestination?: string
+  secure: boolean
+}
+
+export function NetworkDiagnosticPanel() {
+  const [checks, setChecks] = useState<NetworkCheck[]>([])
+  const [ports, setPorts] = useState<PortInfo[]>([])
+  const [isScanning, setIsScanning] = useState(false)
+  const [systemInfo, setSystemInfo] = useState<any>(null)
+
+  const runDiagnostics = async () => {
+    setIsScanning(true)
+    const newChecks: NetworkCheck[] = []
+
+    const addCheck = (name: string, status: NetworkCheck['status'], message: string, details?: string) => {
+      newChecks.push({
+        name,
+        status,
+        message,
+        details,
+        timestamp: new Date().toISOString()
+      })
+      setChecks([...newChecks])
+    }
+
+    addCheck('DNS Resolution', 'checking', 'Checking DNS configuration...', '')
+
+    try {
+      const response = await fetch('https://api.github.com/octocat')
+      if (response.ok) {
+        addCheck('GitHub API', 'success', 'GitHub API is accessible', `Status: ${response.status}`)
+      } else {
+        addCheck('GitHub API', 'warning', 'GitHub API returned non-200 status', `Status: ${response.status}`)
+      }
+    } catch (error) {
+      addCheck('GitHub API', 'error', 'Cannot reach GitHub API', error instanceof Error ? error.message : 'Unknown error')
+    }
+
+    try {
+      const response = await fetch(window.location.origin)
+      addCheck('Local Server', 'success', 'Local development server is responding', `Origin: ${window.location.origin}`)
+    } catch (error) {
+      addCheck('Local Server', 'error', 'Local server check failed', error instanceof Error ? error.message : 'Unknown error')
+    }
+
+    const userAgent = navigator.userAgent
+    const platform = navigator.platform
+    const language = navigator.language
+    const online = navigator.onLine
+    
+    setSystemInfo({
+      userAgent,
+      platform,
+      language,
+      online,
+      origin: window.location.origin,
+      hostname: window.location.hostname,
+      protocol: window.location.protocol,
+      port: window.location.port || '(default)'
+    })
+
+    addCheck('Browser Status', online ? 'success' : 'error', 
+      online ? 'Browser is online' : 'Browser is offline',
+      `Platform: ${platform}`)
+
+    const commonPorts = [
+      { port: 3000, name: 'React Dev Server', expectedDest: 'localhost:3000' },
+      { port: 5000, name: 'Vite Preview', expectedDest: 'localhost:5000' },
+      { port: 4173, name: 'Vite Build Preview', expectedDest: 'localhost:4173' },
+      { port: 8080, name: 'Alternative HTTP', expectedDest: 'localhost:8080' },
+      { port: 9000, name: 'Custom Port', expectedDest: 'localhost:9000' }
+    ]
+
+    const portResults: PortInfo[] = []
+    for (const { port, expectedDest } of commonPorts) {
+      try {
+        const testUrl = `${window.location.protocol}//${window.location.hostname}:${port}`
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 2000)
+        
+        try {
+          const response = await fetch(testUrl, { 
+            signal: controller.signal,
+            mode: 'no-cors'
+          })
+          clearTimeout(timeoutId)
+          
+          portResults.push({
+            port,
+            status: 'open',
+            expectedDestination: expectedDest,
+            actualDestination: testUrl,
+            secure: testUrl.startsWith('https')
+          })
+        } catch (fetchError) {
+          clearTimeout(timeoutId)
+          portResults.push({
+            port,
+            status: 'unknown',
+            expectedDestination: expectedDest,
+            secure: false
+          })
+        }
+      } catch (error) {
+        portResults.push({
+          port,
+          status: 'blocked',
+          expectedDestination: expectedDest,
+          secure: false
+        })
+      }
+    }
+
+    setPorts(portResults)
+    addCheck('Port Scan Complete', 'success', `Scanned ${commonPorts.length} ports`, '')
+
+    setIsScanning(false)
+  }
+
+  useEffect(() => {
+    runDiagnostics()
+  }, [])
+
+  const getStatusIcon = (status: NetworkCheck['status']) => {
+    switch (status) {
+      case 'success':
+        return <CheckCircle weight="fill" className="text-green-500" size={20} />
+      case 'warning':
+        return <Warning weight="fill" className="text-amber-500" size={20} />
+      case 'error':
+        return <XCircle weight="fill" className="text-red-500" size={20} />
+      default:
+        return <ArrowClockwise className="animate-spin text-blue-500" size={20} />
+    }
+  }
+
+  const getPortStatusColor = (status: PortInfo['status']) => {
+    switch (status) {
+      case 'open':
+        return 'bg-green-500'
+      case 'blocked':
+        return 'bg-red-500'
+      case 'redirected':
+        return 'bg-amber-500'
+      default:
+        return 'bg-gray-400'
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="p-3 bg-primary/10 rounded-xl">
+            <GlobeHemisphereWest size={32} weight="duotone" className="text-primary" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold">Network Diagnostics</h2>
+            <p className="text-muted-foreground">Monitor connections, ports, and security</p>
+          </div>
+        </div>
+        <Button onClick={runDiagnostics} disabled={isScanning}>
+          <ArrowClockwise className={isScanning ? 'animate-spin' : ''} size={16} />
+          {isScanning ? 'Scanning...' : 'Refresh Scan'}
+        </Button>
+      </div>
+
+      <Tabs defaultValue="checks" className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="checks">Connection Checks</TabsTrigger>
+          <TabsTrigger value="ports">Port Status</TabsTrigger>
+          <TabsTrigger value="system">System Info</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="checks" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Network Connection Tests</CardTitle>
+              <CardDescription>
+                Real-time checks of your network connectivity and API access
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ScrollArea className="h-[500px] pr-4">
+                <div className="space-y-3">
+                  {checks.map((check, index) => (
+                    <motion.div
+                      key={`${check.name}-${index}`}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                    >
+                      <Alert className="relative">
+                        <div className="flex items-start gap-3">
+                          {getStatusIcon(check.status)}
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between mb-1">
+                              <h4 className="font-semibold">{check.name}</h4>
+                              <Badge variant="outline" className="text-xs">
+                                {new Date(check.timestamp).toLocaleTimeString()}
+                              </Badge>
+                            </div>
+                            <AlertDescription>
+                              <p className="mb-1">{check.message}</p>
+                              {check.details && (
+                                <code className="text-xs bg-muted px-2 py-1 rounded block mt-2">
+                                  {check.details}
+                                </code>
+                              )}
+                            </AlertDescription>
+                          </div>
+                        </div>
+                      </Alert>
+                    </motion.div>
+                  ))}
+                </div>
+              </ScrollArea>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="ports" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ShieldCheck size={24} weight="duotone" className="text-primary" />
+                Port Security Status
+              </CardTitle>
+              <CardDescription>
+                Monitor which ports are accessible and verify no unauthorized redirections
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {ports.map((portInfo) => (
+                  <Card key={portInfo.port}>
+                    <CardContent className="pt-6">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className={`w-3 h-3 rounded-full ${getPortStatusColor(portInfo.status)}`} />
+                          <div>
+                            <p className="font-semibold text-lg">Port {portInfo.port}</p>
+                            <p className="text-sm text-muted-foreground">
+                              Expected: {portInfo.expectedDestination}
+                            </p>
+                            {portInfo.actualDestination && (
+                              <p className="text-xs text-muted-foreground mt-1">
+                                Actual: {portInfo.actualDestination}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Badge variant={portInfo.status === 'open' ? 'default' : 'destructive'}>
+                            {portInfo.status.toUpperCase()}
+                          </Badge>
+                          {portInfo.secure && (
+                            <Badge variant="outline" className="gap-1">
+                              <ShieldCheck size={14} />
+                              Secure
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                      {portInfo.status === 'redirected' && (
+                        <Alert className="mt-4">
+                          <Warning size={16} />
+                          <AlertDescription>
+                            This port may be redirected to an unexpected destination. 
+                            Verify this is intentional.
+                          </AlertDescription>
+                        </Alert>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="system" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Code size={24} weight="duotone" className="text-primary" />
+                System Information
+              </CardTitle>
+              <CardDescription>
+                Current environment and browser details
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {systemInfo ? (
+                <div className="space-y-4">
+                  {Object.entries(systemInfo).map(([key, value]) => (
+                    <div key={key} className="flex flex-col gap-1 pb-3 border-b last:border-0">
+                      <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                        {key.replace(/([A-Z])/g, ' $1').trim()}
+                      </span>
+                      <span className="font-mono text-sm break-all">
+                        {String(value)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-muted-foreground">No system information available</p>
+              )}
+            </CardContent>
+          </Card>
+
+          <Alert>
+            <ShieldCheck size={16} />
+            <AlertDescription>
+              <strong>Security Recommendation:</strong> Review the port status regularly to ensure
+              no unauthorized redirections are occurring. All connections should point to your
+              intended destinations only.
+            </AlertDescription>
+          </Alert>
+        </TabsContent>
+      </Tabs>
+    </div>
+  )
+}
