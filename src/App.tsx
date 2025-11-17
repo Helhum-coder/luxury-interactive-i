@@ -20,6 +20,7 @@ import NetworkDiagnostic from '@/components/NetworkDiagnostic'
 import FirewallDiagnostic from '@/components/FirewallDiagnostic'
 import ClusterConnectionAnalyzer from '@/components/ClusterConnectionAnalyzer'
 import DashboardTemplateManager from '@/components/DashboardTemplateManager'
+import PersonalTemplateManager from '@/components/PersonalTemplateManager'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -942,7 +943,7 @@ function App() {
 
           <TabsContent value="templates" className="flex-1 m-0 overflow-hidden">
             <Card className="h-full border-2 border-accent/50 console-glow-active rounded-none bg-card/50 overflow-hidden">
-              <DashboardTemplateManager onApplyTemplate={handleApplyTemplate} />
+              <PersonalTemplateManager onApplyTemplate={handleApplyTemplate} />
             </Card>
           </TabsContent>
         </Tabs>
