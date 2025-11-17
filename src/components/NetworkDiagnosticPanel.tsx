@@ -52,7 +52,11 @@ interface PortInfo {
   secure: boolean
 }
 
-export function NetworkDiagnosticPanel() {
+interface NetworkDiagnosticPanelProps {
+  onShowFixScripts?: () => void
+}
+
+export function NetworkDiagnosticPanel({ onShowFixScripts }: NetworkDiagnosticPanelProps = {}) {
   const [checks, setChecks] = useState<NetworkCheck[]>([])
   const [ports, setPorts] = useState<PortInfo[]>([])
   const [isScanning, setIsScanning] = useState(false)
@@ -403,6 +407,12 @@ export function NetworkDiagnosticPanel() {
           </div>
         </div>
         <div className="flex gap-2">
+          {onShowFixScripts && (
+            <Button variant="default" onClick={onShowFixScripts}>
+              <Lightning size={16} />
+              Fix Scripts
+            </Button>
+          )}
           <Button variant="outline" onClick={exportDiagnostics} disabled={checks.length === 0}>
             <DownloadSimple size={16} />
             Export Report

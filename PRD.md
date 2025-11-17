@@ -68,12 +68,36 @@ A comprehensive document viewer that provides organized access to all markdown d
 - **Progression**: Scan runs → Issues detected → Toast appears → User clicks to view → Navigate to diagnostics
 - **Success criteria**: Notifications appear promptly, can be dismissed, not intrusive
 
+### Automated Fix Scripts
+- **Functionality**: One-click automated solutions for common network, cache, DNS, and browser issues
+- **Purpose**: Enable users to resolve problems quickly without technical knowledge
+- **Trigger**: User navigates to Fix Scripts or clicks from Network Diagnostics panel
+- **Progression**: View script library → Select category filter → Read script description → Click "Run Script" → See real-time progress → View success/error result → Check execution history
+- **Success criteria**: Scripts execute reliably, provide clear feedback, log results, handle failures gracefully
+
+### Fix Script Categories
+- **Functionality**: Organized collection of 12+ automated fix scripts grouped by type
+- **Purpose**: Help users find the right solution for their specific problem
+- **Trigger**: User browses fix scripts interface
+- **Progression**: See all scripts → Filter by category (Network/Cache/Browser/Security/DNS) → View estimated time & severity → Run selected script
+- **Success criteria**: Clear categorization, accurate execution times, appropriate severity levels
+
+### Fix Execution History
+- **Functionality**: Persistent log of all executed fix scripts with timestamps, results, and details
+- **Purpose**: Track what fixes have been tried and their outcomes for troubleshooting
+- **Trigger**: Any script execution
+- **Progression**: Script runs → Result logged automatically → View history panel → See success/failure with details → Export if needed
+- **Success criteria**: All executions logged, history persists across sessions, shows last 50 entries
+
 ## Edge Case Handling
 - **No Documents Found**: Display helpful empty state with instructions
 - **Search No Results**: Show "no matches found" with suggestion to refine search
 - **Markdown Parse Errors**: Gracefully handle malformed markdown, show raw text if needed
 - **Large Documents**: Implement virtual scrolling or pagination for performance
 - **Broken Links**: Handle relative links, external links, and missing assets gracefully
+- **Script Execution Failures**: Show clear error messages, suggest alternatives, don't break UI
+- **Concurrent Script Runs**: Prevent multiple scripts running simultaneously to avoid conflicts
+- **Browser Compatibility**: Check API support before executing (caches, clipboard, etc.)
 
 ## Design Direction
 The design should feel professional and documentation-focused, with a clean, minimalist interface that prioritizes readability and efficient information access, using a rich interface with clear visual hierarchy to handle the volume of content.
@@ -142,6 +166,12 @@ Subtle and functional, focused on smooth transitions between document views, gen
   - `List` for table of contents
   - `BookOpen` for reading mode
   - `Copy` for copy code blocks
+  - `Lightning` for fix scripts
+  - `Play` for execute action
+  - `CheckCircle` for success states
+  - `XCircle` for error states
+  - `Wrench` for tools/fixes
+  - `GlobeHemisphereWest` for network
   
 - **Spacing**: 
   - Container padding: `p-6` (24px)

@@ -2,11 +2,12 @@ import { useState, useEffect, useMemo } from 'react'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
-import { MagnifyingGlass, BookOpen, Folder, GlobeHemisphereWest } from '@phosphor-icons/react'
+import { MagnifyingGlass, BookOpen, Folder, GlobeHemisphereWest, Lightning } from '@phosphor-icons/react'
 import { motion } from 'framer-motion'
 import { DocumentCard } from '@/components/DocumentCard'
 import { DocumentViewer } from '@/components/DocumentViewer'
 import { NetworkDiagnosticPanel } from '@/components/NetworkDiagnosticPanel'
+import { AutomatedFixScripts } from '@/components/AutomatedFixScripts'
 import { useRecentDocuments } from '@/hooks/use-recent-documents'
 import { 
   DOCUMENT_FILES, 
@@ -23,6 +24,7 @@ function App() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [loading, setLoading] = useState(true)
   const [showNetworkDiagnostics, setShowNetworkDiagnostics] = useState(false)
+  const [showFixScripts, setShowFixScripts] = useState(false)
   const { addToRecent } = useRecentDocuments()
 
   useEffect(() => {
@@ -88,10 +90,29 @@ function App() {
   if (showNetworkDiagnostics) {
     return (
       <div className="min-h-screen bg-background p-6">
-        <NetworkDiagnosticPanel />
+        <NetworkDiagnosticPanel onShowFixScripts={() => {
+          setShowNetworkDiagnostics(false)
+          setShowFixScripts(true)
+        }} />
         <div className="mt-6">
           <button
             onClick={() => setShowNetworkDiagnostics(false)}
+            className="text-primary hover:underline"
+          >
+            ← Back to Documents
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  if (showFixScripts) {
+    return (
+      <div className="min-h-screen bg-background p-6">
+        <AutomatedFixScripts />
+        <div className="mt-6">
+          <button
+            onClick={() => setShowFixScripts(false)}
             className="text-primary hover:underline"
           >
             ← Back to Documents
@@ -132,6 +153,13 @@ function App() {
               </p>
             </div>
             <div className="ml-auto flex items-center gap-3">
+              <button
+                onClick={() => setShowFixScripts(true)}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 transition-colors"
+              >
+                <Lightning size={20} weight="duotone" className="text-amber-600" />
+                <span className="text-sm font-semibold text-amber-600">Fix Scripts</span>
+              </button>
               <button
                 onClick={() => setShowNetworkDiagnostics(true)}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors"
