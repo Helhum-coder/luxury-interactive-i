@@ -110,6 +110,20 @@ A comprehensive document viewer that provides organized access to all markdown d
 - **Progression**: Pattern identified → Send to LLM with context → Receive structured recommendation → Parse actions → Mark automated vs manual → Display with confidence score → User executes action
 - **Success criteria**: Clear recommendations, 2-4 actionable steps per issue, estimated fix times accurate, automated actions work reliably
 
+### Satellite Connection Monitor
+- **Functionality**: Real-time browser satellite network connection monitoring with live metrics
+- **Purpose**: Monitor satellite network connectivity status, latency, bandwidth, and signal strength
+- **Trigger**: User clicks "Satellite Monitor" button or from diagnostics panel
+- **Progression**: Open monitor → Start monitoring → View real-time metrics (latency, bandwidth, packet loss, signal strength) → Track uptime → Review connection history → Stop monitoring
+- **Success criteria**: Updates every second, accurate metrics display, color-coded status indicators, connection history logged
+
+### Multi-Format File Converter
+- **Functionality**: Convert files between multiple formats (JSON↔TypeScript, HTML↔JSX, CSS↔Tailwind, JS↔TS, XML↔JSON)
+- **Purpose**: Quickly transform code between different formats for development workflows
+- **Trigger**: User clicks "File Converter" button
+- **Progression**: Select conversion type → Paste source code → Click convert → View output → Copy or download result
+- **Success criteria**: All 5 conversion types work accurately, handles syntax errors gracefully, provides copy and download options
+
 ## Edge Case Handling
 - **No Documents Found**: Display helpful empty state with instructions
 - **Search No Results**: Show "no matches found" with suggestion to refine search
@@ -123,6 +137,11 @@ A comprehensive document viewer that provides organized access to all markdown d
 - **No Error Patterns**: Display helpful message encouraging network scan first
 - **Low Confidence Recommendations**: Clearly mark recommendations below 60% confidence
 - **Duplicate Patterns**: Merge similar error patterns to avoid noise
+- **Satellite Connection Lost**: Show disconnected state, attempt auto-reconnect, log disconnection time
+- **Invalid Conversion Input**: Display clear error messages with format examples
+- **Large File Conversions**: Show loading state, handle memory limits gracefully
+- **Unsupported Conversion Types**: Clearly indicate which conversions are supported
+- **Clipboard Access Denied**: Fallback to manual copy with instructions
 
 ## Design Direction
 The design should feel professional and documentation-focused, with a clean, minimalist interface that prioritizes readability and efficient information access, using a rich interface with clear visual hierarchy to handle the volume of content.
@@ -204,6 +223,13 @@ Subtle and functional, focused on smooth transitions between document views, gen
   - `Lightbulb` for recommendations
   - `Bug` for error patterns
   - `ChartBar` for analytics
+  - `Globe` for satellite monitoring
+  - `FileCode` for file conversion
+  - `ArrowRight` for conversion flow
+  - `Copy` for copy actions
+  - `Download` for download actions
+  - `WifiHigh`/`WifiSlash` for connection status
+  - `Activity` for monitoring activity
   
 - **Spacing**: 
   - Container padding: `p-6` (24px)
