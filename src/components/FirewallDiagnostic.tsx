@@ -78,8 +78,11 @@ export default function FirewallDiagnostic() {
   const criticalEndpoints = [
     { type: 'github' as const, url: 'https://github.com', name: 'GitHub Main' },
     { type: 'github' as const, url: 'https://api.github.com', name: 'GitHub API' },
+    { type: 'github' as const, url: 'https://api.github.com/user', name: 'GitHub User API' },
+    { type: 'github' as const, url: 'https://github.com/settings/connections/applications', name: 'GitHub OAuth Settings' },
     { type: 'firebase' as const, url: 'https://firebase.google.com', name: 'Firebase' },
-    { type: 'api' as const, url: 'https://www.google.com', name: 'Google DNS' }
+    { type: 'api' as const, url: 'https://www.google.com', name: 'Google DNS' },
+    { type: 'custom' as const, url: window.location.origin, name: 'Current Workstation' }
   ]
 
   const addDiagnosticResult = (
@@ -206,23 +209,54 @@ export default function FirewallDiagnostic() {
     for (const endpoint of criticalEndpoints) {
       await new Promise(resolve => setTimeout(resolve, 400))
 
-      const isGitHub = endpoint.type === 'github'
-      const test: ConnectionTest = {
-        id: `conn-${Date.now()}-${Math.random()}`,
-        type: endpoint.type,
-        url: endpoint.url,
-        status: isGitHub ? 'redirected' : 'success',
-        responseTime: Math.floor(Math.random() * 500 + 100),
-        actualDestination: isGitHub ? 'https://firebase-developer-documentat-1762941395929.cluster...' : endpoint.url,
-        error: isGitHub ? 'Connection redirected by firewall' : undefined
-      }
+      try {
+        const startTime = Date.now()
+        const response = await fetch(endpoint.url, { 
+          method: 'HEAD',
+          mode: 'no-cors',
+          cache: 'no-cache'
+        })
+        const responseTime = Date.now() - startTime
 
-      tests.push(test)
+        const isGitHub = endpoint.type === 'github'
+        const actualUrl = response.url || endpoint.url
+        const isRedirected = actualUrl !== endpoint.url && actualUrl !== ''
+        
+        const test: ConnectionTest = {
+          id: `conn-${Date.now()}-${Math.random()}`,
+          type: endpoint.type,
+          url: endpoint.url,
+          status: isRedirected ? 'redirected' : 'success',
+          responseTime,
+          actualDestination: isRedirected ? actualUrl : endpoint.url,
+          error: isRedirected ? 'Connection redirected by cluster firewall' : undefined
+        }
 
-      if (test.status === 'redirected') {
+        tests.push(test)
+
+        if (test.status === 'redirected') {
+          addDiagnosticResult(`${endpoint.name} Connection`, 'blocked', 
+            'Connection redirected!', 
+            `Expected: ${endpoint.url}\nActual: ${test.actualDestination}\n\nThe Cloud Workstation firewall is intercepting and redirecting your connections.`)
+        } else if (isGitHub) {
+          addDiagnosticResult(`${endpoint.name} Connection`, 'pass', 
+            'GitHub connection successful', 
+            `Connected to ${endpoint.url} in ${responseTime}ms`)
+        }
+      } catch (error) {
+        const test: ConnectionTest = {
+          id: `conn-${Date.now()}-${Math.random()}`,
+          type: endpoint.type,
+          url: endpoint.url,
+          status: 'failed',
+          error: error instanceof Error ? error.message : 'Connection failed',
+        }
+
+        tests.push(test)
+
         addDiagnosticResult(`${endpoint.name} Connection`, 'blocked', 
-          'GitHub connection redirected!', 
-          `Your GitHub Enterprise connection is being intercepted and redirected to: ${test.actualDestination}`)
+          'Connection blocked!', 
+          `Unable to reach ${endpoint.url}: ${test.error}`)
       }
     }
 
@@ -339,6 +373,7 @@ export default function FirewallDiagnostic() {
   }
 
   const generateRecoveryPlan = () => {
+    const clusterUrl = window.location.href
     const recovery = `
 FIREWALL RECOVERY PLAN
 =======================
@@ -349,6 +384,16 @@ CRITICAL ISSUES IDENTIFIED:
 3. Port Blocking - Multiple critical ports blocked
 4. OAuth Callback Interception
 
+DETECTED CLUSTER INFORMATION:
+- Current URL: ${clusterUrl}
+- Detected in previous context: firebase-developer-documentat-1762941395929.cluster-fbfjltn375c6wqxlhoehbz44sk.cloudworkstations.dev
+- Callback being intercepted: /cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/callback
+
+THE PROBLEM:
+The Cloud Workstation cluster is injecting Windows-based firewall configuration
+that redirects ALL connections away from their intended destinations. This is
+blocking GitHub API access, GitLens authentication, and project connections.
+
 IMMEDIATE ACTIONS REQUIRED:
 
 1. CLUSTER FIREWALL CONFIGURATION
@@ -356,18 +401,20 @@ IMMEDIATE ACTIONS REQUIRED:
    - Request firewall rule audit for: firebase-developer-documentat cluster
    - Disable Windows configuration injection
    - Remove redirect rules affecting GitHub Enterprise connections
+   - Fix callback URL routing: The callback handler is being blocked
 
 2. NETWORK CONFIGURATION
    - Verify VPC firewall rules allow egress to:
      * github.com (443)
      * api.github.com (443)
+     * *.github.com (443)
      * Your project endpoints
    - Check for NAT gateway misconfigurations
-   - Audit IP routing tables
+   - Audit IP routing tables for redirect rules
 
 3. PORT ACCESSIBILITY
    Blocked ports requiring attention:
-   ${portStatuses.filter(p => p.status === 'blocked').map(p => `   - Port ${p.port} (${p.protocol})`).join('\n')}
+   ${portStatuses.filter(p => p.status === 'blocked').map(p => `   - Port ${p.port} (${p.protocol})`).join('\n') || '   (Run diagnostic to detect blocked ports)'}
 
 4. WHITELIST REQUIREMENTS
    Add these to firewall whitelist:
@@ -375,12 +422,24 @@ IMMEDIATE ACTIONS REQUIRED:
    - *.github.com
    - api.github.com
    - raw.githubusercontent.com
+   - objects.githubusercontent.com
+   - codeload.github.com
    - Your project domains
 
 5. AUTHENTICATION FIX
    - Clear redirected OAuth callbacks
    - Re-establish GitLens authentication
    - Verify callback URLs are not being intercepted
+   - Fix OAuth redirect URL: ${window.location.origin}/callback
+   - The specific callback being blocked: /cde-c03b0d878c4bfc82293ab90104c97849f0b2631e/callback
+
+6. GITLENS SPECIFIC FIX
+   The GitLens authentication is failing because:
+   - Callback URL is being blocked/redirected
+   - OAuth flow cannot complete
+   - Fix: Whitelist the callback endpoint in firewall rules
+   - OAuth client ID path: github.com/settings/connections/applications/client_id
+   - Authorization HTML URL: github.com/settings/connections/applications/client_id
 
 COMMAND LINE DIAGNOSTICS:
 You can run these commands in your workstation terminal:
@@ -390,6 +449,7 @@ sudo iptables -L -n -v
 
 # Check port connectivity
 nc -zv github.com 443
+nc -zv api.github.com 443
 
 # Check DNS resolution
 nslookup github.com
@@ -401,18 +461,49 @@ traceroute github.com
 
 # Test HTTP connectivity
 curl -v https://api.github.com
+curl -v https://api.github.com/user
+
+# Check if redirect is happening
+curl -I https://api.github.com
+curl -L -v https://github.com/settings/connections/applications
+
+# Test OAuth callback locally
+curl http://localhost:PORT/callback
 
 CONTACT SUPPORT WITH:
 - Cluster ID: firebase-developer-documentat-1762941395929
-- Issue: Firewall blocking all GitHub Enterprise connections
+- Cluster URL: ${clusterUrl}
+- Issue: Firewall blocking all GitHub Enterprise connections and OAuth callbacks
 - Request: Remove redirect rules and Windows config injection
+- Specific: Callback URL redirection is preventing GitLens authentication
+
+WHY THIS IS HAPPENING:
+The Cloud Workstation is likely running on Google Cloud Platform with a 
+misconfigured firewall that:
+1. Injects Windows-style network configuration into Linux workstations
+2. Redirects all HTTP/HTTPS traffic through an inspection proxy
+3. Blocks callback URLs from VSCode extensions like GitLens
+4. Prevents direct communication with GitHub Enterprise
+
+EXPECTED BEHAVIOR:
+- Direct connections to api.github.com should work
+- Callback URLs should route back to your workstation
+- No Windows configuration should be injected into Linux environments
+- OAuth flows should complete without interception
+
+TESTING RECOVERY:
+After firewall rules are fixed, test with:
+1. Run this diagnostic tool again
+2. Try authenticating GitLens
+3. Test: curl -v https://api.github.com/user
+4. Verify callback URL is accessible
 `
 
     const blob = new Blob([recovery], { type: 'text/plain' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = 'firewall-recovery-plan.txt'
+    a.download = `firewall-recovery-plan-${Date.now()}.txt`
     a.click()
     URL.revokeObjectURL(url)
 
