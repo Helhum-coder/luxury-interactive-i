@@ -21,7 +21,8 @@ import {
   Wrench,
   Lightning,
   Copy,
-  Check
+  Check,
+  Sparkle
 } from '@phosphor-icons/react'
 import { motion } from 'framer-motion'
 import { toast } from 'sonner'
@@ -54,9 +55,10 @@ interface PortInfo {
 
 interface NetworkDiagnosticPanelProps {
   onShowFixScripts?: () => void
+  onShowAIDiagnostics?: (checks: NetworkCheck[]) => void
 }
 
-export function NetworkDiagnosticPanel({ onShowFixScripts }: NetworkDiagnosticPanelProps = {}) {
+export function NetworkDiagnosticPanel({ onShowFixScripts, onShowAIDiagnostics }: NetworkDiagnosticPanelProps = {}) {
   const [checks, setChecks] = useState<NetworkCheck[]>([])
   const [ports, setPorts] = useState<PortInfo[]>([])
   const [isScanning, setIsScanning] = useState(false)
@@ -407,6 +409,16 @@ export function NetworkDiagnosticPanel({ onShowFixScripts }: NetworkDiagnosticPa
           </div>
         </div>
         <div className="flex gap-2">
+          {onShowAIDiagnostics && (
+            <Button 
+              variant="default" 
+              onClick={() => onShowAIDiagnostics(checks)}
+              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+            >
+              <Sparkle size={16} weight="fill" />
+              AI Analysis
+            </Button>
+          )}
           {onShowFixScripts && (
             <Button variant="default" onClick={onShowFixScripts}>
               <Lightning size={16} />

@@ -2,12 +2,13 @@ import { useState, useEffect, useMemo } from 'react'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
-import { MagnifyingGlass, BookOpen, Folder, GlobeHemisphereWest, Lightning } from '@phosphor-icons/react'
+import { MagnifyingGlass, BookOpen, Folder, GlobeHemisphereWest, Lightning, Brain } from '@phosphor-icons/react'
 import { motion } from 'framer-motion'
 import { DocumentCard } from '@/components/DocumentCard'
 import { DocumentViewer } from '@/components/DocumentViewer'
 import { NetworkDiagnosticPanel } from '@/components/NetworkDiagnosticPanel'
 import { AutomatedFixScripts } from '@/components/AutomatedFixScripts'
+import { AIDiagnosticEngine } from '@/components/AIDiagnosticEngine'
 import { useRecentDocuments } from '@/hooks/use-recent-documents'
 import { 
   DOCUMENT_FILES, 
@@ -25,6 +26,8 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [showNetworkDiagnostics, setShowNetworkDiagnostics] = useState(false)
   const [showFixScripts, setShowFixScripts] = useState(false)
+  const [showAIDiagnostics, setShowAIDiagnostics] = useState(false)
+  const [networkCheckResults, setNetworkCheckResults] = useState<any[]>([])
   const { addToRecent } = useRecentDocuments()
 
   useEffect(() => {
@@ -87,13 +90,36 @@ function App() {
     })
   }, [documents, searchQuery, selectedCategory])
 
+  if (showAIDiagnostics) {
+    return (
+      <div className="min-h-screen bg-background p-6">
+        <AIDiagnosticEngine networkChecks={networkCheckResults} />
+        <div className="mt-6">
+          <button
+            onClick={() => setShowAIDiagnostics(false)}
+            className="text-primary hover:underline"
+          >
+            ← Back to Documents
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   if (showNetworkDiagnostics) {
     return (
       <div className="min-h-screen bg-background p-6">
-        <NetworkDiagnosticPanel onShowFixScripts={() => {
-          setShowNetworkDiagnostics(false)
-          setShowFixScripts(true)
-        }} />
+        <NetworkDiagnosticPanel 
+          onShowFixScripts={() => {
+            setShowNetworkDiagnostics(false)
+            setShowFixScripts(true)
+          }}
+          onShowAIDiagnostics={(checks) => {
+            setNetworkCheckResults(checks)
+            setShowNetworkDiagnostics(false)
+            setShowAIDiagnostics(true)
+          }}
+        />
         <div className="mt-6">
           <button
             onClick={() => setShowNetworkDiagnostics(false)}
@@ -153,6 +179,13 @@ function App() {
               </p>
             </div>
             <div className="ml-auto flex items-center gap-3">
+              <button
+                onClick={() => setShowAIDiagnostics(true)}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-500/10 to-pink-500/10 hover:from-purple-500/20 hover:to-pink-500/20 transition-colors"
+              >
+                <Brain size={20} weight="duotone" className="text-purple-600" />
+                <span className="text-sm font-semibold text-purple-600">AI Diagnostics</span>
+              </button>
               <button
                 onClick={() => setShowFixScripts(true)}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 transition-colors"

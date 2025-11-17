@@ -89,6 +89,27 @@ A comprehensive document viewer that provides organized access to all markdown d
 - **Progression**: Script runs → Result logged automatically → View history panel → See success/failure with details → Export if needed
 - **Success criteria**: All executions logged, history persists across sessions, shows last 50 entries
 
+### AI-Powered Diagnostic Engine
+- **Functionality**: Machine learning-based error pattern analysis that generates intelligent recommendations
+- **Purpose**: Automatically identify root causes and suggest targeted solutions for recurring issues
+- **Trigger**: User clicks "AI Diagnostics" or from Network Diagnostics via "AI Analysis" button
+- **Progression**: Click AI analysis → LLM analyzes error patterns → Patterns categorized by type & severity → AI generates recommendations with confidence scores → View detailed reasoning → Execute automated actions → Track results
+- **Success criteria**: Accurate pattern detection, relevant recommendations, high confidence scores (>75%), actionable insights
+
+### Error Pattern Recognition
+- **Functionality**: Intelligent classification of errors into types (CORS, DNS, SSL, Cache, Network, Port, Timeout)
+- **Purpose**: Identify recurring issues and their frequency to prioritize fixes
+- **Trigger**: AI analysis runs on network check results
+- **Progression**: Collect diagnostics → Detect patterns → Count occurrences → Determine severity → Track timeline → Display organized list
+- **Success criteria**: Accurate categorization, severity levels appropriate, occurrence tracking reliable
+
+### AI Recommendation Generation
+- **Functionality**: LLM-powered recommendation engine that provides step-by-step fixes
+- **Purpose**: Transform technical errors into actionable solutions for any skill level
+- **Trigger**: Error patterns detected during analysis
+- **Progression**: Pattern identified → Send to LLM with context → Receive structured recommendation → Parse actions → Mark automated vs manual → Display with confidence score → User executes action
+- **Success criteria**: Clear recommendations, 2-4 actionable steps per issue, estimated fix times accurate, automated actions work reliably
+
 ## Edge Case Handling
 - **No Documents Found**: Display helpful empty state with instructions
 - **Search No Results**: Show "no matches found" with suggestion to refine search
@@ -98,16 +119,21 @@ A comprehensive document viewer that provides organized access to all markdown d
 - **Script Execution Failures**: Show clear error messages, suggest alternatives, don't break UI
 - **Concurrent Script Runs**: Prevent multiple scripts running simultaneously to avoid conflicts
 - **Browser Compatibility**: Check API support before executing (caches, clipboard, etc.)
+- **AI Analysis Failures**: Fallback to pre-defined recommendations if LLM is unavailable
+- **No Error Patterns**: Display helpful message encouraging network scan first
+- **Low Confidence Recommendations**: Clearly mark recommendations below 60% confidence
+- **Duplicate Patterns**: Merge similar error patterns to avoid noise
 
 ## Design Direction
 The design should feel professional and documentation-focused, with a clean, minimalist interface that prioritizes readability and efficient information access, using a rich interface with clear visual hierarchy to handle the volume of content.
 
 ## Color Selection
-Complementary (opposite colors) - Using deep blues for navigation/structure and warm amber accents for interactive elements, creating a professional yet approachable documentation experience.
+Complementary (opposite colors) with gradient accents - Using deep blues for navigation/structure, warm amber for actions, and purple-to-pink gradients for AI features, creating a professional yet modern diagnostic experience.
 
 - **Primary Color**: Deep Blue `oklch(0.35 0.15 250)` - Communicates trust, stability, and professionalism for navigation and headers
 - **Secondary Colors**: Slate Blue `oklch(0.55 0.08 250)` for secondary UI elements and muted backgrounds
 - **Accent Color**: Warm Amber `oklch(0.75 0.15 70)` - Highlights interactive elements, CTAs, and important information
+- **AI Gradient**: Purple `oklch(0.55 0.20 300)` to Pink `oklch(0.65 0.25 350)` - Represents intelligent, cutting-edge AI features
 - **Foreground/Background Pairings**:
   - Background (White `oklch(1 0 0)`): Foreground Dark Gray `oklch(0.20 0.01 250)` - Ratio 16.2:1 ✓
   - Card (Soft White `oklch(0.98 0.005 250)`): Foreground Dark Gray `oklch(0.20 0.01 250)` - Ratio 15.1:1 ✓
@@ -115,6 +141,7 @@ Complementary (opposite colors) - Using deep blues for navigation/structure and 
   - Secondary (Slate Blue `oklch(0.55 0.08 250)`): White text `oklch(1 0 0)` - Ratio 4.7:1 ✓
   - Accent (Warm Amber `oklch(0.75 0.15 70)`): Dark Gray `oklch(0.20 0.01 250)` - Ratio 10.2:1 ✓
   - Muted (Light Gray `oklch(0.95 0.01 250)`): Medium Gray `oklch(0.45 0.02 250)` - Ratio 7.8:1 ✓
+  - AI Purple: White text `oklch(1 0 0)` - Ratio 6.1:1 ✓
 
 ## Font Selection
 Clear, highly readable sans-serif for body text combined with a monospace font for code blocks, conveying professionalism and technical precision.
@@ -172,6 +199,11 @@ Subtle and functional, focused on smooth transitions between document views, gen
   - `XCircle` for error states
   - `Wrench` for tools/fixes
   - `GlobeHemisphereWest` for network
+  - `Brain` for AI diagnostics
+  - `Sparkle` for AI features
+  - `Lightbulb` for recommendations
+  - `Bug` for error patterns
+  - `ChartBar` for analytics
   
 - **Spacing**: 
   - Container padding: `p-6` (24px)
