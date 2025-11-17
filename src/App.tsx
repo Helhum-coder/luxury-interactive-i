@@ -15,6 +15,7 @@ import CICDPipelineManager from '@/components/CICDPipelineManager'
 import ClusterAccessDiagnostic from '@/components/ClusterAccessDiagnostic'
 import ClusterHealthMonitor from '@/components/ClusterHealthMonitor'
 import APIIntegrationManager from '@/components/APIIntegrationManager'
+import UnifiedDashboard from '@/components/UnifiedDashboard'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -39,7 +40,8 @@ import {
   CirclesThreePlus,
   CloudArrowUp,
   Activity,
-  Plugs
+  Plugs,
+  Kanban
 } from '@phosphor-icons/react'
 import { ConsoleType, ConsoleMessage, DashboardWidget, MarketingStrategy } from '@/lib/types'
 import { detectLocalVersion } from '@/lib/version-detector'
@@ -755,6 +757,13 @@ function App() {
                 <Plugs size={18} weight="fill" className="mr-2" />
                 API INTEGRATION
               </TabsTrigger>
+              <TabsTrigger 
+                value="unified"
+                className="font-orbitron tracking-wide data-[state=active]:bg-accent data-[state=active]:text-accent-foreground"
+              >
+                <Kanban size={18} weight="fill" className="mr-2" />
+                UNIFIED DASHBOARD
+              </TabsTrigger>
             </TabsList>
           </div>
 
@@ -856,6 +865,12 @@ function App() {
           <TabsContent value="api" className="flex-1 m-0 overflow-hidden">
             <Card className="h-full border-2 border-primary/50 console-glow rounded-none bg-card/50">
               <APIIntegrationManager />
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="unified" className="flex-1 m-0 overflow-hidden">
+            <Card className="h-full border-2 border-accent/50 console-glow-active rounded-none bg-card/50 overflow-hidden">
+              <UnifiedDashboard />
             </Card>
           </TabsContent>
         </Tabs>
