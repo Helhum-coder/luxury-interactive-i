@@ -22,8 +22,9 @@ export class GitHubAPI {
     }
 
     const headers: HeadersInit = {
-      'Accept': 'application/vnd.github.v3+json',
+      'Accept': 'application/vnd.github+json',
       'Authorization': `Bearer ${this.accessToken}`,
+      'X-GitHub-Api-Version': '2022-11-28',
       ...options.headers,
     }
 

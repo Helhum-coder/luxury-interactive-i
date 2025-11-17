@@ -22,6 +22,7 @@ import ClusterConnectionAnalyzer from '@/components/ClusterConnectionAnalyzer'
 import DashboardTemplateManager from '@/components/DashboardTemplateManager'
 import PersonalTemplateManager from '@/components/PersonalTemplateManager'
 import CopilotLogAnalyzer from '@/components/CopilotLogAnalyzer'
+import APIStatusPanel from '@/components/APIStatusPanel'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -52,7 +53,8 @@ import {
   FireExtinguisher,
   Bug,
   GridFour,
-  Detective
+  Detective,
+  ChartLineUp
 } from '@phosphor-icons/react'
 import { ConsoleType, ConsoleMessage, DashboardWidget, MarketingStrategy } from '@/lib/types'
 import { DashboardTemplate } from '@/lib/dashboard-templates'
@@ -822,6 +824,13 @@ function App() {
                 <Detective size={18} weight="fill" className="mr-2" />
                 COPILOT LOGS
               </TabsTrigger>
+              <TabsTrigger 
+                value="api-status"
+                className="font-orbitron tracking-wide data-[state=active]:bg-accent data-[state=active]:text-accent-foreground"
+              >
+                <ChartLineUp size={18} weight="fill" className="mr-2" />
+                API STATUS
+              </TabsTrigger>
             </TabsList>
           </div>
 
@@ -960,6 +969,10 @@ function App() {
             <Card className="h-full border-2 border-destructive/50 console-glow-active rounded-none bg-card/50 overflow-hidden">
               <CopilotLogAnalyzer />
             </Card>
+          </TabsContent>
+
+          <TabsContent value="api-status" className="flex-1 p-6 m-0 overflow-hidden">
+            <APIStatusPanel />
           </TabsContent>
         </Tabs>
       </div>
