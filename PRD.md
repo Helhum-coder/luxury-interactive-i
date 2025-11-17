@@ -68,6 +68,20 @@ This IDE represents a sophisticated ecosystem where multiple consoles work in ha
 - **Progression**: System event occurs → event categorized by type, priority, and source → notification created with metadata → rules engine evaluates notification → applies matching rule actions (sound, toast, highlight, archive) → notification appears in center → user filters/searches notifications → user interacts with actionable notifications → user archives or deletes → analytics track notification patterns
 - **Success criteria**: All system events generate appropriate notifications, filtering is responsive and intuitive, priority levels accurately reflect urgency, notification rules correctly route alerts, sound/toast notifications work reliably, search and archive functions perform well, notification history provides audit trail, and system remains performant with high notification volumes
 
+### Port Redirection Diagnostic & Recovery
+- **Functionality**: Deep analysis tool that identifies when local development ports are being hijacked or redirected to unauthorized external destinations, with automatic fix capabilities to restore direct localhost bindings; detects proxy layers, external routing, and unauthorized port forwarding configurations
+- **Purpose**: Helps developers identify and resolve situations where their ports (3000, 5173, 8080, etc.) are being redirected through third-party proxies, cloud platform intermediaries, or enterprise network layers instead of binding directly to localhost, which prevents proper local development and testing
+- **Trigger**: User accesses "PORT REDIRECTION FIX" tab or suspects ports are being hijacked based on unexpected behavior
+- **Progression**: User clicks "SCAN PORTS" → tool analyzes active network listeners, routing tables, and connection destinations → identifies discrepancies between expected localhost bindings and actual destinations → matches issues to known error codes (Vercel, deployment platforms) → displays findings with severity levels → user clicks "FIX ALL" or individual fix buttons → tool removes unauthorized redirections and proxy configurations → restores direct localhost bindings → confirms successful restoration
+- **Success criteria**: Tool accurately detects port redirections to external IPs, proxy services, or cloud platforms; correctly identifies the actual destination vs expected destination; maps issues to relevant error codes (DEPLOYMENT_NOT_READY_REDIRECTING, ROUTER_EXTERNAL_TARGET_CONNECTION_ERROR, etc.); provides clear severity ratings; successfully removes redirections and restores localhost control; displays real-time status for all scanned ports
+
+### Deployment Blocker Removal System
+- **Functionality**: Comprehensive diagnostic system that identifies and removes restrictions preventing application deployment and cluster access, including firewall rules, permission issues, DNS misconfigurations, OAuth problems, and deployment configuration errors; provides targeted solutions for each blocker type with batch or individual removal capabilities
+- **Purpose**: Eliminates obstacles that prevent developers from publishing their applications, accessing their clusters, or deploying to production environments; particularly addresses issues with GitHub Enterprise access, Cloud Workstation firewalls, Vercel deployment blocks, and authentication redirect mismatches
+- **Trigger**: User accesses "DEPLOYMENT UNBLOCK" tab, enters deployment ID, or experiences deployment failures
+- **Progression**: User enters deployment ID → clicks "ANALYZE" → tool scans for firewall blockers, permission restrictions, DNS issues, deployment misconfigurations, and authentication problems → categorizes each blocker by type and severity → displays detailed descriptions with blocking impacts and solutions → checks cluster accessibility (Firebase, GitHub Enterprise, Vercel) → user clicks "REMOVE ALL" or individual "Remove This Blocker" buttons → tool systematically eliminates each blocker → updates cluster access status → confirms successful removal and deployment readiness
+- **Success criteria**: Tool detects all major blocker types (firewall, permissions, DNS, deployment config, authentication); provides accurate severity ratings (critical, high, medium); offers actionable solutions for each issue; successfully removes blockers without breaking legitimate security; verifies cluster accessibility after removal; handles deployment IDs correctly; tracks metrics (total blockers, active, removed, accessible clusters); maintains system stability throughout removal process
+
 ### Version History Timeline Visualization
 - **Functionality**: Interactive timeline that visualizes commit history across multiple branches with three view modes (timeline, graph, list), sophisticated filtering by author, branch, time range, and search, D3-powered commit graph visualization showing branch relationships and merge patterns, and detailed commit metadata including author, date, message, and files changed
 - **Purpose**: Provides comprehensive version control visualization for understanding project evolution, identifying patterns in development activity, tracking contributions across team members, and navigating commit history with elegance and precision
@@ -93,6 +107,11 @@ This IDE represents a sophisticated ecosystem where multiple consoles work in ha
 - **API Rate Limits**: Intelligent caching and rate limit detection prevent GitHub API throttling with graceful degradation
 - **Timeline Performance**: D3 visualizations use canvas rendering fallback for repositories with extremely high commit volumes
 - **Merge Complexity**: Visual timeline intelligently handles octopus merges and complex branching patterns with clear visual indicators
+- **Port Conflicts**: When multiple services compete for the same port, diagnostic tool identifies all claimants and prioritizes resolution
+- **Legitimate Proxies**: Tool distinguishes between malicious redirections and legitimate development proxies (like Ngrok) to avoid breaking intentional configurations
+- **Persistent Blockers**: If blockers cannot be removed automatically, tool provides manual remediation steps with command-line examples
+- **Cluster Unavailability**: Graceful handling when clusters are genuinely down vs when access is blocked, with appropriate messaging
+- **Multiple Simultaneous Fixes**: Batch operations handle race conditions and maintain consistency when fixing multiple issues at once
 
 ## Design Direction
 The design should evoke feelings of prestige, power, and refined luxury - think high-end automotive interfaces meets premium financial terminals. It should feel cutting-edge yet timeless, with rich, deep colors suggesting wealth and sophistication, metallic accents conveying precision and quality, and subtle lighting effects creating depth and atmosphere. The interface should be rich rather than minimal, embracing ornamental details that enhance rather than distract, creating an immersive environment that feels like operating in a luxurious command center.
@@ -172,6 +191,9 @@ Animations should feel luxurious and powerful - smooth, deliberate movements tha
   - Gear, Info, Warning for settings and status
   - GitCommit, GitBranch, GitMerge, ClockCounterClockwise for version control
   - User, Calendar, FileText for commit metadata
+  - Crosshair, Bug for port redirection diagnostics
+  - ShieldSlash, LockOpen, CloudCheck for deployment blockers
+  - Key, Globe for authentication and DNS issues
   
 - **Spacing**:
   - Base unit: 4px

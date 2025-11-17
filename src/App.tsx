@@ -23,6 +23,8 @@ import DashboardTemplateManager from '@/components/DashboardTemplateManager'
 import PersonalTemplateManager from '@/components/PersonalTemplateManager'
 import CopilotLogAnalyzer from '@/components/CopilotLogAnalyzer'
 import APIStatusPanel from '@/components/APIStatusPanel'
+import PortRedirectionDiagnostic from '@/components/PortRedirectionDiagnostic'
+import DeploymentBlockerRemoval from '@/components/DeploymentBlockerRemoval'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -54,7 +56,9 @@ import {
   Bug,
   GridFour,
   Detective,
-  ChartLineUp
+  ChartLineUp,
+  Crosshair,
+  ShieldSlash
 } from '@phosphor-icons/react'
 import { ConsoleType, ConsoleMessage, DashboardWidget, MarketingStrategy } from '@/lib/types'
 import { DashboardTemplate } from '@/lib/dashboard-templates'
@@ -831,6 +835,20 @@ function App() {
                 <ChartLineUp size={18} weight="fill" className="mr-2" />
                 API STATUS
               </TabsTrigger>
+              <TabsTrigger 
+                value="port-redirection"
+                className="font-orbitron tracking-wide data-[state=active]:bg-destructive data-[state=active]:text-destructive-foreground"
+              >
+                <Crosshair size={18} weight="fill" className="mr-2" />
+                PORT REDIRECTION FIX
+              </TabsTrigger>
+              <TabsTrigger 
+                value="deployment-blockers"
+                className="font-orbitron tracking-wide data-[state=active]:bg-accent data-[state=active]:text-accent-foreground"
+              >
+                <ShieldSlash size={18} weight="fill" className="mr-2" />
+                DEPLOYMENT UNBLOCK
+              </TabsTrigger>
             </TabsList>
           </div>
 
@@ -973,6 +991,18 @@ function App() {
 
           <TabsContent value="api-status" className="flex-1 p-6 m-0 overflow-hidden">
             <APIStatusPanel />
+          </TabsContent>
+
+          <TabsContent value="port-redirection" className="flex-1 m-0 overflow-hidden">
+            <Card className="h-full border-2 border-destructive/50 console-glow-active rounded-none bg-card/50 overflow-hidden">
+              <PortRedirectionDiagnostic />
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="deployment-blockers" className="flex-1 m-0 overflow-hidden">
+            <Card className="h-full border-2 border-accent/50 console-glow-active rounded-none bg-card/50 overflow-hidden">
+              <DeploymentBlockerRemoval />
+            </Card>
           </TabsContent>
         </Tabs>
       </div>

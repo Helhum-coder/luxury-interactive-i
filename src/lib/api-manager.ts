@@ -1,12 +1,5 @@
-export interface APICredentials {
-  github?: {
-    token: string
-    apiVersion?: string
-  }
-  linear?: {
-    apiKey: string
-  }
-}
+import { fetchWithRetry, globalErrorHandler, HandledError } from './error-handler'
+import { APICredentials } from './utils'
 
 export interface GitHubUserInfo {
   login: string
@@ -39,6 +32,7 @@ export interface GitHubRepo {
 
 export class APIManager {
   private credentials: APICredentials = {}
+  private lastError: HandledError | null = null
 
   setGitHubToken(token: string, apiVersion = '2022-11-28') {
     this.credentials.github = { token, apiVersion }
@@ -70,23 +64,31 @@ export class APIManager {
     }
 
     try {
-      const response = await fetch('https://api.github.com/user', {
+      const response = await fetchWithRetry('https://api.github.com/user', {
         headers: {
           'Authorization': `Bearer ${this.credentials.github.token}`,
           'X-GitHub-Api-Version': this.credentials.github.apiVersion || '2022-11-28',
           'Accept': 'application/vnd.github+json'
         }
+      }, {
+        maxRetries: 2,
+        timeout: 10000
       })
-
-      if (!response.ok) {
-        return { success: false, error: `GitHub API error: ${response.statusText}` }
-      }
 
       const user = await response.json()
       return { success: true, user }
     } catch (error) {
-      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+      const handledError = globalErrorHandler.handleError(error, { context: 'testGitHubConnection' })
+      this.lastError = handledError
+      return { 
+        success: false, 
+        error: handledError.userMessage 
+      }
     }
+  }
+
+  getLastError(): HandledError | null {
+    return this.lastError
   }
 
   async getGitHubOctocat(): Promise<string> {
@@ -94,16 +96,15 @@ export class APIManager {
       throw new Error('No GitHub token configured')
     }
 
-    const response = await fetch('https://api.github.com/octocat', {
+    const response = await fetchWithRetry('https://api.github.com/octocat', {
       headers: {
         'Authorization': `Bearer ${this.credentials.github.token}`,
         'X-GitHub-Api-Version': this.credentials.github.apiVersion || '2022-11-28'
       }
+    }, {
+      maxRetries: 2,
+      timeout: 10000
     })
-
-    if (!response.ok) {
-      throw new Error(`GitHub API error: ${response.statusText}`)
-    }
 
     return response.text()
   }
@@ -113,17 +114,16 @@ export class APIManager {
       throw new Error('No GitHub token configured')
     }
 
-    const response = await fetch('https://api.github.com/user/repos?sort=updated&per_page=100', {
+    const response = await fetchWithRetry('https://api.github.com/user/repos?sort=updated&per_page=100', {
       headers: {
         'Authorization': `Bearer ${this.credentials.github.token}`,
         'X-GitHub-Api-Version': this.credentials.github.apiVersion || '2022-11-28',
         'Accept': 'application/vnd.github+json'
       }
+    }, {
+      maxRetries: 2,
+      timeout: 15000
     })
-
-    if (!response.ok) {
-      throw new Error(`GitHub API error: ${response.statusText}`)
-    }
 
     return response.json()
   }
@@ -133,17 +133,16 @@ export class APIManager {
       throw new Error('No GitHub token configured')
     }
 
-    const response = await fetch(`https://api.github.com/repos/${owner}/${repo}`, {
+    const response = await fetchWithRetry(`https://api.github.com/repos/${owner}/${repo}`, {
       headers: {
         'Authorization': `Bearer ${this.credentials.github.token}`,
         'X-GitHub-Api-Version': this.credentials.github.apiVersion || '2022-11-28',
         'Accept': 'application/vnd.github+json'
       }
+    }, {
+      maxRetries: 2,
+      timeout: 10000
     })
-
-    if (!response.ok) {
-      throw new Error(`GitHub API error: ${response.statusText}`)
-    }
 
     return response.json()
   }
