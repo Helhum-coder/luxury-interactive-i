@@ -13,9 +13,6 @@ Welcome to LUXE IDE, a sophisticated command center with integrated development 
 - **D3 Visualizations**: Create dynamic charts (line, bar, pie, area, radar, gauge)
 - **Distributed Dashboards**: Multiple widgets with live data
 - **Custom Metrics**: Track KPIs and system performance
-- **Industry Templates** 🆕: 10 pre-configured templates for different industries
-- **Template Library**: Finance, Healthcare, E-Commerce, SaaS, Manufacturing, and more
-- **One-Click Setup**: Apply complete dashboards instantly
 
 ### AI Marketing Engine
 - **Strategy Generation**: AI-powered campaign creation
@@ -54,8 +51,6 @@ See the [Version Detection Guide](./VERSION_DETECTION_GUIDE.md) for detailed usa
 
 ## 📚 Documentation
 
-- [Dashboard Templates Guide](./DASHBOARD_TEMPLATES_GUIDE.md) 🆕 - Industry-specific templates
-- [Dashboard Templates Quick Start](./DASHBOARD_TEMPLATES_QUICKSTART.md) 🆕 - Get started fast
 - [Version Detection Guide](./VERSION_DETECTION_GUIDE.md) - Automatic version tracking
 - [Git Integration Guide](./GIT_INTEGRATION_GUIDE.md) - Repository management
 - [Webhook Integration](./WEBHOOK_INTEGRATION_GUIDE.md) - Event monitoring
@@ -75,10 +70,9 @@ LUXE IDE embodies luxury and sophistication with:
 
 1. **Launch the IDE** - The app starts with all systems initialized
 2. **Explore Consoles** - Try commands like `help`, `status`, `version`
-3. **Try Templates** 🆕 - Navigate to DASHBOARD TEMPLATES tab for instant dashboards
-4. **Generate Dashboards** - Run `demo charts` to see visualizations
-5. **Connect GitHub** - Authenticate in the Git Integration tab
-6. **Monitor Versions** - Check the Versions tab for package info
+3. **Generate Dashboards** - Run `demo charts` to see visualizations
+4. **Connect GitHub** - Authenticate in the Git Integration tab
+5. **Monitor Versions** - Check the Versions tab for package info
 
 ## 🔧 Console Commands
 
@@ -111,7 +105,6 @@ clear                        # Clear console
 
 - **Development Command Center**: Centralize your dev operations
 - **Project Analytics**: Visualize metrics and performance
-- **Industry Dashboards** 🆕: Finance, Healthcare, E-Commerce, SaaS, Manufacturing, and more
 - **Marketing Campaigns**: Generate AI-powered strategies
 - **Repository Management**: Sync multiple Git branches
 - **Version Tracking**: Monitor dependencies across projects

@@ -1,0 +1,79 @@
+{
+    "version": 2,
+    "builds": [
+        {
+            "src": "package.json",
+            "use": "@vercel/static-build",
+            "config": {
+                "distDir": "dist"
+            }
+        }
+    ],
+    "routes": [
+        {
+            "src": "/api/(.*)",
+            "dest": "/api/$1"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "/index.html"
+        }
+    ],
+    "env": {
+        "HELHUM_EMAIL": "helhum@hotmail.com",
+        "HELHUM_GITHUB": "Helhum-coder",
+        "HELBS_EMAIL": "helbslozroj@gmail.com",
+        "HELBS_GITHUB": "HelbsLozroj",
+        "APP_ENV": "production",
+        "DEPLOYMENT_PLATFORM": "vercel",
+        "ENABLE_ANALYTICS": "true",
+        "ENABLE_MONITORING": "true",
+        "ENABLE_CACHE": "true"
+    },
+    "functions": {
+        "src/api/**/*.ts": {
+            "runtime": "@vercel/node@20.x"
+        }
+    },
+    "headers": [
+        {
+            "source": "/api/(.*)",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "s-maxage=1, stale-while-revalidate"
+                }
+            ]
+        },
+        {
+            "source": "/(.*)",
+            "headers": [
+                {
+                    "key": "X-Frame-Options",
+                    "value": "SAMEORIGIN"
+                },
+                {
+                    "key": "X-Content-Type-Options",
+                    "value": "nosniff"
+                },
+                {
+                    "key": "Referrer-Policy",
+                    "value": "strict-origin-when-cross-origin"
+                }
+            ]
+        }
+    ],
+    "redirects": [
+        {
+            "source": "/health",
+            "destination": "/api/health",
+            "permanent": false
+        }
+    ],
+    "rewrites": [
+        {
+            "source": "/api/health",
+            "destination": "/api/health.ts"
+        }
+    ]
+}
