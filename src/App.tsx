@@ -19,6 +19,7 @@ import UnifiedDashboard from '@/components/UnifiedDashboard'
 import NetworkDiagnostic from '@/components/NetworkDiagnostic'
 import FirewallDiagnostic from '@/components/FirewallDiagnostic'
 import ClusterConnectionAnalyzer from '@/components/ClusterConnectionAnalyzer'
+import DashboardTemplateManager from '@/components/DashboardTemplateManager'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -47,9 +48,11 @@ import {
   Kanban,
   WifiHigh,
   FireExtinguisher,
-  Bug
+  Bug,
+  GridFour
 } from '@phosphor-icons/react'
 import { ConsoleType, ConsoleMessage, DashboardWidget, MarketingStrategy } from '@/lib/types'
+import { DashboardTemplate } from '@/lib/dashboard-templates'
 import { detectLocalVersion } from '@/lib/version-detector'
 import { toast } from 'sonner'
 import { motion } from 'framer-motion'
@@ -593,6 +596,17 @@ function App() {
     })
   }
 
+  const handleApplyTemplate = (template: DashboardTemplate) => {
+    setDashboards((current) => {
+      const newWidgets = template.widgets.map(widget => ({
+        ...widget,
+        id: `${widget.id}-${Date.now()}-${Math.random()}`
+      }))
+      return [...newWidgets, ...(current || [])]
+    })
+    addMessage('system', 'success', `Applied ${template.name} template with ${template.widgets.length} widgets`)
+  }
+
   const consoles: Array<{ id: ConsoleType; title: string; icon: React.ReactNode }> = [
     { id: 'system', title: 'SYSTEM', icon: <Terminal size={24} weight="fill" /> },
     { id: 'development', title: 'DEVELOPMENT', icon: <Code size={24} weight="fill" /> },
@@ -791,6 +805,13 @@ function App() {
                 <Bug size={18} weight="fill" className="mr-2" />
                 CONNECTION ANALYZER
               </TabsTrigger>
+              <TabsTrigger 
+                value="templates"
+                className="font-orbitron tracking-wide data-[state=active]:bg-accent data-[state=active]:text-accent-foreground"
+              >
+                <GridFour size={18} weight="fill" className="mr-2" />
+                DASHBOARD TEMPLATES
+              </TabsTrigger>
             </TabsList>
           </div>
 
@@ -916,6 +937,12 @@ function App() {
           <TabsContent value="connection-analyzer" className="flex-1 m-0 overflow-hidden">
             <Card className="h-full border-2 border-purple-500/50 console-glow-active rounded-none bg-card/50 overflow-hidden">
               <ClusterConnectionAnalyzer />
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="templates" className="flex-1 m-0 overflow-hidden">
+            <Card className="h-full border-2 border-accent/50 console-glow-active rounded-none bg-card/50 overflow-hidden">
+              <DashboardTemplateManager onApplyTemplate={handleApplyTemplate} />
             </Card>
           </TabsContent>
         </Tabs>
