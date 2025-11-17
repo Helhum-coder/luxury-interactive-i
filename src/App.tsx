@@ -16,6 +16,7 @@ import ClusterAccessDiagnostic from '@/components/ClusterAccessDiagnostic'
 import ClusterHealthMonitor from '@/components/ClusterHealthMonitor'
 import APIIntegrationManager from '@/components/APIIntegrationManager'
 import UnifiedDashboard from '@/components/UnifiedDashboard'
+import NetworkDiagnostic from '@/components/NetworkDiagnostic'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -41,7 +42,8 @@ import {
   CloudArrowUp,
   Activity,
   Plugs,
-  Kanban
+  Kanban,
+  WifiHigh
 } from '@phosphor-icons/react'
 import { ConsoleType, ConsoleMessage, DashboardWidget, MarketingStrategy } from '@/lib/types'
 import { detectLocalVersion } from '@/lib/version-detector'
@@ -764,6 +766,13 @@ function App() {
                 <Kanban size={18} weight="fill" className="mr-2" />
                 UNIFIED DASHBOARD
               </TabsTrigger>
+              <TabsTrigger 
+                value="network"
+                className="font-orbitron tracking-wide data-[state=active]:bg-green-500 data-[state=active]:text-white"
+              >
+                <WifiHigh size={18} weight="fill" className="mr-2" />
+                NETWORK DIAGNOSTIC
+              </TabsTrigger>
             </TabsList>
           </div>
 
@@ -871,6 +880,12 @@ function App() {
           <TabsContent value="unified" className="flex-1 m-0 overflow-hidden">
             <Card className="h-full border-2 border-accent/50 console-glow-active rounded-none bg-card/50 overflow-hidden">
               <UnifiedDashboard />
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="network" className="flex-1 m-0 overflow-hidden">
+            <Card className="h-full border-2 border-green-500/50 console-glow-active rounded-none bg-card/50 overflow-hidden">
+              <NetworkDiagnostic />
             </Card>
           </TabsContent>
         </Tabs>
