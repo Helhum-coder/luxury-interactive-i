@@ -1,211 +1,136 @@
 # Planning Guide
 
-A luxury-grade, interactive development environment that serves as a sophisticated command center, featuring 5 interconnected console systems, distributed dashboard generation, an AI-powered advertising strategy engine, and a comprehensive Git integration manager for hybrid repository systems with live conflict resolution.
+A comprehensive document viewer that provides organized access to all markdown documentation files in the project, enabling users to quickly find, read, and navigate through technical guides, API documentation, setup instructions, and troubleshooting resources.
 
-**Experience Qualities**: 
-1. **Opulent Sophistication** - Every interaction should evoke the feeling of handling premium, high-end technology with refined aesthetics and smooth transitions
-2. **Immersive Control** - Users should feel like they're operating a powerful command center where every system responds intelligently to their needs
-3. **Effortless Mastery** - Complex functionality presented through an intuitive interface that makes advanced operations feel natural and accessible
+**Experience Qualities**:
+1. **Efficient** - Quick navigation and search functionality to find specific documents instantly
+2. **Organized** - Clear categorization and visual hierarchy that makes browsing intuitive
+3. **Readable** - Beautiful typography and layout optimized for reading technical content
 
-**Complexity Level**: Complex Application (advanced functionality, multiple integrated systems)
-This IDE represents a sophisticated ecosystem where multiple consoles work in harmony, generating intelligent outputs including dashboards and marketing strategies, requiring advanced state management and AI integration.
+**Complexity Level**: Light Application (multiple features with basic state)
+- A document viewer with categorization, search, and markdown rendering capabilities
 
 ## Essential Features
 
-### Five Interactive Console System
-- **Functionality**: Five distinct console panels that can execute commands, display outputs, and communicate with each other and the broader system
-- **Purpose**: Provides modular workspaces for different aspects of development, monitoring, and control
-- **Trigger**: User opens the IDE and sees all 5 consoles arranged in an elegant layout
-- **Progression**: User selects console → inputs command or selects function → system processes → displays results → other consoles update reactively → data flows between systems
-- **Success criteria**: All 5 consoles are independently functional, visually distinct, and can share data between them seamlessly
+### Document Browser
+- **Functionality**: Display all markdown files organized by category with preview cards
+- **Purpose**: Provide quick access to all documentation in one central location
+- **Trigger**: User opens the app
+- **Progression**: App loads → Documents categorized automatically → User sees organized grid/list → Click to view full document
+- **Success criteria**: All markdown files visible, properly categorized, and clickable
 
-### Distributed Dashboard Generator
-- **Functionality**: Automatically creates functional, distributed dashboards based on the information system or unit being executed
-- **Purpose**: Transforms data and system information into beautiful, actionable visual dashboards
-- **Trigger**: User executes a system/unit command in any console
-- **Progression**: Command execution → system analyzes data structure → generates appropriate dashboard layout → renders interactive visualizations → distributes across display areas → updates in real-time
-- **Success criteria**: Dashboards are generated dynamically, look sophisticated, and display relevant metrics with interactive elements
+### Search & Filter
+- **Functionality**: Real-time search across document titles and optionally content
+- **Purpose**: Help users quickly find specific documentation
+- **Trigger**: User types in search input
+- **Progression**: User types query → Results filter in real-time → Matching documents highlighted → Click to view
+- **Success criteria**: Search responds instantly, shows relevant results, handles empty states
 
-### AI Advertising Strategy Engine
-- **Functionality**: Analyzes project context and automatically generates comprehensive advertising and marketing strategies, including campaigns, trends analysis, and targeting recommendations
-- **Purpose**: Provides expert-level marketing intelligence and campaign development capabilities
-- **Trigger**: User initiates strategy generation from dedicated console or menu
-- **Progression**: User inputs project details → AI analyzes market trends and positioning → generates multi-channel strategy → presents campaign concepts → provides tactical recommendations → exports actionable plan
-- **Success criteria**: Generated strategies are comprehensive, creative, trend-aware, and immediately actionable with clear KPIs and channel recommendations
+### Document Viewer
+- **Functionality**: Render markdown content with proper formatting, syntax highlighting, and navigation
+- **Purpose**: Display full document content in a readable format
+- **Trigger**: User clicks on a document card
+- **Progression**: Click document → Content loads → Markdown rendered beautifully → Scroll to read → Navigate back or to another doc
+- **Success criteria**: Markdown renders correctly, code blocks highlighted, images display, links work
 
-### Built-in IDE Functionalities
-- **Functionality**: Core development tools including code editing, project management, system monitoring, and cross-platform compatibility
-- **Purpose**: Provides complete development environment without external dependencies
-- **Trigger**: Various entry points depending on function (file explorer, editor pane, system monitor)
-- **Progression**: User accesses tool → interacts with built-in functionality → system responds with appropriate interface → changes persist → integrates with console outputs
-- **Success criteria**: All core IDE functions are accessible, responsive, and work harmoniously with the console system
+### Category Navigation
+- **Functionality**: Group documents by type (API, Git, Deployment, Security, etc.)
+- **Purpose**: Make it easy to browse related documentation
+- **Trigger**: Automatic on load, filterable by user
+- **Progression**: Documents auto-categorized → User sees category tabs/filters → Click category → View filtered list
+- **Success criteria**: Clear categories, accurate grouping, easy switching between categories
 
-### Immersive Luxury Interface
-- **Functionality**: Rich visual experience with premium animations, sophisticated color schemes, and engaging micro-interactions
-- **Purpose**: Creates an enchanting, high-end experience that immerses users in a luxurious technological world
-- **Trigger**: Present from initial load throughout all interactions
-- **Progression**: Continuous environmental experience → subtle animations respond to user actions → elegant transitions between states → satisfying feedback on interactions → ambient details enhance immersion
-- **Success criteria**: Every interaction feels premium, animations are fluid and purposeful, and the overall experience conveys luxury and sophistication
-
-### Git Integration & Conflict Resolution Manager
-- **Functionality**: Comprehensive tool for managing hybrid git repository systems with multiple active branches (master/main), detecting and resolving conflicts, monitoring live integrations (Firebase, GitHub Actions, live servers), executing git operations, **connecting to real GitHub repositories via OAuth to fetch actual branch data, commit history, and repository information using GitHub API v2022-11-28 (latest stable version)**, and **real-time webhook integration to monitor repository events and trigger automatic syncs**
-- **Purpose**: Helps developers understand, manage, and resolve conflicts in "living" repository systems where git branches serve as active deployment endpoints, solving the problem where traditional git models don't apply, while providing **real-time access to GitHub repository data with enhanced image rendering and visual quality** and **automated synchronization based on repository events**
-- **Trigger**: User accesses Git Integration tab, or system detects branch/deployment conflicts, **or user connects their GitHub account to access real repository data**, **or webhook receives repository event (push, PR, workflow run, deployment)**
-- **Progression**: **User authenticates with GitHub OAuth using API v2022-11-28 → views their actual repositories → selects a repository → configures webhook monitoring** → views system architecture → identifies branch purposes and integration points → **examines real commit history with enhanced visual rendering** → **webhook events trigger automatic syncs** → detects conflicts → reviews resolution strategies → applies fixes → syncs branches → monitors deployment status → documents changes
-- **Success criteria**: Users can visualize their hybrid system, understand why it's complex, detect and resolve conflicts with confidence, sync branches safely, explain the architecture to others, **seamlessly access real GitHub repository data including branches, commits, and repository metadata with enhanced image quality and rendering**, and **automatically sync branches based on real-time webhook events from GitHub**
-
-### Webhook Event Monitoring & Auto-Sync
-- **Functionality**: Real-time monitoring of GitHub repository events (push, pull_request, create, delete, release, workflow_run, deployment) with automatic synchronization triggers, configurable event filters, and live activity tracking
-- **Purpose**: Eliminates manual sync operations by automatically detecting repository changes and triggering appropriate branch synchronizations, ensuring the hybrid system stays current with upstream changes
-- **Trigger**: Webhook monitoring enabled in Git Integration → Webhooks tab, or repository event occurs
-- **Progression**: User configures webhook for repository → selects event types to monitor → enables auto-sync → webhook event occurs (push, PR, etc.) → system receives and processes event → filters based on configuration → triggers automatic branch sync → updates integration targets → logs sync activity → notifies user of completion
-- **Success criteria**: Webhook events are received and processed in real-time, auto-sync triggers reliably for configured events, sync activity is logged and visible, users can create/manage multiple webhook configurations, and system performance remains optimal under event load
-
-### Advanced Notification Center with Customizable Alerts
-- **Functionality**: Centralized notification hub with intelligent filtering, categorization, priority-based alerts, customizable rules, and multi-channel notification delivery (visual, audio, toast); notifications generated from all system events including webhooks, syncs, deployments, console operations, and marketing engine activities
-- **Purpose**: Provides unified awareness of all system activity with sophisticated filtering to reduce noise and ensure critical information reaches users through appropriate channels based on priority and context
-- **Trigger**: Any system event occurs (webhook event, sync completion, dashboard generation, marketing strategy completion, console command execution, error detection), or user accesses Notifications tab
-- **Progression**: System event occurs → event categorized by type, priority, and source → notification created with metadata → rules engine evaluates notification → applies matching rule actions (sound, toast, highlight, archive) → notification appears in center → user filters/searches notifications → user interacts with actionable notifications → user archives or deletes → analytics track notification patterns
-- **Success criteria**: All system events generate appropriate notifications, filtering is responsive and intuitive, priority levels accurately reflect urgency, notification rules correctly route alerts, sound/toast notifications work reliably, search and archive functions perform well, notification history provides audit trail, and system remains performant with high notification volumes
-
-### Port Redirection Diagnostic & Recovery
-- **Functionality**: Deep analysis tool that identifies when local development ports are being hijacked or redirected to unauthorized external destinations, with automatic fix capabilities to restore direct localhost bindings; detects proxy layers, external routing, and unauthorized port forwarding configurations
-- **Purpose**: Helps developers identify and resolve situations where their ports (3000, 5173, 8080, etc.) are being redirected through third-party proxies, cloud platform intermediaries, or enterprise network layers instead of binding directly to localhost, which prevents proper local development and testing
-- **Trigger**: User accesses "PORT REDIRECTION FIX" tab or suspects ports are being hijacked based on unexpected behavior
-- **Progression**: User clicks "SCAN PORTS" → tool analyzes active network listeners, routing tables, and connection destinations → identifies discrepancies between expected localhost bindings and actual destinations → matches issues to known error codes (Vercel, deployment platforms) → displays findings with severity levels → user clicks "FIX ALL" or individual fix buttons → tool removes unauthorized redirections and proxy configurations → restores direct localhost bindings → confirms successful restoration
-- **Success criteria**: Tool accurately detects port redirections to external IPs, proxy services, or cloud platforms; correctly identifies the actual destination vs expected destination; maps issues to relevant error codes (DEPLOYMENT_NOT_READY_REDIRECTING, ROUTER_EXTERNAL_TARGET_CONNECTION_ERROR, etc.); provides clear severity ratings; successfully removes redirections and restores localhost control; displays real-time status for all scanned ports
-
-### Deployment Blocker Removal System
-- **Functionality**: Comprehensive diagnostic system that identifies and removes restrictions preventing application deployment and cluster access, including firewall rules, permission issues, DNS misconfigurations, OAuth problems, and deployment configuration errors; provides targeted solutions for each blocker type with batch or individual removal capabilities
-- **Purpose**: Eliminates obstacles that prevent developers from publishing their applications, accessing their clusters, or deploying to production environments; particularly addresses issues with GitHub Enterprise access, Cloud Workstation firewalls, Vercel deployment blocks, and authentication redirect mismatches
-- **Trigger**: User accesses "DEPLOYMENT UNBLOCK" tab, enters deployment ID, or experiences deployment failures
-- **Progression**: User enters deployment ID → clicks "ANALYZE" → tool scans for firewall blockers, permission restrictions, DNS issues, deployment misconfigurations, and authentication problems → categorizes each blocker by type and severity → displays detailed descriptions with blocking impacts and solutions → checks cluster accessibility (Firebase, GitHub Enterprise, Vercel) → user clicks "REMOVE ALL" or individual "Remove This Blocker" buttons → tool systematically eliminates each blocker → updates cluster access status → confirms successful removal and deployment readiness
-- **Success criteria**: Tool detects all major blocker types (firewall, permissions, DNS, deployment config, authentication); provides accurate severity ratings (critical, high, medium); offers actionable solutions for each issue; successfully removes blockers without breaking legitimate security; verifies cluster accessibility after removal; handles deployment IDs correctly; tracks metrics (total blockers, active, removed, accessible clusters); maintains system stability throughout removal process
-
-### Version History Timeline Visualization
-- **Functionality**: Interactive timeline that visualizes commit history across multiple branches with three view modes (timeline, graph, list), sophisticated filtering by author, branch, time range, and search, D3-powered commit graph visualization showing branch relationships and merge patterns, and detailed commit metadata including author, date, message, and files changed
-- **Purpose**: Provides comprehensive version control visualization for understanding project evolution, identifying patterns in development activity, tracking contributions across team members, and navigating commit history with elegance and precision
-- **Trigger**: User accesses Version History tab, or initiates commit history analysis from Git Integration panel
-- **Progression**: User authenticates with GitHub → selects repository → optionally selects specific branch → views timeline visualization → filters by author/time/search → switches between timeline/graph/list views → examines commit details → clicks commit to view on GitHub → analyzes statistics (total commits, authors, branches, activity patterns) → exports or shares findings
-- **Success criteria**: Timeline loads and displays commits efficiently even with large histories, D3 graph renders branch relationships accurately with smooth animations, filtering is instant and intuitive, all three view modes provide distinct value, commit statistics are accurate and meaningful, and the visual design maintains luxury aesthetic with smooth transitions
-
-### Visual Branch Timeline with Merge & Divergence
-- **Functionality**: Sophisticated D3.js-powered visual timeline displaying commits across multiple branches simultaneously, with clear visualization of branch divergence points, merge commits, and branch relationships; includes interactive commit nodes, merge path animations, branch color coding, chronological time axis, commit detail panel, and demo mode for exploration without GitHub connection
-- **Purpose**: Enables developers to understand complex branch structures at a glance, identify merge points and potential conflicts, track when branches diverged from main development lines, and comprehend the overall git history flow with visual clarity
-- **Trigger**: User accesses Branch Timeline tab, or selects "View Timeline" from Git Integration panel
-- **Progression**: User authenticates with GitHub (or uses demo mode) → selects repository → system fetches branches and commit history → D3 renders visual timeline with branches as vertical lanes → commits appear as nodes positioned chronologically → merge lines connect parent commits across branches → user hovers over commits to see details → clicks commit to view full information in side panel → searches/filters commits → adjusts max commits per branch → refreshes data → analyzes branch topology and merge patterns
-- **Success criteria**: Timeline accurately represents branch structure and chronology, merge commits clearly show source and target branches, visual design uses color and positioning effectively to distinguish branches, interactions are smooth with sub-100ms response, commit details are comprehensive and accessible, filtering works instantly, demo mode provides realistic sample data, and the visualization scales gracefully from 2-8 branches with 10-100 commits each
+### Reading Experience
+- **Functionality**: Optimized layout for reading with table of contents, breadcrumbs, and navigation
+- **Purpose**: Make long technical documents easy to navigate and read
+- **Trigger**: Document opened
+- **Progression**: Document opens → TOC generated → User clicks TOC item → Smooth scroll to section → Return to top/navigate
+- **Success criteria**: Smooth scrolling, clear navigation, responsive layout
 
 ## Edge Case Handling
-- **Console Conflicts**: If multiple consoles attempt conflicting operations, priority system resolves with visual feedback
-- **Dashboard Overflow**: When too much data is generated, intelligent summarization and drill-down capabilities are provided
-- **AI Generation Failures**: Graceful fallback to template-based strategies with clear indication of limited mode
-- **System Compatibility**: Universal compatibility layer ensures functions work regardless of underlying system context
-- **Empty States**: Sophisticated onboarding guides users through first-time setup with elegant tutorials
-- **Large Commit Histories**: Timeline virtualization and pagination handle repositories with thousands of commits efficiently
-- **Branch Complexity**: Graph visualization intelligently groups and simplifies complex branch structures for readability
-- **API Rate Limits**: Intelligent caching and rate limit detection prevent GitHub API throttling with graceful degradation
-- **Timeline Performance**: D3 visualizations use canvas rendering fallback for repositories with extremely high commit volumes
-- **Merge Complexity**: Visual timeline intelligently handles octopus merges and complex branching patterns with clear visual indicators
-- **Port Conflicts**: When multiple services compete for the same port, diagnostic tool identifies all claimants and prioritizes resolution
-- **Legitimate Proxies**: Tool distinguishes between malicious redirections and legitimate development proxies (like Ngrok) to avoid breaking intentional configurations
-- **Persistent Blockers**: If blockers cannot be removed automatically, tool provides manual remediation steps with command-line examples
-- **Cluster Unavailability**: Graceful handling when clusters are genuinely down vs when access is blocked, with appropriate messaging
-- **Multiple Simultaneous Fixes**: Batch operations handle race conditions and maintain consistency when fixing multiple issues at once
+- **No Documents Found**: Display helpful empty state with instructions
+- **Search No Results**: Show "no matches found" with suggestion to refine search
+- **Markdown Parse Errors**: Gracefully handle malformed markdown, show raw text if needed
+- **Large Documents**: Implement virtual scrolling or pagination for performance
+- **Broken Links**: Handle relative links, external links, and missing assets gracefully
 
 ## Design Direction
-The design should evoke feelings of prestige, power, and refined luxury - think high-end automotive interfaces meets premium financial terminals. It should feel cutting-edge yet timeless, with rich, deep colors suggesting wealth and sophistication, metallic accents conveying precision and quality, and subtle lighting effects creating depth and atmosphere. The interface should be rich rather than minimal, embracing ornamental details that enhance rather than distract, creating an immersive environment that feels like operating in a luxurious command center.
+The design should feel professional and documentation-focused, with a clean, minimalist interface that prioritizes readability and efficient information access, using a rich interface with clear visual hierarchy to handle the volume of content.
 
 ## Color Selection
-Complementary color scheme with rich jewel tones and metallic accents to create a sense of opulence and high-end technology, evoking the feeling of premium materials like polished obsidian, gold leaf, and sapphire glass.
+Complementary (opposite colors) - Using deep blues for navigation/structure and warm amber accents for interactive elements, creating a professional yet approachable documentation experience.
 
-- **Primary Color**: Deep Royal Purple (oklch(0.35 0.15 300)) - Communicates luxury, sophistication, and premium quality; represents power and creativity
-- **Secondary Colors**: 
-  - Rich Gold/Amber (oklch(0.75 0.15 85)) - Accent color suggesting wealth and excellence
-  - Deep Charcoal (oklch(0.20 0.02 270)) - Sophisticated background suggesting depth and elegance
-  - Midnight Blue (oklch(0.25 0.12 250)) - Supporting color for secondary panels and depth
-- **Accent Color**: Luminous Gold (oklch(0.85 0.18 90)) - Bright metallic gold for CTAs, highlights, and premium interactive elements
+- **Primary Color**: Deep Blue `oklch(0.35 0.15 250)` - Communicates trust, stability, and professionalism for navigation and headers
+- **Secondary Colors**: Slate Blue `oklch(0.55 0.08 250)` for secondary UI elements and muted backgrounds
+- **Accent Color**: Warm Amber `oklch(0.75 0.15 70)` - Highlights interactive elements, CTAs, and important information
 - **Foreground/Background Pairings**:
-  - Background (Deep Charcoal oklch(0.20 0.02 270)): Platinum text (oklch(0.95 0.01 270)) - Ratio 12.1:1 ✓
-  - Card (Midnight Blue oklch(0.25 0.12 250)): Platinum text (oklch(0.95 0.01 270)) - Ratio 10.5:1 ✓
-  - Primary (Royal Purple oklch(0.35 0.15 300)): White text (oklch(0.98 0 0)) - Ratio 6.8:1 ✓
-  - Secondary (Rich Gold oklch(0.75 0.15 85)): Deep Charcoal (oklch(0.20 0.02 270)) - Ratio 8.5:1 ✓
-  - Accent (Luminous Gold oklch(0.85 0.18 90)): Deep Charcoal (oklch(0.20 0.02 270)) - Ratio 10.2:1 ✓
-  - Muted (Dark Purple oklch(0.28 0.10 290)): Light Purple (oklch(0.75 0.08 300)) - Ratio 7.2:1 ✓
+  - Background (White `oklch(1 0 0)`): Foreground Dark Gray `oklch(0.20 0.01 250)` - Ratio 16.2:1 ✓
+  - Card (Soft White `oklch(0.98 0.005 250)`): Foreground Dark Gray `oklch(0.20 0.01 250)` - Ratio 15.1:1 ✓
+  - Primary (Deep Blue `oklch(0.35 0.15 250)`): White text `oklch(1 0 0)` - Ratio 8.9:1 ✓
+  - Secondary (Slate Blue `oklch(0.55 0.08 250)`): White text `oklch(1 0 0)` - Ratio 4.7:1 ✓
+  - Accent (Warm Amber `oklch(0.75 0.15 70)`): Dark Gray `oklch(0.20 0.01 250)` - Ratio 10.2:1 ✓
+  - Muted (Light Gray `oklch(0.95 0.01 250)`): Medium Gray `oklch(0.45 0.02 250)` - Ratio 7.8:1 ✓
 
 ## Font Selection
-Typography should convey technical precision combined with luxury and elegance, using a sophisticated sans-serif that feels both modern and premium, suggesting high-end technology interfaces and exclusive experiences.
-
-**Primary Font**: Orbitron (Google Fonts) - Geometric, futuristic feel with premium quality
-**Secondary Font**: Inter (Google Fonts) - Clean, highly legible for body text and technical content
+Clear, highly readable sans-serif for body text combined with a monospace font for code blocks, conveying professionalism and technical precision.
 
 - **Typographic Hierarchy**:
-  - H1 (Main Title/IDE Name): Orbitron Bold/32px/wide letter-spacing (0.08em)/uppercase
-  - H2 (Console Titles): Orbitron SemiBold/20px/normal letter-spacing/mixed case
-  - H3 (Section Headers): Orbitron Medium/16px/slight letter-spacing (0.02em)
-  - Body (Console Output): Inter Regular/14px/line-height 1.6/monospace feel
-  - Labels (UI Elements): Inter Medium/12px/letter-spacing 0.03em/uppercase
-  - Captions (Metadata): Inter Regular/11px/opacity 0.7
+  - H1 (Page Title): Inter Bold/32px/tight letter spacing/-0.02em
+  - H2 (Category/Section): Inter SemiBold/24px/tight letter spacing/-0.01em
+  - H3 (Document Title): Inter SemiBold/20px/normal letter spacing
+  - H4 (Subsection): Inter Medium/18px/normal letter spacing
+  - Body (Main Content): Inter Regular/16px/relaxed line height 1.7
+  - Caption (Metadata): Inter Regular/14px/normal line height 1.5
+  - Code Blocks: JetBrains Mono Regular/14px/line height 1.6
 
 ## Animations
-Animations should feel luxurious and powerful - smooth, deliberate movements that suggest precision engineering and premium quality, with subtle prismatic effects and metallic shimmers that enhance the feeling of interacting with high-end technology.
+Subtle and functional, focused on smooth transitions between document views, gentle hover states on cards, and smooth scrolling within documents to guide attention without distraction.
 
-- **Purposeful Meaning**: Motion communicates system responsiveness and power, with console interactions feeling like operating precision instruments, dashboard transitions suggesting intelligent data processing, and hover effects revealing hidden depth and detail
-- **Hierarchy of Movement**: 
-  - Primary: Console command execution with satisfying feedback (ripple effects, glow)
-  - Secondary: Dashboard generation animations showing data flowing and organizing
-  - Tertiary: Ambient background elements (subtle particle effects, gentle pulsing lights)
-  - Micro: Button interactions, hover states with metallic sheen, focus highlights
+- **Purposeful Meaning**: Smooth page transitions communicate spatial relationships between browse and read modes; card hover effects invite exploration
+- **Hierarchy of Movement**: Document transitions (300ms), card hovers (150ms), search filtering (200ms), scroll navigation (400ms smooth)
 
 ## Component Selection
-
-- **Components**:
-  - **Tabs**: For switching between console modes and dashboard views with custom luxury styling
-  - **Card**: For console panels, dashboard widgets, and content containers with gradient borders
-  - **Button**: Primary actions styled with metallic gradients and glow effects
-  - **Dialog**: For AI strategy configuration and detailed reports with premium modal styling
-  - **Textarea**: For console input with custom syntax highlighting and glow effects
-  - **ScrollArea**: For console output and long content with custom luxury scrollbars
-  - **Select**: For system/unit selection with elegant dropdown styling
-  - **Badge**: For status indicators with metallic finishes
-  - **Separator**: With gradient styling for visual division
-  - **Tooltip**: For contextual help with subtle animations
+- **Components**: 
+  - `Card` for document preview cards with hover states
+  - `Input` for search with icon
+  - `Tabs` for category filtering
+  - `ScrollArea` for document content with custom scrollbar
+  - `Badge` for document metadata (category tags)
+  - `Breadcrumb` for navigation context
+  - `Button` for actions (back, copy, etc.)
+  - `Separator` for visual section breaks
+  - `Sheet` or `Dialog` for full document view (mobile consideration)
   
-- **Customizations**:
-  - Console panels with custom borders (gradient, glow effects, animated edges)
-  - Dashboard grid system with dynamic layouts and smooth reorganization
-  - AI Strategy display with rich formatting and visual hierarchy
-  - Custom code editor component with luxury syntax theme
-  - Command palette with premium search and autocomplete
+- **Customizations**: 
+  - Custom markdown renderer component with syntax highlighting
+  - Table of contents generator for long documents
+  - Document preview cards with gradient overlays
+  - Search highlight component for matching text
   
-- **States**:
-  - Buttons: Rest (metallic gradient), Hover (bright glow), Active (pressed inset), Focus (ring with glow), Disabled (muted opacity)
-  - Consoles: Inactive (subtle), Active (bright border glow), Processing (animated border), Error (red accent glow)
-  - Dashboards: Loading (skeleton with shimmer), Ready (full color), Updating (pulse effect)
+- **States**: 
+  - Cards: default, hover (lift + shadow), active (pressed state)
+  - Search input: empty, typing, results found, no results
+  - Document viewer: loading skeleton, content loaded, error state
+  - Navigation: active category, inactive category
   
-- **Icon Selection**:
-  - Terminal, Code, ChartBar, Sparkle for console types
-  - Lightning, Cpu, Database for system functions
-  - TrendUp, Target, Megaphone for marketing features
-  - Play, Pause, ArrowsClockwise for controls
-  - Gear, Info, Warning for settings and status
-  - GitCommit, GitBranch, GitMerge, ClockCounterClockwise for version control
-  - User, Calendar, FileText for commit metadata
-  - Crosshair, Bug for port redirection diagnostics
-  - ShieldSlash, LockOpen, CloudCheck for deployment blockers
-  - Key, Globe for authentication and DNS issues
+- **Icon Selection**: 
+  - `MagnifyingGlass` for search
+  - `FileText` for documents
+  - `Folder` for categories
+  - `ArrowLeft` for back navigation
+  - `List` for table of contents
+  - `BookOpen` for reading mode
+  - `Copy` for copy code blocks
   
-- **Spacing**:
-  - Base unit: 4px
-  - Compact spacing: 8px (console internal padding)
-  - Standard spacing: 16px (between console sections)
-  - Generous spacing: 24px (between major UI areas)
-  - Section spacing: 32px (between console groups)
+- **Spacing**: 
+  - Container padding: `p-6` (24px)
+  - Card gap: `gap-4` (16px)
+  - Section spacing: `space-y-6` (24px)
+  - Content margin: `my-8` (32px)
   
-- **Mobile**:
-  - Stack consoles vertically on mobile (< 768px)
-  - Collapsible console panels with tab navigation
-  - Dashboard widgets reflow to single column
-  - Touch-optimized console controls (larger buttons, swipe gestures)
-  - Simplified AI strategy view with accordion sections
-  - Bottom navigation for quick console switching
+- **Mobile**: 
+  - Stack cards vertically on mobile
+  - Hide category sidebar, use dropdown or tabs
+  - Full-screen document view on mobile
+  - Floating TOC button for small screens
+  - Touch-optimized card sizes (min 44px)

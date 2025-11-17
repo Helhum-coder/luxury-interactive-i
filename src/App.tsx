@@ -1,1011 +1,201 @@
-import { useState, useEffect } from 'react'
-import { useKV } from '@github/spark/hooks'
-import Console from '@/components/Console'
-import DashboardDisplay from '@/components/DashboardDisplay'
-import MarketingEngine from '@/components/MarketingEngine'
-import GitIntegrationManager from '@/components/GitIntegrationManager'
-import NotificationCenter from '@/components/NotificationCenter'
-import VersionDetector from '@/components/VersionDetector'
-import VersionHistoryTimeline from '@/components/VersionHistoryTimeline'
-import CommitComparisonTool from '@/components/CommitComparisonTool'
-import BranchTimelineViewer from '@/components/BranchTimelineViewer'
-import PortSecurityManager from '@/components/PortSecurityManager'
-import PublishEnabler from '@/components/PublishEnabler'
-import CICDPipelineManager from '@/components/CICDPipelineManager'
-import ClusterAccessDiagnostic from '@/components/ClusterAccessDiagnostic'
-import ClusterHealthMonitor from '@/components/ClusterHealthMonitor'
-import APIIntegrationManager from '@/components/APIIntegrationManager'
-import UnifiedDashboard from '@/components/UnifiedDashboard'
-import NetworkDiagnostic from '@/components/NetworkDiagnostic'
-import FirewallDiagnostic from '@/components/FirewallDiagnostic'
-import ClusterConnectionAnalyzer from '@/components/ClusterConnectionAnalyzer'
-import DashboardTemplateManager from '@/components/DashboardTemplateManager'
-import PersonalTemplateManager from '@/components/PersonalTemplateManager'
-import CopilotLogAnalyzer from '@/components/CopilotLogAnalyzer'
-import APIStatusPanel from '@/components/APIStatusPanel'
-import PortRedirectionDiagnostic from '@/components/PortRedirectionDiagnostic'
-import DeploymentBlockerRemoval from '@/components/DeploymentBlockerRemoval'
-import ConnectionErrorManager from '@/components/ConnectionErrorManager'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
+import { useState, useEffect, useMemo } from 'react'
+import { Input } from '@/components/ui/input'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
-import { Toaster } from '@/components/ui/sonner'
-import { 
-  Terminal, 
-  Code, 
-  ChartBar, 
-  Sparkle, 
-  Cpu,
-  Lightning,
-  CirclesFour,
-  GitBranch,
-  Bell,
-  Package,
-  ClockCounterClockwise,
-  GitDiff,
-  FlowArrow,
-  ShieldCheck,
-  RocketLaunch,
-  CirclesThreePlus,
-  CloudArrowUp,
-  Activity,
-  Plugs,
-  Kanban,
-  WifiHigh,
-  FireExtinguisher,
-  Bug,
-  GridFour,
-  Detective,
-  ChartLineUp,
-  Crosshair,
-  ShieldSlash
-} from '@phosphor-icons/react'
-import { ConsoleType, ConsoleMessage, DashboardWidget, MarketingStrategy } from '@/lib/types'
-import { DashboardTemplate } from '@/lib/dashboard-templates'
-import { detectLocalVersion } from '@/lib/version-detector'
-import { toast } from 'sonner'
+import { MagnifyingGlass, BookOpen, Folder } from '@phosphor-icons/react'
 import { motion } from 'framer-motion'
+import { DocumentCard } from '@/components/DocumentCard'
+import { DocumentViewer } from '@/components/DocumentViewer'
+import { useRecentDocuments } from '@/hooks/use-recent-documents'
+import { 
+  DOCUMENT_FILES, 
+  categorizeDocument, 
+  generateDocumentTitle, 
+  generateDocumentDescription,
+  type Document 
+} from '@/lib/documents'
 
 function App() {
-  const [activeConsole, setActiveConsole] = useState<ConsoleType>('system')
-  const [appVersion, setAppVersion] = useState<string>('0.0.0')
-  const [consoleMessages, setConsoleMessages] = useKV<Record<ConsoleType, ConsoleMessage[]>>(
-    'console-messages',
-    {
-      system: [],
-      development: [],
-      analytics: [],
-      marketing: [],
-      control: []
-    }
-  )
-  const [dashboards, setDashboards] = useKV<DashboardWidget[]>('dashboards', [])
-  const [strategies, setStrategies] = useKV<MarketingStrategy[]>('marketing-strategies', [])
+  const [documents, setDocuments] = useState<Document[]>([])
+  const [selectedDocument, setSelectedDocument] = useState<Document | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState<string>('all')
+  const [loading, setLoading] = useState(true)
+  const { addToRecent } = useRecentDocuments()
 
   useEffect(() => {
-    const loadVersion = async () => {
-      try {
-        const versionInfo = await detectLocalVersion()
-        setAppVersion(versionInfo.appVersion)
-      } catch (error) {
-        console.error('Failed to detect version:', error)
+    const loadDocuments = async () => {
+      setLoading(true)
+      
+      const loadedDocs: Document[] = []
+      
+      for (const fileName of DOCUMENT_FILES) {
+        try {
+          const response = await fetch(`/${fileName}`)
+          if (response.ok) {
+            const content = await response.text()
+            const doc: Document = {
+              id: fileName,
+              title: generateDocumentTitle(fileName),
+              fileName,
+              category: categorizeDocument(fileName),
+              content,
+              description: generateDocumentDescription(content),
+            }
+            loadedDocs.push(doc)
+          }
+        } catch (error) {
+          console.error(`Failed to load ${fileName}:`, error)
+        }
       }
+      
+      setDocuments(loadedDocs)
+      setLoading(false)
     }
-    loadVersion()
+
+    loadDocuments()
   }, [])
 
-  const addMessage = (consoleId: ConsoleType, type: ConsoleMessage['type'], content: string) => {
-    const message: ConsoleMessage = {
-      id: `msg-${Date.now()}-${Math.random()}`,
-      type,
-      content,
-      timestamp: Date.now(),
-      consoleId
-    }
+  const categories = useMemo(() => {
+    const categoryMap = new Map<string, number>()
     
-    setConsoleMessages((current) => {
-      const messages = current || {
-        system: [],
-        development: [],
-        analytics: [],
-        marketing: [],
-        control: []
-      }
-      return {
-        ...messages,
-        [consoleId]: [...messages[consoleId], message]
-      }
+    documents.forEach(doc => {
+      const count = categoryMap.get(doc.category) || 0
+      categoryMap.set(doc.category, count + 1)
     })
-  }
+    
+    return Array.from(categoryMap.entries())
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => a.name.localeCompare(b.name))
+  }, [documents])
 
-  const executeCommand = async (consoleId: ConsoleType, command: string) => {
-    addMessage(consoleId, 'input', command)
-
-    const lowerCommand = command.toLowerCase().trim()
-
-    if (lowerCommand === 'help') {
-      const helpText = `Available Commands:
-- help: Show this help message
-- clear: Clear console
-- status: Show system status
-- version: Show version information
-- detect versions: Detect and show all package versions
-- generate dashboard [type]: Generate a dashboard with D3 visualizations (e.g., analytics, financial, performance)
-- demo charts: Generate a demo dashboard showcasing all chart types
-- analyze [topic]: Analyze data on a topic
-- deploy [project]: Deploy a project
-- monitor: Start system monitoring
-- optimize: Run system optimization`
-      addMessage(consoleId, 'info', helpText)
-      return
-    }
-
-    if (lowerCommand === 'clear') {
-      clearConsole(consoleId)
-      return
-    }
-
-    if (lowerCommand === 'demo charts') {
-      addMessage(consoleId, 'info', 'Generating comprehensive chart demo...')
+  const filteredDocuments = useMemo(() => {
+    return documents.filter(doc => {
+      const matchesSearch = searchQuery === '' || 
+        doc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        doc.fileName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        doc.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (doc.description && doc.description.toLowerCase().includes(searchQuery.toLowerCase()))
       
-      setTimeout(() => {
-        const demoWidgets: DashboardWidget[] = [
-          {
-            id: `demo-line-${Date.now()}`,
-            type: 'line',
-            title: 'Revenue Trend (Line Chart)',
-            data: Array.from({ length: 15 }, (_, i) => ({
-              x: i,
-              y: Math.floor(Math.random() * 60 + 40 + i * 3)
-            })),
-            position: { x: 0, y: 0, w: 4, h: 2 },
-            chartConfig: { 
-              color: 'oklch(0.85 0.18 90)', 
-              showGrid: true, 
-              animate: true 
-            }
-          },
-          {
-            id: `demo-bar-${Date.now()}`,
-            type: 'bar',
-            title: 'Sales by Category (Bar Chart)',
-            data: [
-              { label: 'Electronics', value: 145, color: 'oklch(0.85 0.18 90)' },
-              { label: 'Fashion', value: 98, color: 'oklch(0.75 0.15 85)' },
-              { label: 'Food', value: 122, color: 'oklch(0.35 0.15 300)' },
-              { label: 'Sports', value: 87, color: 'oklch(0.65 0.20 180)' },
-              { label: 'Books', value: 76, color: 'oklch(0.70 0.18 270)' }
-            ],
-            position: { x: 4, y: 0, w: 4, h: 2 },
-            chartConfig: { animate: true }
-          },
-          {
-            id: `demo-pie-${Date.now()}`,
-            type: 'pie',
-            title: 'Market Share (Donut Chart)',
-            data: [
-              { label: 'Product A', value: 35, color: 'oklch(0.85 0.18 90)' },
-              { label: 'Product B', value: 28, color: 'oklch(0.75 0.15 85)' },
-              { label: 'Product C', value: 22, color: 'oklch(0.35 0.15 300)' },
-              { label: 'Product D', value: 15, color: 'oklch(0.65 0.20 180)' }
-            ],
-            position: { x: 8, y: 0, w: 4, h: 2 },
-            chartConfig: { 
-              innerRadius: 70, 
-              animate: true, 
-              showLabels: true 
-            }
-          },
-          {
-            id: `demo-area-${Date.now()}`,
-            type: 'area',
-            title: 'Revenue vs Expenses (Area Chart)',
-            data: [
-              {
-                name: 'Revenue',
-                data: Array.from({ length: 12 }, (_, i) => ({ 
-                  x: i, 
-                  y: Math.floor(Math.random() * 40 + 60 + i * 2) 
-                })),
-                color: 'oklch(0.85 0.18 90)'
-              },
-              {
-                name: 'Expenses',
-                data: Array.from({ length: 12 }, (_, i) => ({ 
-                  x: i, 
-                  y: Math.floor(Math.random() * 30 + 30 + i * 1.5) 
-                })),
-                color: 'oklch(0.55 0.22 25)'
-              },
-              {
-                name: 'Profit',
-                data: Array.from({ length: 12 }, (_, i) => ({ 
-                  x: i, 
-                  y: Math.floor(Math.random() * 20 + 20 + i * 0.5) 
-                })),
-                color: 'oklch(0.35 0.15 300)'
-              }
-            ],
-            position: { x: 0, y: 2, w: 6, h: 2 },
-            chartConfig: { 
-              showGrid: true, 
-              animate: true 
-            }
-          },
-          {
-            id: `demo-radar-${Date.now()}`,
-            type: 'radar',
-            title: 'Performance Radar',
-            data: [
-              { axis: 'Speed', value: 85 },
-              { axis: 'Quality', value: 92 },
-              { axis: 'Security', value: 78 },
-              { axis: 'Usability', value: 88 },
-              { axis: 'Features', value: 75 },
-              { axis: 'Support', value: 90 }
-            ],
-            position: { x: 6, y: 2, w: 3, h: 2 },
-            chartConfig: { 
-              color: 'oklch(0.35 0.15 300)', 
-              levels: 5,
-              animate: true 
-            }
-          },
-          {
-            id: `demo-gauge-${Date.now()}`,
-            type: 'gauge',
-            title: 'System Load (Gauge)',
-            data: { 
-              value: 78, 
-              label: 'CPU USAGE',
-              unit: '%'
-            },
-            position: { x: 9, y: 2, w: 3, h: 2 },
-            chartConfig: { 
-              min: 0,
-              max: 100,
-              animate: true 
-            }
-          },
-          {
-            id: `demo-bar-horizontal-${Date.now()}`,
-            type: 'bar',
-            title: 'Top Products (Horizontal)',
-            data: [
-              { label: 'Widget Pro', value: 234 },
-              { label: 'Gadget Max', value: 198 },
-              { label: 'Tool Elite', value: 176 },
-              { label: 'Device Plus', value: 145 }
-            ],
-            position: { x: 0, y: 4, w: 4, h: 2 },
-            chartConfig: { 
-              color: 'oklch(0.75 0.15 85)',
-              animate: true,
-              horizontal: true
-            }
-          },
-          {
-            id: `demo-metric-${Date.now()}`,
-            type: 'metric',
-            title: 'Key Performance Indicators',
-            data: {
-              'Total Revenue': '$127,450',
-              'Active Users': '12,847',
-              'Conversion Rate': '3.42%',
-              'Avg Order Value': '$89.32',
-              'Customer Satisfaction': '4.8/5.0'
-            },
-            position: { x: 4, y: 4, w: 4, h: 2 }
-          },
-          {
-            id: `demo-status-${Date.now()}`,
-            type: 'status',
-            title: 'Infrastructure Status',
-            data: {
-              'Web Servers': 'Operational',
-              'Database': 'Healthy',
-              'Cache Layer': 'Optimal',
-              'API Gateway': 'Active',
-              'CDN': 'Protected',
-              'Monitoring': 'Active'
-            },
-            position: { x: 8, y: 4, w: 4, h: 2 }
-          }
-        ]
-        
-        setDashboards(() => demoWidgets)
-        addMessage(consoleId, 'success', `Chart demo generated with ${demoWidgets.length} visualizations`)
-        toast.success('Demo Dashboard Created!', { 
-          description: 'Showcasing Line, Bar, Pie, Area, Radar, and Gauge charts' 
-        })
-      }, 1000)
-      return
-    }
-
-    if (lowerCommand === 'status') {
-      addMessage(consoleId, 'success', 'System Status: ALL SYSTEMS OPERATIONAL')
-      addMessage(consoleId, 'output', `CPU: ${Math.floor(Math.random() * 30 + 20)}%`)
-      addMessage(consoleId, 'output', `Memory: ${Math.floor(Math.random() * 40 + 30)}%`)
-      addMessage(consoleId, 'output', `Network: ${Math.floor(Math.random() * 50 + 50)}Mbps`)
-      addMessage(consoleId, 'output', `Active Processes: ${Math.floor(Math.random() * 20 + 10)}`)
-      return
-    }
-
-    if (lowerCommand === 'version' || lowerCommand === 'detect versions') {
-      addMessage(consoleId, 'info', 'Detecting version information...')
+      const matchesCategory = selectedCategory === 'all' || doc.category === selectedCategory
       
-      try {
-        const versionInfo = await detectLocalVersion()
-        addMessage(consoleId, 'success', `Application Version: v${versionInfo.appVersion}`)
-        
-        if (versionInfo.cliVersions.vite) {
-          addMessage(consoleId, 'output', `├─ Vite: v${versionInfo.cliVersions.vite}`)
-        }
-        if (versionInfo.cliVersions.typescript) {
-          addMessage(consoleId, 'output', `├─ TypeScript: v${versionInfo.cliVersions.typescript}`)
-        }
-        if (versionInfo.cliVersions.react) {
-          addMessage(consoleId, 'output', `├─ React: v${versionInfo.cliVersions.react}`)
-        }
-        
-        addMessage(consoleId, 'output', `└─ Total Dependencies: ${versionInfo.dependencies.length}`)
-        addMessage(consoleId, 'success', 'Version detection complete')
-        
-        setAppVersion(versionInfo.appVersion)
-        toast.success('Version detected!', {
-          description: `v${versionInfo.appVersion} with ${versionInfo.dependencies.length} packages`
-        })
-      } catch (error) {
-        addMessage(consoleId, 'error', 'Failed to detect version information')
-        console.error(error)
-      }
-      return
-    }
-
-    if (lowerCommand.startsWith('generate dashboard')) {
-      const type = command.split(' ')[2] || 'analytics'
-      addMessage(consoleId, 'info', `Generating ${type} dashboard...`)
-      
-      setTimeout(() => {
-        const generateLineData = () => 
-          Array.from({ length: 12 }, (_, i) => ({
-            x: i,
-            y: Math.floor(Math.random() * 80 + 20)
-          }))
-
-        const generateBarData = () => [
-          { label: 'Mon', value: Math.floor(Math.random() * 100 + 50) },
-          { label: 'Tue', value: Math.floor(Math.random() * 100 + 50) },
-          { label: 'Wed', value: Math.floor(Math.random() * 100 + 50) },
-          { label: 'Thu', value: Math.floor(Math.random() * 100 + 50) },
-          { label: 'Fri', value: Math.floor(Math.random() * 100 + 50) }
-        ]
-
-        const generatePieData = () => [
-          { label: 'Desktop', value: Math.floor(Math.random() * 50 + 30), color: 'oklch(0.85 0.18 90)' },
-          { label: 'Mobile', value: Math.floor(Math.random() * 50 + 30), color: 'oklch(0.75 0.15 85)' },
-          { label: 'Tablet', value: Math.floor(Math.random() * 30 + 10), color: 'oklch(0.35 0.15 300)' },
-          { label: 'Other', value: Math.floor(Math.random() * 20 + 5), color: 'oklch(0.65 0.20 180)' }
-        ]
-
-        const generateAreaData = () => [
-          {
-            name: 'Revenue',
-            data: Array.from({ length: 10 }, (_, i) => ({ x: i, y: Math.floor(Math.random() * 60 + 40) })),
-            color: 'oklch(0.85 0.18 90)'
-          },
-          {
-            name: 'Costs',
-            data: Array.from({ length: 10 }, (_, i) => ({ x: i, y: Math.floor(Math.random() * 40 + 20) })),
-            color: 'oklch(0.55 0.22 25)'
-          }
-        ]
-
-        const generateRadarData = () => [
-          { axis: 'Speed', value: Math.floor(Math.random() * 50 + 50) },
-          { axis: 'Quality', value: Math.floor(Math.random() * 50 + 50) },
-          { axis: 'Security', value: Math.floor(Math.random() * 50 + 50) },
-          { axis: 'UX', value: Math.floor(Math.random() * 50 + 50) },
-          { axis: 'Performance', value: Math.floor(Math.random() * 50 + 50) }
-        ]
-
-        const newWidgets: DashboardWidget[] = [
-          {
-            id: `widget-${Date.now()}-1`,
-            type: 'line',
-            title: `${type.toUpperCase()} Trend`,
-            data: generateLineData(),
-            position: { x: 0, y: 0, w: 4, h: 2 },
-            chartConfig: { 
-              color: 'oklch(0.85 0.18 90)', 
-              showGrid: true, 
-              animate: true 
-            }
-          },
-          {
-            id: `widget-${Date.now()}-2`,
-            type: 'bar',
-            title: 'Weekly Performance',
-            data: generateBarData(),
-            position: { x: 4, y: 0, w: 4, h: 2 },
-            chartConfig: { 
-              color: 'oklch(0.75 0.15 85)', 
-              animate: true 
-            }
-          },
-          {
-            id: `widget-${Date.now()}-3`,
-            type: 'pie',
-            title: 'Traffic Distribution',
-            data: generatePieData(),
-            position: { x: 8, y: 0, w: 4, h: 2 },
-            chartConfig: { 
-              innerRadius: 60, 
-              animate: true, 
-              showLabels: true 
-            }
-          },
-          {
-            id: `widget-${Date.now()}-4`,
-            type: 'gauge',
-            title: 'System Performance',
-            data: { 
-              value: Math.floor(Math.random() * 40 + 60), 
-              label: 'EFFICIENCY',
-              unit: '%'
-            },
-            position: { x: 0, y: 2, w: 4, h: 2 },
-            chartConfig: { 
-              animate: true 
-            }
-          },
-          {
-            id: `widget-${Date.now()}-5`,
-            type: 'area',
-            title: 'Financial Overview',
-            data: generateAreaData(),
-            position: { x: 4, y: 2, w: 4, h: 2 },
-            chartConfig: { 
-              showGrid: true, 
-              animate: true 
-            }
-          },
-          {
-            id: `widget-${Date.now()}-6`,
-            type: 'radar',
-            title: 'Quality Metrics',
-            data: generateRadarData(),
-            position: { x: 8, y: 2, w: 4, h: 2 },
-            chartConfig: { 
-              color: 'oklch(0.35 0.15 300)', 
-              animate: true 
-            }
-          },
-          {
-            id: `widget-${Date.now()}-7`,
-            type: 'metric',
-            title: 'Key Metrics',
-            data: {
-              'Total Users': Math.floor(Math.random() * 10000 + 5000),
-              'Active Sessions': Math.floor(Math.random() * 1000 + 500),
-              'Conversion Rate': `${(Math.random() * 5 + 2).toFixed(2)}%`,
-              'Revenue': `$${Math.floor(Math.random() * 50000 + 25000).toLocaleString()}`
-            },
-            position: { x: 0, y: 4, w: 4, h: 2 }
-          },
-          {
-            id: `widget-${Date.now()}-8`,
-            type: 'status',
-            title: 'System Health',
-            data: {
-              'Database': 'Healthy',
-              'API Gateway': 'Operational',
-              'Cache': 'Optimal',
-              'CDN': 'Active',
-              'Security': 'Protected'
-            },
-            position: { x: 4, y: 4, w: 4, h: 2 }
-          }
-        ]
-        
-        setDashboards((current) => [...newWidgets, ...(current || [])].slice(0, 24))
-        addMessage(consoleId, 'success', `Dashboard generated successfully with ${newWidgets.length} widgets`)
-        toast.success('Dashboard generated!', { description: `${newWidgets.length} advanced visualizations created` })
-      }, 1500)
-      return
-    }
-
-    if (lowerCommand.startsWith('analyze')) {
-      const topic = command.split(' ').slice(1).join(' ') || 'system'
-      addMessage(consoleId, 'info', `Analyzing ${topic}...`)
-      
-      setTimeout(() => {
-        addMessage(consoleId, 'output', `Analysis complete for: ${topic}`)
-        addMessage(consoleId, 'output', `• Data points processed: ${Math.floor(Math.random() * 10000 + 5000)}`)
-        addMessage(consoleId, 'output', `• Patterns detected: ${Math.floor(Math.random() * 20 + 5)}`)
-        addMessage(consoleId, 'output', `• Anomalies found: ${Math.floor(Math.random() * 3)}`)
-        addMessage(consoleId, 'success', 'Analysis completed successfully')
-      }, 2000)
-      return
-    }
-
-    if (lowerCommand.startsWith('deploy')) {
-      const project = command.split(' ').slice(1).join(' ') || 'application'
-      addMessage(consoleId, 'info', `Deploying ${project}...`)
-      
-      setTimeout(() => {
-        addMessage(consoleId, 'output', 'Building application...')
-        setTimeout(() => {
-          addMessage(consoleId, 'output', 'Running tests...')
-          setTimeout(() => {
-            addMessage(consoleId, 'output', 'Pushing to production...')
-            setTimeout(() => {
-              addMessage(consoleId, 'success', `${project} deployed successfully!`)
-              toast.success('Deployment complete!', { description: `${project} is now live` })
-            }, 800)
-          }, 800)
-        }, 800)
-      }, 1000)
-      return
-    }
-
-    if (lowerCommand === 'monitor') {
-      addMessage(consoleId, 'info', 'Starting system monitoring...')
-      setTimeout(() => {
-        addMessage(consoleId, 'output', 'Monitoring CPU, Memory, Network, and Disk I/O')
-        addMessage(consoleId, 'success', 'Monitoring active - data streaming to analytics console')
-      }, 1000)
-      return
-    }
-
-    if (lowerCommand === 'optimize') {
-      addMessage(consoleId, 'info', 'Running system optimization...')
-      setTimeout(() => {
-        addMessage(consoleId, 'output', 'Clearing cache...')
-        setTimeout(() => {
-          addMessage(consoleId, 'output', 'Optimizing database queries...')
-          setTimeout(() => {
-            addMessage(consoleId, 'output', 'Compressing assets...')
-            setTimeout(() => {
-              addMessage(consoleId, 'success', 'System optimization complete - Performance improved by 23%')
-              toast.success('Optimization complete!')
-            }, 600)
-          }, 600)
-        }, 600)
-      }, 1000)
-      return
-    }
-
-    addMessage(consoleId, 'output', `Executing: ${command}`)
-    setTimeout(() => {
-      addMessage(consoleId, 'success', 'Command executed successfully')
-    }, 500)
-  }
-
-  const clearConsole = (consoleId: ConsoleType) => {
-    setConsoleMessages((current) => {
-      const messages = current || {
-        system: [],
-        development: [],
-        analytics: [],
-        marketing: [],
-        control: []
-      }
-      return {
-        ...messages,
-        [consoleId]: []
-      }
+      return matchesSearch && matchesCategory
     })
+  }, [documents, searchQuery, selectedCategory])
+
+  if (selectedDocument) {
+    return (
+      <DocumentViewer 
+        document={selectedDocument} 
+        onBack={() => setSelectedDocument(null)} 
+      />
+    )
   }
 
-  const handleStrategyGenerated = (strategy: MarketingStrategy) => {
-    setStrategies((current) => [strategy, ...(current || [])])
-    toast.success('Strategy saved!', { 
-      description: `${strategy.campaigns.length} campaigns generated` 
-    })
+  const handleDocumentClick = (doc: Document) => {
+    addToRecent(doc)
+    setSelectedDocument(doc)
   }
-
-  const handleApplyTemplate = (template: DashboardTemplate) => {
-    setDashboards((current) => {
-      const newWidgets = template.widgets.map(widget => ({
-        ...widget,
-        id: `${widget.id}-${Date.now()}-${Math.random()}`
-      }))
-      return [...newWidgets, ...(current || [])]
-    })
-    addMessage('system', 'success', `Applied ${template.name} template with ${template.widgets.length} widgets`)
-  }
-
-  const consoles: Array<{ id: ConsoleType; title: string; icon: React.ReactNode }> = [
-    { id: 'system', title: 'SYSTEM', icon: <Terminal size={24} weight="fill" /> },
-    { id: 'development', title: 'DEVELOPMENT', icon: <Code size={24} weight="fill" /> },
-    { id: 'analytics', title: 'ANALYTICS', icon: <ChartBar size={24} weight="fill" /> },
-    { id: 'marketing', title: 'MARKETING', icon: <Sparkle size={24} weight="fill" /> },
-    { id: 'control', title: 'CONTROL', icon: <Cpu size={24} weight="fill" /> }
-  ]
 
   return (
-    <div className="h-screen w-screen overflow-hidden bg-background flex flex-col">
-      <Toaster />
-      <motion.header 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="border-b-2 border-border/50 luxury-gradient p-4 shadow-lg"
-      >
-        <div className="flex items-center justify-between max-w-[1800px] mx-auto">
-          <div className="flex items-center gap-4">
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-            >
-              <CirclesFour size={40} weight="fill" className="text-accent" />
-            </motion.div>
+    <div className="min-h-screen bg-background flex flex-col">
+      <header className="border-b border-border bg-card/30 sticky top-0 z-10 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto px-6 py-6">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="p-3 bg-primary/10 rounded-xl">
+              <BookOpen size={32} weight="duotone" className="text-primary" />
+            </div>
             <div>
-              <h1 className="font-orbitron font-bold text-3xl tracking-wider text-glow uppercase">
-                LUXE IDE
+              <h1 className="font-bold text-3xl tracking-tight text-foreground">
+                Documentation Viewer
               </h1>
-              <div className="flex items-center gap-2 mt-1">
-                <p className="text-muted-foreground text-sm tracking-wide">
-                  Premium Command Center
-                </p>
-                <Badge variant="outline" className="border-accent/50 text-accent font-mono text-xs">
-                  v{appVersion}
-                </Badge>
-              </div>
+              <p className="text-muted-foreground mt-1">
+                Browse and search through all project documentation
+              </p>
+            </div>
+            <div className="ml-auto">
+              <Badge variant="secondary" className="text-sm px-3 py-1">
+                {documents.length} documents
+              </Badge>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <Button
-              variant="outline"
-              className="border-accent/50 hover:bg-accent/20 hover:text-accent font-orbitron"
-              onClick={() => {
-                setConsoleMessages(() => ({
-                  system: [],
-                  development: [],
-                  analytics: [],
-                  marketing: [],
-                  control: []
-                }))
-                setDashboards(() => [])
-                toast.success('All systems reset')
-              }}
-            >
-              <Lightning size={18} weight="fill" />
-              RESET ALL
-            </Button>
+
+          <div className="relative">
+            <MagnifyingGlass 
+              size={20} 
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" 
+            />
+            <Input
+              type="text"
+              placeholder="Search documents..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 h-12 text-base"
+            />
           </div>
         </div>
-      </motion.header>
+      </header>
 
-      <div className="flex-1 overflow-hidden">
-        <Tabs defaultValue="consoles" className="h-full flex flex-col">
-          <div className="border-b border-border/50 bg-card/30 px-4">
-            <TabsList className="bg-transparent border-b-0 h-14">
-              <TabsTrigger 
-                value="consoles" 
-                className="font-orbitron tracking-wide data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-              >
-                <Terminal size={18} weight="fill" className="mr-2" />
-                CONSOLES
+      <div className="flex-1">
+        <div className="max-w-7xl mx-auto px-6 py-6">
+          <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="mb-6">
+            <TabsList className="flex-wrap h-auto gap-2">
+              <TabsTrigger value="all" className="gap-2">
+                <Folder size={16} weight="fill" />
+                All ({documents.length})
               </TabsTrigger>
-              <TabsTrigger 
-                value="dashboards"
-                className="font-orbitron tracking-wide data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-              >
-                <ChartBar size={18} weight="fill" className="mr-2" />
-                DASHBOARDS
-              </TabsTrigger>
-              <TabsTrigger 
-                value="marketing"
-                className="font-orbitron tracking-wide data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-              >
-                <Sparkle size={18} weight="fill" className="mr-2" />
-                AI MARKETING
-              </TabsTrigger>
-              <TabsTrigger 
-                value="git"
-                className="font-orbitron tracking-wide data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-              >
-                <GitBranch size={18} weight="fill" className="mr-2" />
-                GIT INTEGRATION
-              </TabsTrigger>
-              <TabsTrigger 
-                value="notifications"
-                className="font-orbitron tracking-wide data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-              >
-                <Bell size={18} weight="fill" className="mr-2" />
-                NOTIFICATIONS
-              </TabsTrigger>
-              <TabsTrigger 
-                value="versions"
-                className="font-orbitron tracking-wide data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-              >
-                <Package size={18} weight="fill" className="mr-2" />
-                VERSIONS
-              </TabsTrigger>
-              <TabsTrigger 
-                value="history"
-                className="font-orbitron tracking-wide data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-              >
-                <ClockCounterClockwise size={18} weight="fill" className="mr-2" />
-                VERSION HISTORY
-              </TabsTrigger>
-              <TabsTrigger 
-                value="compare"
-                className="font-orbitron tracking-wide data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-              >
-                <GitDiff size={18} weight="fill" className="mr-2" />
-                COMMIT COMPARE
-              </TabsTrigger>
-              <TabsTrigger 
-                value="timeline"
-                className="font-orbitron tracking-wide data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-              >
-                <FlowArrow size={18} weight="fill" className="mr-2" />
-                BRANCH TIMELINE
-              </TabsTrigger>
-              <TabsTrigger 
-                value="security"
-                className="font-orbitron tracking-wide data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-              >
-                <ShieldCheck size={18} weight="fill" className="mr-2" />
-                PORT SECURITY
-              </TabsTrigger>
-              <TabsTrigger 
-                value="publish"
-                className="font-orbitron tracking-wide data-[state=active]:bg-accent data-[state=active]:text-accent-foreground"
-              >
-                <RocketLaunch size={18} weight="fill" className="mr-2" />
-                PUBLISH
-              </TabsTrigger>
-              <TabsTrigger 
-                value="cicd"
-                className="font-orbitron tracking-wide data-[state=active]:bg-accent data-[state=active]:text-accent-foreground"
-              >
-                <CirclesThreePlus size={18} weight="fill" className="mr-2" />
-                CI/CD PIPELINES
-              </TabsTrigger>
-              <TabsTrigger 
-                value="cluster"
-                className="font-orbitron tracking-wide data-[state=active]:bg-destructive data-[state=active]:text-destructive-foreground"
-              >
-                <CloudArrowUp size={18} weight="fill" className="mr-2" />
-                CLUSTER ACCESS
-              </TabsTrigger>
-              <TabsTrigger 
-                value="health"
-                className="font-orbitron tracking-wide data-[state=active]:bg-accent data-[state=active]:text-accent-foreground"
-              >
-                <Activity size={18} weight="fill" className="mr-2" />
-                CLUSTER HEALTH
-              </TabsTrigger>
-              <TabsTrigger 
-                value="api"
-                className="font-orbitron tracking-wide data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-              >
-                <Plugs size={18} weight="fill" className="mr-2" />
-                API INTEGRATION
-              </TabsTrigger>
-              <TabsTrigger 
-                value="unified"
-                className="font-orbitron tracking-wide data-[state=active]:bg-accent data-[state=active]:text-accent-foreground"
-              >
-                <Kanban size={18} weight="fill" className="mr-2" />
-                UNIFIED DASHBOARD
-              </TabsTrigger>
-              <TabsTrigger 
-                value="network"
-                className="font-orbitron tracking-wide data-[state=active]:bg-green-500 data-[state=active]:text-white"
-              >
-                <WifiHigh size={18} weight="fill" className="mr-2" />
-                NETWORK DIAGNOSTIC
-              </TabsTrigger>
-              <TabsTrigger 
-                value="firewall"
-                className="font-orbitron tracking-wide data-[state=active]:bg-red-500 data-[state=active]:text-white"
-              >
-                <FireExtinguisher size={18} weight="fill" className="mr-2" />
-                FIREWALL RECOVERY
-              </TabsTrigger>
-              <TabsTrigger 
-                value="connection-analyzer"
-                className="font-orbitron tracking-wide data-[state=active]:bg-purple-500 data-[state=active]:text-white"
-              >
-                <Bug size={18} weight="fill" className="mr-2" />
-                CONNECTION ANALYZER
-              </TabsTrigger>
-              <TabsTrigger 
-                value="templates"
-                className="font-orbitron tracking-wide data-[state=active]:bg-accent data-[state=active]:text-accent-foreground"
-              >
-                <GridFour size={18} weight="fill" className="mr-2" />
-                DASHBOARD TEMPLATES
-              </TabsTrigger>
-              <TabsTrigger 
-                value="copilot-logs"
-                className="font-orbitron tracking-wide data-[state=active]:bg-destructive data-[state=active]:text-destructive-foreground"
-              >
-                <Detective size={18} weight="fill" className="mr-2" />
-                COPILOT LOGS
-              </TabsTrigger>
-              <TabsTrigger 
-                value="api-status"
-                className="font-orbitron tracking-wide data-[state=active]:bg-accent data-[state=active]:text-accent-foreground"
-              >
-                <ChartLineUp size={18} weight="fill" className="mr-2" />
-                API STATUS
-              </TabsTrigger>
-              <TabsTrigger 
-                value="port-redirection"
-                className="font-orbitron tracking-wide data-[state=active]:bg-destructive data-[state=active]:text-destructive-foreground"
-              >
-                <Crosshair size={18} weight="fill" className="mr-2" />
-                PORT REDIRECTION FIX
-              </TabsTrigger>
-              <TabsTrigger 
-                value="deployment-blockers"
-                className="font-orbitron tracking-wide data-[state=active]:bg-accent data-[state=active]:text-accent-foreground"
-              >
-                <ShieldSlash size={18} weight="fill" className="mr-2" />
-                DEPLOYMENT UNBLOCK
-              </TabsTrigger>
+              {categories.map(({ name, count }) => (
+                <TabsTrigger key={name} value={name} className="gap-2">
+                  <Folder size={16} weight="fill" />
+                  {name} ({count})
+                </TabsTrigger>
+              ))}
             </TabsList>
-          </div>
+          </Tabs>
 
-          <TabsContent value="consoles" className="flex-1 p-6 m-0 overflow-hidden">
-            <div className="h-full grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-              {consoles.map((console) => (
-                <Console
-                  key={console.id}
-                  id={console.id}
-                  title={console.title}
-                  icon={console.icon}
-                  isActive={activeConsole === console.id}
-                  messages={consoleMessages?.[console.id] || []}
-                  onExecute={(cmd) => executeCommand(console.id, cmd)}
-                  onClear={() => clearConsole(console.id)}
-                  onActivate={() => setActiveConsole(console.id)}
-                />
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="h-40 bg-muted animate-pulse rounded-lg" />
               ))}
             </div>
-          </TabsContent>
-
-          <TabsContent value="dashboards" className="flex-1 m-0 overflow-hidden">
-            <Card className="h-full border-2 border-border/50 console-glow rounded-none bg-card/50">
-              <DashboardDisplay 
-                widgets={dashboards || []} 
-                title="DISTRIBUTED DASHBOARDS"
-              />
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="marketing" className="flex-1 m-0 overflow-hidden">
-            <Card className="h-full border-2 border-border/50 console-glow rounded-none bg-card/50">
-              <MarketingEngine onStrategyGenerated={handleStrategyGenerated} />
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="git" className="flex-1 m-0 overflow-hidden">
-            <Card className="h-full border-2 border-border/50 console-glow rounded-none bg-card/50">
-              <GitIntegrationManager />
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="notifications" className="flex-1 p-6 m-0 overflow-hidden">
-            <NotificationCenter />
-          </TabsContent>
-
-          <TabsContent value="versions" className="flex-1 m-0 overflow-hidden">
-            <Card className="h-full border-2 border-border/50 console-glow rounded-none bg-card/50">
-              <VersionDetector />
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="history" className="flex-1 m-0 overflow-hidden">
-            <Card className="h-full border-2 border-border/50 console-glow rounded-none bg-card/50">
-              <VersionHistoryTimeline />
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="compare" className="flex-1 m-0 overflow-hidden">
-            <Card className="h-full border-2 border-border/50 console-glow rounded-none bg-card/50">
-              <CommitComparisonTool />
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="timeline" className="flex-1 m-0 overflow-hidden">
-            <BranchTimelineViewer />
-          </TabsContent>
-
-          <TabsContent value="security" className="flex-1 m-0 overflow-hidden">
-            <Card className="h-full border-2 border-accent/50 console-glow-active rounded-none bg-card/50">
-              <PortSecurityManager />
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="publish" className="flex-1 m-0 overflow-hidden">
-            <Card className="h-full border-2 border-accent/50 console-glow-active rounded-none bg-card/50">
-              <PublishEnabler />
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="cicd" className="flex-1 m-0 overflow-hidden">
-            <Card className="h-full border-2 border-accent/50 console-glow-active rounded-none bg-card/50">
-              <CICDPipelineManager />
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="cluster" className="flex-1 m-0 overflow-hidden">
-            <Card className="h-full border-2 border-destructive/50 console-glow-active rounded-none bg-card/50">
-              <ClusterAccessDiagnostic />
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="health" className="flex-1 m-0 overflow-hidden">
-            <Card className="h-full border-2 border-accent/50 console-glow-active rounded-none bg-card/50">
-              <ClusterHealthMonitor />
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="api" className="flex-1 m-0 overflow-hidden">
-            <Card className="h-full border-2 border-primary/50 console-glow rounded-none bg-card/50">
-              <APIIntegrationManager />
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="unified" className="flex-1 m-0 overflow-hidden">
-            <Card className="h-full border-2 border-accent/50 console-glow-active rounded-none bg-card/50 overflow-hidden">
-              <UnifiedDashboard />
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="network" className="flex-1 m-0 overflow-hidden">
-            <Card className="h-full border-2 border-green-500/50 console-glow-active rounded-none bg-card/50 overflow-hidden">
-              <NetworkDiagnostic />
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="firewall" className="flex-1 m-0 overflow-hidden">
-            <Card className="h-full border-2 border-red-500/50 console-glow-active rounded-none bg-card/50 overflow-hidden">
-              <FirewallDiagnostic />
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="connection-analyzer" className="flex-1 m-0 overflow-hidden">
-            <Card className="h-full border-2 border-purple-500/50 console-glow-active rounded-none bg-card/50 overflow-hidden">
-              <ClusterConnectionAnalyzer />
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="templates" className="flex-1 m-0 overflow-hidden">
-            <Card className="h-full border-2 border-accent/50 console-glow-active rounded-none bg-card/50 overflow-hidden">
-              <PersonalTemplateManager onApplyTemplate={handleApplyTemplate} />
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="copilot-logs" className="flex-1 m-0 overflow-hidden">
-            <Card className="h-full border-2 border-destructive/50 console-glow-active rounded-none bg-card/50 overflow-hidden">
-              <CopilotLogAnalyzer />
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="api-status" className="flex-1 p-6 m-0 overflow-hidden">
-            <APIStatusPanel />
-          </TabsContent>
-
-          <TabsContent value="port-redirection" className="flex-1 m-0 overflow-hidden">
-            <Card className="h-full border-2 border-destructive/50 console-glow-active rounded-none bg-card/50 overflow-hidden">
-              <PortRedirectionDiagnostic />
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="deployment-blockers" className="flex-1 m-0 overflow-hidden">
-            <Card className="h-full border-2 border-accent/50 console-glow-active rounded-none bg-card/50 overflow-hidden">
-              <DeploymentBlockerRemoval />
-            </Card>
-          </TabsContent>
-        </Tabs>
+          ) : filteredDocuments.length === 0 ? (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center py-16"
+            >
+              <div className="inline-flex p-6 bg-muted rounded-full mb-4">
+                <MagnifyingGlass size={48} className="text-muted-foreground" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">No documents found</h3>
+              <p className="text-muted-foreground">
+                Try adjusting your search or filter criteria
+              </p>
+            </motion.div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+            >
+              {filteredDocuments.map((doc, index) => (
+                <motion.div
+                  key={doc.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05, duration: 0.3 }}
+                >
+                  <DocumentCard
+                    document={doc}
+                    onClick={() => handleDocumentClick(doc)}
+                  />
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
+        </div>
       </div>
     </div>
   )
