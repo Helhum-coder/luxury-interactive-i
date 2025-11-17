@@ -1,4 +1,7 @@
 // Firebase Authentication utilities with error handling
+// Note: Firebase packages are not installed and not compatible with Spark runtime
+// These imports are commented out to prevent errors
+/*
 import { auth } from './firebase'
 import { 
   signInWithEmailAndPassword,
@@ -86,3 +89,4 @@ export class FirebaseAuthService {
 }
 
 export default FirebaseAuthService
+*/

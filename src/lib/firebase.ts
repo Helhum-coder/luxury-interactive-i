@@ -1,10 +1,13 @@
 // Firebase Configuration for TypeScript/React
-import { initializeApp } from 'firebase/app'
-import { getAuth } from 'firebase/auth'
-import { getFirestore } from 'firebase/firestore'
-import { getStorage } from 'firebase/storage'
+// Note: Firebase packages are not installed and not compatible with Spark runtime
+// These imports are commented out to prevent errors
+// import { initializeApp } from 'firebase/app'
+// import { getAuth } from 'firebase/auth'
+// import { getFirestore } from 'firebase/firestore'
+// import { getStorage } from 'firebase/storage'
 
 // Firebase configuration using environment variables
+/*
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -35,3 +38,4 @@ export const TEAM_CONFIG = {
 }
 
 export default app
+*/

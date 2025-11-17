@@ -732,11 +732,6 @@ ${htmlContent}
   }
 
   const handleFileRead = (file: File) => {
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('File size must be less than 5MB')
-      return
-    }
-
     const reader = new FileReader()
     reader.onload = (e) => {
       const content = e.target?.result as string
@@ -835,8 +830,13 @@ ${htmlContent}
             >
               <Card className="border-2">
                 <CardHeader>
-                  <CardTitle className="text-xl">Select Conversion Type</CardTitle>
-                  <CardDescription>Choose how you want to transform your code</CardDescription>
+                  <CardTitle className="flex items-center gap-2">
+                    <Lightning size={24} weight="duotone" className="text-primary" />
+                    Select Conversion Type
+                  </CardTitle>
+                  <CardDescription>
+                    Choose the format transformation you need
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -978,9 +978,6 @@ ${htmlContent}
                           </div>
                         )}
                       </div>
-                    </div>
-
-                    <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         <label className="text-sm font-semibold">Output ({selectedOption?.to})</label>
                         <div className="flex items-center gap-2">
