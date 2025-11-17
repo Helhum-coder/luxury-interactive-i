@@ -17,11 +17,23 @@ import {
   Code,
   DownloadSimple,
   Bell,
-  BellSlash
+  BellSlash,
+  Wrench,
+  Lightning,
+  Copy,
+  Check
 } from '@phosphor-icons/react'
 import { motion } from 'framer-motion'
 import { toast } from 'sonner'
 import { useKV } from '@github/spark/hooks'
+
+interface QuickFix {
+  id: string
+  title: string
+  description: string
+  action: () => void | Promise<void>
+  icon?: React.ReactNode
+}
 
 interface NetworkCheck {
   name: string
@@ -29,6 +41,7 @@ interface NetworkCheck {
   message: string
   details?: string
   timestamp: string
+  quickFixes?: QuickFix[]
 }
 
 interface PortInfo {
@@ -47,19 +60,155 @@ export function NetworkDiagnosticPanel() {
   const [autoMonitor, setAutoMonitor] = useKV<boolean>('network-auto-monitor', false)
   const [notificationsEnabled, setNotificationsEnabled] = useKV<boolean>('network-notifications', true)
   const [lastScanResults, setLastScanResults] = useState<{ successCount: number; errorCount: number } | null>(null)
+  const [copiedText, setCopiedText] = useState<string | null>(null)
+
+  const copyToClipboard = async (text: string, label: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopiedText(label)
+      toast.success(`${label} copied to clipboard`)
+      setTimeout(() => setCopiedText(null), 2000)
+    } catch (error) {
+      toast.error('Failed to copy to clipboard')
+    }
+  }
+
+  const clearBrowserCache = async () => {
+    try {
+      if ('caches' in window) {
+        const cacheNames = await caches.keys()
+        await Promise.all(cacheNames.map(name => caches.delete(name)))
+        toast.success('Browser cache cleared successfully')
+        setTimeout(() => runDiagnostics(false), 1000)
+      } else {
+        toast.info('Please manually clear your browser cache', {
+          description: 'Press Ctrl+Shift+Delete (Windows) or Cmd+Shift+Delete (Mac)'
+        })
+      }
+    } catch (error) {
+      toast.error('Failed to clear cache')
+    }
+  }
+
+  const reloadPage = () => {
+    toast.info('Reloading page...')
+    setTimeout(() => window.location.reload(), 500)
+  }
+
+  const openNetworkSettings = () => {
+    toast.info('Opening browser network settings', {
+      description: 'Check your DevTools Network tab'
+    })
+    window.open('about:blank', '_blank')
+  }
+
+  const testAlternativeEndpoint = async () => {
+    try {
+      toast.info('Testing alternative endpoints...')
+      const endpoints = [
+        'https://httpbin.org/get',
+        'https://jsonplaceholder.typicode.com/posts/1',
+        'https://api.ipify.org?format=json'
+      ]
+      
+      for (const endpoint of endpoints) {
+        try {
+          const response = await fetch(endpoint)
+          if (response.ok) {
+            toast.success(`Successfully connected to ${endpoint}`)
+            return
+          }
+        } catch {
+          continue
+        }
+      }
+      toast.warning('All alternative endpoints failed')
+    } catch (error) {
+      toast.error('Test failed')
+    }
+  }
+
+  const generateQuickFixes = (check: NetworkCheck): QuickFix[] => {
+    const fixes: QuickFix[] = []
+
+    if (check.status === 'error' || check.status === 'warning') {
+      if (check.name.includes('GitHub API')) {
+        fixes.push({
+          id: 'test-alt-endpoint',
+          title: 'Test Alternative Endpoint',
+          description: 'Try connecting to alternative test APIs',
+          action: testAlternativeEndpoint,
+          icon: <Lightning size={16} />
+        })
+        fixes.push({
+          id: 'clear-cache',
+          title: 'Clear Browser Cache',
+          description: 'Clear cached data that might be causing issues',
+          action: clearBrowserCache,
+          icon: <ArrowClockwise size={16} />
+        })
+        fixes.push({
+          id: 'copy-error',
+          title: 'Copy Error Details',
+          description: 'Copy error information for support',
+          action: () => copyToClipboard(check.details || check.message, 'Error details'),
+          icon: <Copy size={16} />
+        })
+      }
+
+      if (check.name.includes('Browser Status') || check.name.includes('Local Server')) {
+        fixes.push({
+          id: 'reload-page',
+          title: 'Reload Page',
+          description: 'Refresh the page to re-establish connection',
+          action: reloadPage,
+          icon: <ArrowClockwise size={16} />
+        })
+        fixes.push({
+          id: 'check-network',
+          title: 'Check Network Settings',
+          description: 'Open browser DevTools to inspect network',
+          action: openNetworkSettings,
+          icon: <Code size={16} />
+        })
+      }
+
+      if (check.name.includes('DNS')) {
+        fixes.push({
+          id: 'flush-dns',
+          title: 'Flush DNS Cache',
+          description: 'Instructions to flush your DNS cache',
+          action: () => {
+            toast.info('DNS Flush Instructions', {
+              description: 'Windows: ipconfig /flushdns | Mac: sudo dscacheutil -flushcache | Linux: sudo systemd-resolve --flush-caches'
+            })
+          },
+          icon: <Code size={16} />
+        })
+      }
+    }
+
+    return fixes
+  }
 
   const runDiagnostics = useCallback(async (silent = false) => {
     setIsScanning(true)
     const newChecks: NetworkCheck[] = []
 
     const addCheck = (name: string, status: NetworkCheck['status'], message: string, details?: string) => {
-      newChecks.push({
+      const check: NetworkCheck = {
         name,
         status,
         message,
         details,
         timestamp: new Date().toISOString()
-      })
+      }
+      
+      if (status === 'error' || status === 'warning') {
+        check.quickFixes = generateQuickFixes(check)
+      }
+      
+      newChecks.push(check)
       setChecks([...newChecks])
     }
 
@@ -384,6 +533,46 @@ export function NetworkDiagnosticPanel() {
                                   {check.details}
                                 </code>
                               )}
+                              {check.quickFixes && check.quickFixes.length > 0 && (
+                                <div className="mt-4 pt-4 border-t border-border">
+                                  <div className="flex items-center gap-2 mb-3">
+                                    <Wrench size={16} className="text-primary" />
+                                    <span className="text-sm font-semibold text-foreground">
+                                      Quick Fixes
+                                    </span>
+                                  </div>
+                                  <div className="space-y-2">
+                                    {check.quickFixes.map((fix) => (
+                                      <Button
+                                        key={fix.id}
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={fix.action}
+                                        className="w-full justify-start text-left h-auto py-3"
+                                      >
+                                        <div className="flex items-start gap-3 w-full">
+                                          {fix.icon && (
+                                            <div className="mt-0.5 text-primary">
+                                              {fix.icon}
+                                            </div>
+                                          )}
+                                          <div className="flex-1 min-w-0">
+                                            <div className="font-semibold text-sm">
+                                              {fix.title}
+                                            </div>
+                                            <div className="text-xs text-muted-foreground mt-0.5">
+                                              {fix.description}
+                                            </div>
+                                          </div>
+                                          {copiedText === fix.title && (
+                                            <Check size={16} className="text-green-500 flex-shrink-0" />
+                                          )}
+                                        </div>
+                                      </Button>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
                             </AlertDescription>
                           </div>
                         </div>
@@ -447,6 +636,88 @@ export function NetworkDiagnosticPanel() {
                             Verify this is intentional.
                           </AlertDescription>
                         </Alert>
+                      )}
+                      {portInfo.status === 'blocked' && (
+                        <div className="mt-4 pt-4 border-t border-border">
+                          <div className="flex items-center gap-2 mb-3">
+                            <Wrench size={16} className="text-primary" />
+                            <span className="text-sm font-semibold text-foreground">
+                              Quick Fixes
+                            </span>
+                          </div>
+                          <div className="space-y-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                copyToClipboard(
+                                  `Check if port ${portInfo.port} is in use:\n\nWindows: netstat -ano | findstr :${portInfo.port}\nMac/Linux: lsof -i :${portInfo.port}`,
+                                  'Port check command'
+                                )
+                              }}
+                              className="w-full justify-start text-left h-auto py-3"
+                            >
+                              <div className="flex items-start gap-3 w-full">
+                                <Copy size={16} className="mt-0.5 text-primary" />
+                                <div className="flex-1 min-w-0">
+                                  <div className="font-semibold text-sm">
+                                    Copy Port Check Command
+                                  </div>
+                                  <div className="text-xs text-muted-foreground mt-0.5">
+                                    Check if port {portInfo.port} is already in use
+                                  </div>
+                                </div>
+                              </div>
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                toast.info('Firewall Check', {
+                                  description: `Verify port ${portInfo.port} is allowed in your firewall settings`
+                                })
+                              }}
+                              className="w-full justify-start text-left h-auto py-3"
+                            >
+                              <div className="flex items-start gap-3 w-full">
+                                <ShieldCheck size={16} className="mt-0.5 text-primary" />
+                                <div className="flex-1 min-w-0">
+                                  <div className="font-semibold text-sm">
+                                    Check Firewall Settings
+                                  </div>
+                                  <div className="text-xs text-muted-foreground mt-0.5">
+                                    Ensure port {portInfo.port} is not blocked by firewall
+                                  </div>
+                                </div>
+                              </div>
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                      {portInfo.status === 'unknown' && (
+                        <div className="mt-4 pt-4 border-t border-border">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={async () => {
+                              toast.info(`Retrying port ${portInfo.port}...`)
+                              await runDiagnostics(false)
+                            }}
+                            className="w-full justify-start text-left h-auto py-3"
+                          >
+                            <div className="flex items-start gap-3 w-full">
+                              <ArrowClockwise size={16} className="mt-0.5 text-primary" />
+                              <div className="flex-1 min-w-0">
+                                <div className="font-semibold text-sm">
+                                  Retry Connection
+                                </div>
+                                <div className="text-xs text-muted-foreground mt-0.5">
+                                  Test port {portInfo.port} again
+                                </div>
+                              </div>
+                            </div>
+                          </Button>
+                        </div>
                       )}
                     </CardContent>
                   </Card>
