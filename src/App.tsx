@@ -10,7 +10,7 @@ import { NetworkDiagnosticPanel } from '@/components/NetworkDiagnosticPanel'
 import { AutomatedFixScripts } from '@/components/AutomatedFixScripts'
 import { AIDiagnosticEngine } from '@/components/AIDiagnosticEngine'
 import { SatelliteConnectionMonitor } from '@/components/SatelliteConnectionMonitor'
-import { MultiFormatConverter } from '@/components/MultiFormatConverter'
+import { FileConverterInterface } from '@/components/FileConverterInterface'
 import { useRecentDocuments } from '@/hooks/use-recent-documents'
 import { 
   DOCUMENT_FILES, 
@@ -127,19 +127,7 @@ function App() {
   }
 
   if (showFileConverter) {
-    return (
-      <div className="min-h-screen bg-background p-6">
-        <MultiFormatConverter />
-        <div className="mt-6">
-          <button
-            onClick={() => setShowFileConverter(false)}
-            className="text-primary hover:underline"
-          >
-            ← Back to Documents
-          </button>
-        </div>
-      </div>
-    )
+    return <FileConverterInterface onClose={() => setShowFileConverter(false)} />
   }
 
   if (showNetworkDiagnostics) {
