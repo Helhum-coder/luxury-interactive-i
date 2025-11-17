@@ -21,6 +21,7 @@ import FirewallDiagnostic from '@/components/FirewallDiagnostic'
 import ClusterConnectionAnalyzer from '@/components/ClusterConnectionAnalyzer'
 import DashboardTemplateManager from '@/components/DashboardTemplateManager'
 import PersonalTemplateManager from '@/components/PersonalTemplateManager'
+import CopilotLogAnalyzer from '@/components/CopilotLogAnalyzer'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -50,7 +51,8 @@ import {
   WifiHigh,
   FireExtinguisher,
   Bug,
-  GridFour
+  GridFour,
+  Detective
 } from '@phosphor-icons/react'
 import { ConsoleType, ConsoleMessage, DashboardWidget, MarketingStrategy } from '@/lib/types'
 import { DashboardTemplate } from '@/lib/dashboard-templates'
@@ -813,6 +815,13 @@ function App() {
                 <GridFour size={18} weight="fill" className="mr-2" />
                 DASHBOARD TEMPLATES
               </TabsTrigger>
+              <TabsTrigger 
+                value="copilot-logs"
+                className="font-orbitron tracking-wide data-[state=active]:bg-destructive data-[state=active]:text-destructive-foreground"
+              >
+                <Detective size={18} weight="fill" className="mr-2" />
+                COPILOT LOGS
+              </TabsTrigger>
             </TabsList>
           </div>
 
@@ -944,6 +953,12 @@ function App() {
           <TabsContent value="templates" className="flex-1 m-0 overflow-hidden">
             <Card className="h-full border-2 border-accent/50 console-glow-active rounded-none bg-card/50 overflow-hidden">
               <PersonalTemplateManager onApplyTemplate={handleApplyTemplate} />
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="copilot-logs" className="flex-1 m-0 overflow-hidden">
+            <Card className="h-full border-2 border-destructive/50 console-glow-active rounded-none bg-card/50 overflow-hidden">
+              <CopilotLogAnalyzer />
             </Card>
           </TabsContent>
         </Tabs>
