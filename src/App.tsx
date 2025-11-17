@@ -17,6 +17,7 @@ import ClusterHealthMonitor from '@/components/ClusterHealthMonitor'
 import APIIntegrationManager from '@/components/APIIntegrationManager'
 import UnifiedDashboard from '@/components/UnifiedDashboard'
 import NetworkDiagnostic from '@/components/NetworkDiagnostic'
+import FirewallDiagnostic from '@/components/FirewallDiagnostic'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -43,7 +44,8 @@ import {
   Activity,
   Plugs,
   Kanban,
-  WifiHigh
+  WifiHigh,
+  FireExtinguisher
 } from '@phosphor-icons/react'
 import { ConsoleType, ConsoleMessage, DashboardWidget, MarketingStrategy } from '@/lib/types'
 import { detectLocalVersion } from '@/lib/version-detector'
@@ -773,6 +775,13 @@ function App() {
                 <WifiHigh size={18} weight="fill" className="mr-2" />
                 NETWORK DIAGNOSTIC
               </TabsTrigger>
+              <TabsTrigger 
+                value="firewall"
+                className="font-orbitron tracking-wide data-[state=active]:bg-red-500 data-[state=active]:text-white"
+              >
+                <FireExtinguisher size={18} weight="fill" className="mr-2" />
+                FIREWALL RECOVERY
+              </TabsTrigger>
             </TabsList>
           </div>
 
@@ -886,6 +895,12 @@ function App() {
           <TabsContent value="network" className="flex-1 m-0 overflow-hidden">
             <Card className="h-full border-2 border-green-500/50 console-glow-active rounded-none bg-card/50 overflow-hidden">
               <NetworkDiagnostic />
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="firewall" className="flex-1 m-0 overflow-hidden">
+            <Card className="h-full border-2 border-red-500/50 console-glow-active rounded-none bg-card/50 overflow-hidden">
+              <FirewallDiagnostic />
             </Card>
           </TabsContent>
         </Tabs>
