@@ -20,6 +20,7 @@ import { PipelineMonitor } from '@/components/PipelineMonitor'
 import { RealtimePipelineDashboard } from '@/components/RealtimePipelineDashboard'
 import { RealtimeStatusFeed } from '@/components/RealtimeStatusFeed'
 import { PackageDiagnostic } from '@/components/PackageDiagnostic'
+import { VersionCompatibilityMatrix } from '@/components/VersionCompatibilityMatrix'
 import { useRecentDocuments } from '@/hooks/use-recent-documents'
 import { 
   DOCUMENT_FILES, 
@@ -48,6 +49,7 @@ function App() {
   const [showPipelineMonitor, setShowPipelineMonitor] = useState(false)
   const [showRealtimeDashboard, setShowRealtimeDashboard] = useState(false)
   const [showPackageDiagnostic, setShowPackageDiagnostic] = useState(false)
+  const [showVersionMatrix, setShowVersionMatrix] = useState(false)
   const [networkCheckResults, setNetworkCheckResults] = useState<any[]>([])
   const { addToRecent } = useRecentDocuments()
 
@@ -110,6 +112,10 @@ function App() {
       return matchesSearch && matchesCategory
     })
   }, [documents, searchQuery, selectedCategory])
+
+  if (showVersionMatrix) {
+    return <VersionCompatibilityMatrix onClose={() => setShowVersionMatrix(false)} />
+  }
 
   if (showPackageDiagnostic) {
     return <PackageDiagnostic onClose={() => setShowPackageDiagnostic(false)} />
@@ -247,6 +253,13 @@ function App() {
               </p>
             </div>
             <div className="ml-auto flex items-center gap-3">
+              <button
+                onClick={() => setShowVersionMatrix(true)}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-500/10 to-pink-500/10 hover:from-purple-500/20 hover:to-pink-500/20 transition-colors border-2 border-purple-500/30"
+              >
+                <Activity size={20} weight="duotone" className="text-purple-600" />
+                <span className="text-sm font-semibold text-purple-600">Version Matrix</span>
+              </button>
               <button
                 onClick={() => setShowPackageDiagnostic(true)}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10 hover:from-violet-500/20 hover:to-fuchsia-500/20 transition-colors border-2 border-violet-500/30"
