@@ -169,10 +169,6 @@ function App() {
     return <PipelineMonitor onClose={() => setShowPipelineMonitor(false)} />
   }
 
-  if (showRealtimeDashboard) {
-    return <RealtimePipelineDashboard onClose={() => setShowRealtimeDashboard(false)} />
-  }
-
   if (showNetworkDiagnostics) {
     return (
       <div className="min-h-screen bg-background p-6">
@@ -245,13 +241,6 @@ function App() {
               </p>
             </div>
             <div className="ml-auto flex items-center gap-3">
-              <button
-                onClick={() => setShowRealtimeDashboard(true)}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-green-500/10 to-teal-500/10 hover:from-green-500/20 hover:to-teal-500/20 transition-colors border-2 border-green-500/30"
-              >
-                <Activity size={20} weight="duotone" className="text-green-600" />
-                <span className="text-sm font-semibold text-green-600">Real-time Status</span>
-              </button>
               <button
                 onClick={() => setShowPipelineMonitor(true)}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-blue-500/10 to-purple-500/10 hover:from-blue-500/20 hover:to-purple-500/20 transition-colors border-2 border-blue-500/30"
