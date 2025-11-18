@@ -117,6 +117,20 @@ A comprehensive document viewer that provides organized access to all markdown d
 - **Progression**: Open monitor → Start monitoring → View real-time metrics (latency, bandwidth, packet loss, signal strength) → Track uptime → Review connection history → Stop monitoring
 - **Success criteria**: Updates every second, accurate metrics display, color-coded status indicators, connection history logged
 
+### Real-time WebSocket Status Updates
+- **Functionality**: Live status feed showing real-time updates from all monitoring tools via WebSocket connection
+- **Purpose**: Provide instant visibility into all system activities, diagnostics, and pipeline events in one unified stream
+- **Trigger**: Automatically active when monitoring tools are running
+- **Progression**: Connect to WebSocket → Receive real-time updates → Display in feed with timestamps → Filter by source → Color-code by severity → Clear history
+- **Success criteria**: Sub-second latency, reliable connection with auto-reconnect, filterable by source, shows connection status with latency metrics
+
+### Real-time Pipeline Dashboard
+- **Functionality**: Live monitoring of GitHub Actions, Vercel, and Firebase pipelines with streaming status updates
+- **Purpose**: Track deployment pipelines in real-time without manual refresh, see logs as they stream
+- **Trigger**: User clicks "Real-time Status" button
+- **Progression**: Open dashboard → Connect to pipeline sources → Display running/queued/completed jobs → Stream build logs → Update status badges → Show duration and completion time → Navigate back
+- **Success criteria**: Updates within 3 seconds of status change, shows live logs, accurate status badges, proper cleanup on unmount
+
 ### Multi-Format File Converter
 - **Functionality**: Convert files between multiple formats (JSON↔TypeScript, HTML↔JSX, CSS↔Tailwind, JS↔TS, XML↔JSON)
 - **Purpose**: Quickly transform code between different formats for development workflows
@@ -142,6 +156,10 @@ A comprehensive document viewer that provides organized access to all markdown d
 - **Large File Conversions**: Show loading state, handle memory limits gracefully
 - **Unsupported Conversion Types**: Clearly indicate which conversions are supported
 - **Clipboard Access Denied**: Fallback to manual copy with instructions
+- **WebSocket Connection Lost**: Show disconnected state, attempt auto-reconnect with exponential backoff
+- **Status Update Flooding**: Rate limit updates to prevent UI overload, queue and batch updates
+- **Memory Leaks from Listeners**: Proper cleanup of all event listeners on component unmount
+- **Cross-origin WebSocket**: Handle CORS and security restrictions gracefully
 
 ## Design Direction
 The design should feel professional and documentation-focused, with a clean, minimalist interface that prioritizes readability and efficient information access, using a rich interface with clear visual hierarchy to handle the volume of content.
@@ -230,6 +248,9 @@ Subtle and functional, focused on smooth transitions between document views, gen
   - `Download` for download actions
   - `WifiHigh`/`WifiSlash` for connection status
   - `Activity` for monitoring activity
+  - `WifiHigh`/`WifiSlash` for WebSocket connection status
+  - `Clock` for pending/loading states
+  - `Trash` for clear/delete actions
   
 - **Spacing**: 
   - Container padding: `p-6` (24px)

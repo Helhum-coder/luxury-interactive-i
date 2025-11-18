@@ -27,6 +27,8 @@ import {
 import { motion } from 'framer-motion'
 import { toast } from 'sonner'
 import { useKV } from '@github/spark/hooks'
+import { useRealtimeMonitor } from '@/hooks/use-websocket-status'
+import { RealtimeStatusFeed } from '@/components/RealtimeStatusFeed'
 
 interface QuickFix {
   id: string
@@ -67,6 +69,7 @@ export function NetworkDiagnosticPanel({ onShowFixScripts, onShowAIDiagnostics }
   const [notificationsEnabled, setNotificationsEnabled] = useKV<boolean>('network-notifications', true)
   const [lastScanResults, setLastScanResults] = useState<{ successCount: number; errorCount: number } | null>(null)
   const [copiedText, setCopiedText] = useState<string | null>(null)
+  const { reportSuccess, reportError, reportWarning, reportInfo } = useRealtimeMonitor('Network Diagnostics')
 
   const copyToClipboard = async (text: string, label: string) => {
     try {
@@ -199,6 +202,9 @@ export function NetworkDiagnosticPanel({ onShowFixScripts, onShowAIDiagnostics }
 
   const runDiagnostics = useCallback(async (silent = false) => {
     setIsScanning(true)
+    if (!silent) {
+      reportInfo('Starting network diagnostics scan...')
+    }
     const newChecks: NetworkCheck[] = []
 
     const addCheck = (name: string, status: NetworkCheck['status'], message: string, details?: string) => {
@@ -216,6 +222,16 @@ export function NetworkDiagnosticPanel({ onShowFixScripts, onShowAIDiagnostics }
       
       newChecks.push(check)
       setChecks([...newChecks])
+
+      if (!silent) {
+        if (status === 'error') {
+          reportError(`${name}: ${message}`, { details })
+        } else if (status === 'warning') {
+          reportWarning(`${name}: ${message}`, { details })
+        } else if (status === 'success') {
+          reportSuccess(`${name}: ${message}`)
+        }
+      }
     }
 
     addCheck('DNS Resolution', 'checking', 'Checking DNS configuration...', '')
@@ -790,6 +806,10 @@ export function NetworkDiagnosticPanel({ onShowFixScripts, onShowAIDiagnostics }
           </Alert>
         </TabsContent>
       </Tabs>
+
+      <div className="mt-6">
+        <RealtimeStatusFeed filterSource="Network Diagnostics" maxHeight="400px" />
+      </div>
     </div>
   )
 }

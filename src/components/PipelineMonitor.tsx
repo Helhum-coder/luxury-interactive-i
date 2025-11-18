@@ -21,6 +21,8 @@ import {
 } from '@phosphor-icons/react'
 import { motion } from 'framer-motion'
 import { toast } from 'sonner'
+import { useRealtimeMonitor } from '@/hooks/use-websocket-status'
+import { RealtimeStatusFeed } from '@/components/RealtimeStatusFeed'
 
 interface APITokens {
   github?: string
@@ -84,6 +86,7 @@ export function PipelineMonitor({ onClose }: PipelineMonitorProps) {
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null)
   const [autoRefresh, setAutoRefresh] = useState(false)
   const [errors, setErrors] = useState<APIError[]>([])
+  const { reportSuccess, reportError, reportWarning, reportInfo } = useRealtimeMonitor('Pipeline Monitor')
 
   const addError = (provider: string, message: string, type: APIError['type']) => {
     setErrors((current) => [
@@ -95,6 +98,7 @@ export function PipelineMonitor({ onClose }: PipelineMonitorProps) {
       },
       ...current.slice(0, 4)
     ])
+    reportError(`${provider}: ${message}`, { type })
   }
 
   const fetchGitHubWorkflows = async () => {
@@ -249,6 +253,7 @@ export function PipelineMonitor({ onClose }: PipelineMonitorProps) {
   const refreshAll = async () => {
     setIsRefreshing(true)
     setErrors([])
+    reportInfo('Refreshing pipeline data...')
     try {
       await Promise.all([
         fetchGitHubWorkflows(),
@@ -258,9 +263,11 @@ export function PipelineMonitor({ onClose }: PipelineMonitorProps) {
       setLastRefresh(new Date())
       if (errors.length === 0) {
         toast.success('Pipeline data refreshed successfully')
+        reportSuccess('All pipeline data refreshed successfully')
       }
     } catch (error) {
       toast.error('Failed to refresh some data')
+      reportError('Failed to refresh pipeline data')
     } finally {
       setIsRefreshing(false)
     }
@@ -270,6 +277,7 @@ export function PipelineMonitor({ onClose }: PipelineMonitorProps) {
     setIsRefreshing(true)
     setErrors([])
     toast.info('Testing API connections...')
+    reportInfo('Starting API connection tests...')
 
     const tests: Promise<void>[] = []
 
@@ -289,6 +297,7 @@ export function PipelineMonitor({ onClose }: PipelineMonitorProps) {
             clearTimeout(timeoutId)
             if (response.ok) {
               toast.success('GitHub API: Connected ✓')
+              reportSuccess('GitHub API connection successful')
             } else {
               addError('GitHub', `Connection test failed: ${response.status}`, 'network')
             }
@@ -797,6 +806,10 @@ export function PipelineMonitor({ onClose }: PipelineMonitorProps) {
               <p className="text-xs text-muted-foreground">Last 10 runs</p>
             </CardContent>
           </Card>
+        </div>
+
+        <div className="mt-6">
+          <RealtimeStatusFeed filterSource="Pipeline Monitor" maxHeight="400px" />
         </div>
 
         {errors.some(e => e.type === 'timeout') && (

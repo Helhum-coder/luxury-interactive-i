@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
-import { MagnifyingGlass, BookOpen, Folder, GlobeHemisphereWest, Lightning, Brain, Globe, FileCode, HardDrives, Heartbeat, MapTrifold, Broadcast, Key, ChartLine } from '@phosphor-icons/react'
+import { MagnifyingGlass, BookOpen, Folder, GlobeHemisphereWest, Lightning, Brain, Globe, FileCode, HardDrives, Heartbeat, MapTrifold, Broadcast, Key, ChartLine, Activity } from '@phosphor-icons/react'
 import { motion } from 'framer-motion'
 import { DocumentCard } from '@/components/DocumentCard'
 import { DocumentViewer } from '@/components/DocumentViewer'
@@ -17,6 +17,8 @@ import { NetworkPathTracer } from '@/components/NetworkPathTracer'
 import { LiveConnectivityDashboard } from '@/components/LiveConnectivityDashboard'
 import { APITokensManager } from '@/components/APITokensManager'
 import { PipelineMonitor } from '@/components/PipelineMonitor'
+import { RealtimePipelineDashboard } from '@/components/RealtimePipelineDashboard'
+import { RealtimeStatusFeed } from '@/components/RealtimeStatusFeed'
 import { useRecentDocuments } from '@/hooks/use-recent-documents'
 import { 
   DOCUMENT_FILES, 
@@ -43,6 +45,7 @@ function App() {
   const [showLiveConnectivity, setShowLiveConnectivity] = useState(false)
   const [showAPITokens, setShowAPITokens] = useState(false)
   const [showPipelineMonitor, setShowPipelineMonitor] = useState(false)
+  const [showRealtimeDashboard, setShowRealtimeDashboard] = useState(false)
   const [networkCheckResults, setNetworkCheckResults] = useState<any[]>([])
   const { addToRecent } = useRecentDocuments()
 
@@ -166,6 +169,10 @@ function App() {
     return <PipelineMonitor onClose={() => setShowPipelineMonitor(false)} />
   }
 
+  if (showRealtimeDashboard) {
+    return <RealtimePipelineDashboard onClose={() => setShowRealtimeDashboard(false)} />
+  }
+
   if (showNetworkDiagnostics) {
     return (
       <div className="min-h-screen bg-background p-6">
@@ -238,6 +245,13 @@ function App() {
               </p>
             </div>
             <div className="ml-auto flex items-center gap-3">
+              <button
+                onClick={() => setShowRealtimeDashboard(true)}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-green-500/10 to-teal-500/10 hover:from-green-500/20 hover:to-teal-500/20 transition-colors border-2 border-green-500/30"
+              >
+                <Activity size={20} weight="duotone" className="text-green-600" />
+                <span className="text-sm font-semibold text-green-600">Real-time Status</span>
+              </button>
               <button
                 onClick={() => setShowPipelineMonitor(true)}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-blue-500/10 to-purple-500/10 hover:from-blue-500/20 hover:to-purple-500/20 transition-colors border-2 border-blue-500/30"
