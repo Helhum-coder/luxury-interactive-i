@@ -132,10 +132,10 @@ function App() {
     return <FileConverterInterface onClose={() => setShowFileConverter(false)} />
   }
 
+  if (showEnterpriseServer) {
     return <EnterpriseServerConnection onClose={() => setShowEnterpriseServer(false)} />
   }
 
-  if (showNetworkDiagnostics) {
   if (showNetworkDiagnostics) {
     return (
       <div className="min-h-screen bg-background p-6">
