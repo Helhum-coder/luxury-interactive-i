@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
-import { MagnifyingGlass, BookOpen, Folder, GlobeHemisphereWest, Lightning, Brain, Globe, FileCode, HardDrives, Heartbeat, MapTrifold, Broadcast } from '@phosphor-icons/react'
+import { MagnifyingGlass, BookOpen, Folder, GlobeHemisphereWest, Lightning, Brain, Globe, FileCode, HardDrives, Heartbeat, MapTrifold, Broadcast, Key, ChartLine } from '@phosphor-icons/react'
 import { motion } from 'framer-motion'
 import { DocumentCard } from '@/components/DocumentCard'
 import { DocumentViewer } from '@/components/DocumentViewer'
@@ -15,6 +15,8 @@ import { EnterpriseServerConnection } from '@/components/EnterpriseServerConnect
 import { ServerDiagnostic } from '@/components/ServerDiagnostic'
 import { NetworkPathTracer } from '@/components/NetworkPathTracer'
 import { LiveConnectivityDashboard } from '@/components/LiveConnectivityDashboard'
+import { APITokensManager } from '@/components/APITokensManager'
+import { PipelineMonitor } from '@/components/PipelineMonitor'
 import { useRecentDocuments } from '@/hooks/use-recent-documents'
 import { 
   DOCUMENT_FILES, 
@@ -39,6 +41,8 @@ function App() {
   const [showServerDiagnostic, setShowServerDiagnostic] = useState(false)
   const [showPathTracer, setShowPathTracer] = useState(false)
   const [showLiveConnectivity, setShowLiveConnectivity] = useState(false)
+  const [showAPITokens, setShowAPITokens] = useState(false)
+  const [showPipelineMonitor, setShowPipelineMonitor] = useState(false)
   const [networkCheckResults, setNetworkCheckResults] = useState<any[]>([])
   const { addToRecent } = useRecentDocuments()
 
@@ -154,6 +158,14 @@ function App() {
     return <LiveConnectivityDashboard onClose={() => setShowLiveConnectivity(false)} />
   }
 
+  if (showAPITokens) {
+    return <APITokensManager onClose={() => setShowAPITokens(false)} />
+  }
+
+  if (showPipelineMonitor) {
+    return <PipelineMonitor onClose={() => setShowPipelineMonitor(false)} />
+  }
+
   if (showNetworkDiagnostics) {
     return (
       <div className="min-h-screen bg-background p-6">
@@ -226,6 +238,20 @@ function App() {
               </p>
             </div>
             <div className="ml-auto flex items-center gap-3">
+              <button
+                onClick={() => setShowPipelineMonitor(true)}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-blue-500/10 to-purple-500/10 hover:from-blue-500/20 hover:to-purple-500/20 transition-colors border-2 border-blue-500/30"
+              >
+                <ChartLine size={20} weight="duotone" className="text-blue-600" />
+                <span className="text-sm font-semibold text-blue-600">Pipeline Monitor</span>
+              </button>
+              <button
+                onClick={() => setShowAPITokens(true)}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-indigo-500/10 to-violet-500/10 hover:from-indigo-500/20 hover:to-violet-500/20 transition-colors border-2 border-indigo-500/30"
+              >
+                <Key size={20} weight="duotone" className="text-indigo-600" />
+                <span className="text-sm font-semibold text-indigo-600">API Tokens</span>
+              </button>
               <button
                 onClick={() => setShowLiveConnectivity(true)}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-500/10 to-indigo-500/10 hover:from-purple-500/20 hover:to-indigo-500/20 transition-colors border-2 border-purple-500/30"
