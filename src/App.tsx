@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
-import { MagnifyingGlass, BookOpen, Folder, GlobeHemisphereWest, Lightning, Brain, Globe, FileCode, HardDrives } from '@phosphor-icons/react'
+import { MagnifyingGlass, BookOpen, Folder, GlobeHemisphereWest, Lightning, Brain, Globe, FileCode, HardDrives, Heartbeat } from '@phosphor-icons/react'
 import { motion } from 'framer-motion'
 import { DocumentCard } from '@/components/DocumentCard'
 import { DocumentViewer } from '@/components/DocumentViewer'
@@ -12,6 +12,7 @@ import { AIDiagnosticEngine } from '@/components/AIDiagnosticEngine'
 import { SatelliteConnectionMonitor } from '@/components/SatelliteConnectionMonitor'
 import { FileConverterInterface } from '@/components/FileConverterInterface'
 import { EnterpriseServerConnection } from '@/components/EnterpriseServerConnection'
+import { ServerDiagnostic } from '@/components/ServerDiagnostic'
 import { useRecentDocuments } from '@/hooks/use-recent-documents'
 import { 
   DOCUMENT_FILES, 
@@ -33,6 +34,7 @@ function App() {
   const [showSatelliteMonitor, setShowSatelliteMonitor] = useState(false)
   const [showFileConverter, setShowFileConverter] = useState(false)
   const [showEnterpriseServer, setShowEnterpriseServer] = useState(false)
+  const [showServerDiagnostic, setShowServerDiagnostic] = useState(false)
   const [networkCheckResults, setNetworkCheckResults] = useState<any[]>([])
   const { addToRecent } = useRecentDocuments()
 
@@ -136,6 +138,10 @@ function App() {
     return <EnterpriseServerConnection onClose={() => setShowEnterpriseServer(false)} />
   }
 
+  if (showServerDiagnostic) {
+    return <ServerDiagnostic onClose={() => setShowServerDiagnostic(false)} initialUrl="https://169.94.23.117:8443" />
+  }
+
   if (showNetworkDiagnostics) {
     return (
       <div className="min-h-screen bg-background p-6">
@@ -208,6 +214,13 @@ function App() {
               </p>
             </div>
             <div className="ml-auto flex items-center gap-3">
+              <button
+                onClick={() => setShowServerDiagnostic(true)}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-rose-500/10 to-orange-500/10 hover:from-rose-500/20 hover:to-orange-500/20 transition-colors border-2 border-rose-500/30"
+              >
+                <Heartbeat size={20} weight="duotone" className="text-rose-600" />
+                <span className="text-sm font-semibold text-rose-600">Server Diagnostic</span>
+              </button>
               <button
                 onClick={() => setShowFileConverter(true)}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-blue-500/10 to-cyan-500/10 hover:from-blue-500/20 hover:to-cyan-500/20 transition-colors"
