@@ -132,16 +132,15 @@ function App() {
     return <FileConverterInterface onClose={() => setShowFileConverter(false)} />
   }
 
-  if (showEnterpriseServer) {
     return <EnterpriseServerConnection onClose={() => setShowEnterpriseServer(false)} />
   }
 
+  if (showNetworkDiagnostics) {
   if (showNetworkDiagnostics) {
     return (
       <div className="min-h-screen bg-background p-6">
         <NetworkDiagnosticPanel 
           onShowFixScripts={() => {
-            setShowNetworkDiagnostics(false)
             setShowFixScripts(true)
           }}
           onShowAIDiagnostics={(checks) => {
@@ -209,13 +208,6 @@ function App() {
               </p>
             </div>
             <div className="ml-auto flex items-center gap-3">
-              <button
-                onClick={() => setShowEnterpriseServer(true)}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-indigo-500/10 to-violet-500/10 hover:from-indigo-500/20 hover:to-violet-500/20 transition-colors"
-              >
-                <HardDrives size={20} weight="duotone" className="text-indigo-600" />
-                <span className="text-sm font-semibold text-indigo-600">Enterprise Server</span>
-              </button>
               <button
                 onClick={() => setShowFileConverter(true)}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-blue-500/10 to-cyan-500/10 hover:from-blue-500/20 hover:to-cyan-500/20 transition-colors"
