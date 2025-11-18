@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
-import { MagnifyingGlass, BookOpen, Folder, GlobeHemisphereWest, Lightning, Brain, Globe, FileCode, HardDrives, Heartbeat } from '@phosphor-icons/react'
+import { MagnifyingGlass, BookOpen, Folder, GlobeHemisphereWest, Lightning, Brain, Globe, FileCode, HardDrives, Heartbeat, MapTrifold } from '@phosphor-icons/react'
 import { motion } from 'framer-motion'
 import { DocumentCard } from '@/components/DocumentCard'
 import { DocumentViewer } from '@/components/DocumentViewer'
@@ -13,6 +13,7 @@ import { SatelliteConnectionMonitor } from '@/components/SatelliteConnectionMoni
 import { FileConverterInterface } from '@/components/FileConverterInterface'
 import { EnterpriseServerConnection } from '@/components/EnterpriseServerConnection'
 import { ServerDiagnostic } from '@/components/ServerDiagnostic'
+import { NetworkPathTracer } from '@/components/NetworkPathTracer'
 import { useRecentDocuments } from '@/hooks/use-recent-documents'
 import { 
   DOCUMENT_FILES, 
@@ -35,6 +36,7 @@ function App() {
   const [showFileConverter, setShowFileConverter] = useState(false)
   const [showEnterpriseServer, setShowEnterpriseServer] = useState(false)
   const [showServerDiagnostic, setShowServerDiagnostic] = useState(false)
+  const [showPathTracer, setShowPathTracer] = useState(false)
   const [networkCheckResults, setNetworkCheckResults] = useState<any[]>([])
   const { addToRecent } = useRecentDocuments()
 
@@ -142,6 +144,10 @@ function App() {
     return <ServerDiagnostic onClose={() => setShowServerDiagnostic(false)} initialUrl="https://169.94.23.117:8443" />
   }
 
+  if (showPathTracer) {
+    return <NetworkPathTracer onClose={() => setShowPathTracer(false)} />
+  }
+
   if (showNetworkDiagnostics) {
     return (
       <div className="min-h-screen bg-background p-6">
@@ -214,6 +220,13 @@ function App() {
               </p>
             </div>
             <div className="ml-auto flex items-center gap-3">
+              <button
+                onClick={() => setShowPathTracer(true)}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-teal-500/10 to-cyan-500/10 hover:from-teal-500/20 hover:to-cyan-500/20 transition-colors border-2 border-teal-500/30"
+              >
+                <MapTrifold size={20} weight="duotone" className="text-teal-600" />
+                <span className="text-sm font-semibold text-teal-600">Path Tracer</span>
+              </button>
               <button
                 onClick={() => setShowServerDiagnostic(true)}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-rose-500/10 to-orange-500/10 hover:from-rose-500/20 hover:to-orange-500/20 transition-colors border-2 border-rose-500/30"
