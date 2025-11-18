@@ -16,7 +16,8 @@ import {
   ArrowClockwise,
   Lightning,
   Warning,
-  Circle
+  Circle,
+  Heartbeat
 } from '@phosphor-icons/react'
 import { motion } from 'framer-motion'
 import { toast } from 'sonner'
@@ -63,7 +64,18 @@ interface FirebaseDeployment {
   message?: string
 }
 
-export function PipelineMonitor({ onClose }: { onClose: () => void }) {
+interface PipelineMonitorProps {
+  onClose: () => void
+}
+
+interface APIError {
+  provider: string
+  message: string
+  timestamp: Date
+  type: 'timeout' | 'network' | 'auth' | 'unknown'
+}
+
+export function PipelineMonitor({ onClose }: PipelineMonitorProps) {
   const [tokens] = useKV<APITokens>('api-tokens', {})
   const [githubWorkflows, setGithubWorkflows] = useState<WorkflowRun[]>([])
   const [vercelDeployments, setVercelDeployments] = useState<VercelDeployment[]>([])
@@ -71,20 +83,75 @@ export function PipelineMonitor({ onClose }: { onClose: () => void }) {
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [autoRefresh, setAutoRefresh] = useState(true)
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null)
+  const [errors, setErrors] = useState<APIError[]>([])
+
+  const addError = (provider: string, message: string, type: APIError['type']) => {
+    setErrors((current) => [
+      {
+        provider,
+        message,
+        timestamp: new Date(),
+        type
+      },
+      ...current.slice(0, 4)
+    ])
+  }
 
   const fetchGitHubWorkflows = async () => {
     if (!tokens?.github) return
 
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 10000)
+
     try {
-      const response = await fetch('https://api.github.com/repos/OWNER/REPO/actions/runs?per_page=10', {
+      const response = await fetch('https://api.github.com/user/repos?sort=updated&per_page=1', {
         headers: {
           'Authorization': `token ${tokens.github}`,
           'Accept': 'application/vnd.github.v3+json'
-        }
+        },
+        signal: controller.signal
       })
 
-      if (response.ok) {
-        const data = await response.json()
+      clearTimeout(timeoutId)
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          addError('GitHub', 'Invalid or expired token', 'auth')
+          toast.error('GitHub: Invalid token')
+        } else if (response.status === 403) {
+          addError('GitHub', 'Rate limit exceeded', 'auth')
+          toast.error('GitHub: Rate limit exceeded')
+        } else {
+          throw new Error(`GitHub API error: ${response.status} ${response.statusText}`)
+        }
+        return
+      }
+
+      const repos = await response.json()
+      
+      if (!repos || repos.length === 0) {
+        setGithubWorkflows([])
+        return
+      }
+
+      const repo = repos[0]
+      const [owner, repoName] = [repo.owner.login, repo.name]
+
+      const workflowController = new AbortController()
+      const workflowTimeoutId = setTimeout(() => workflowController.abort(), 10000)
+
+      const workflowResponse = await fetch(`https://api.github.com/repos/${owner}/${repoName}/actions/runs?per_page=10`, {
+        headers: {
+          'Authorization': `token ${tokens.github}`,
+          'Accept': 'application/vnd.github.v3+json'
+        },
+        signal: workflowController.signal
+      })
+
+      clearTimeout(workflowTimeoutId)
+
+      if (workflowResponse.ok) {
+        const data = await workflowResponse.json()
         const runs: WorkflowRun[] = data.workflow_runs?.map((run: any) => ({
           id: run.id.toString(),
           name: run.name,
@@ -101,37 +168,73 @@ export function PipelineMonitor({ onClose }: { onClose: () => void }) {
         setGithubWorkflows(runs)
       }
     } catch (error) {
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          addError('GitHub', 'Request timed out after 10 seconds', 'timeout')
+          toast.error('GitHub API request timed out')
+        } else {
+          addError('GitHub', error.message, 'network')
+          toast.error(`GitHub API error: ${error.message}`)
+        }
+      }
       console.error('Failed to fetch GitHub workflows:', error)
+    } finally {
+      clearTimeout(timeoutId)
     }
   }
 
   const fetchVercelDeployments = async () => {
     if (!tokens?.vercel) return
 
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 10000)
+
     try {
       const response = await fetch('https://api.vercel.com/v6/deployments?limit=10', {
         headers: {
           'Authorization': `Bearer ${tokens.vercel}`
-        }
+        },
+        signal: controller.signal
       })
 
-      if (response.ok) {
-        const data = await response.json()
-        const deployments: VercelDeployment[] = data.deployments?.map((dep: any) => ({
-          id: dep.uid,
-          name: dep.name,
-          status: dep.state,
-          url: `https://${dep.url}`,
-          branch: dep.meta?.githubCommitRef || 'main',
-          commit: dep.meta?.githubCommitSha?.substring(0, 7) || 'unknown',
-          creator: dep.creator?.username || 'unknown',
-          createdAt: new Date(dep.created),
-          buildTime: dep.buildingAt && dep.ready ? Math.floor((dep.ready - dep.buildingAt) / 1000) : undefined
-        })) || []
-        setVercelDeployments(deployments)
+      clearTimeout(timeoutId)
+
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          addError('Vercel', 'Invalid or expired token', 'auth')
+          toast.error('Vercel: Invalid token')
+        } else {
+          throw new Error(`Vercel API error: ${response.status} ${response.statusText}`)
+        }
+        return
       }
+
+      const data = await response.json()
+      const deployments: VercelDeployment[] = data.deployments?.map((dep: any) => ({
+        id: dep.uid,
+        name: dep.name,
+        status: dep.state,
+        url: `https://${dep.url}`,
+        branch: dep.meta?.githubCommitRef || 'main',
+        commit: dep.meta?.githubCommitSha?.substring(0, 7) || 'unknown',
+        creator: dep.creator?.username || 'unknown',
+        createdAt: new Date(dep.created),
+        buildTime: dep.buildingAt && dep.ready ? Math.floor((dep.ready - dep.buildingAt) / 1000) : undefined
+      })) || []
+      setVercelDeployments(deployments)
     } catch (error) {
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          addError('Vercel', 'Request timed out after 10 seconds', 'timeout')
+          toast.error('Vercel API request timed out')
+        } else {
+          addError('Vercel', error.message, 'network')
+          toast.error(`Vercel API error: ${error.message}`)
+        }
+      }
       console.error('Failed to fetch Vercel deployments:', error)
+    } finally {
+      clearTimeout(timeoutId)
     }
   }
 
@@ -154,6 +257,7 @@ export function PipelineMonitor({ onClose }: { onClose: () => void }) {
 
   const refreshAll = async () => {
     setIsRefreshing(true)
+    setErrors([])
     try {
       await Promise.all([
         fetchGitHubWorkflows(),
@@ -161,12 +265,80 @@ export function PipelineMonitor({ onClose }: { onClose: () => void }) {
         generateMockFirebaseData()
       ])
       setLastRefresh(new Date())
-      toast.success('Pipeline data refreshed')
+      if (errors.length === 0) {
+        toast.success('Pipeline data refreshed successfully')
+      }
     } catch (error) {
       toast.error('Failed to refresh some data')
     } finally {
       setIsRefreshing(false)
     }
+  }
+
+  const testConnections = async () => {
+    setIsRefreshing(true)
+    setErrors([])
+    toast.info('Testing API connections...')
+
+    const tests: Promise<void>[] = []
+
+    if (tokens?.github) {
+      tests.push(
+        (async () => {
+          const controller = new AbortController()
+          const timeoutId = setTimeout(() => controller.abort(), 5000)
+          try {
+            const response = await fetch('https://api.github.com/user', {
+              headers: {
+                'Authorization': `token ${tokens.github}`,
+                'Accept': 'application/vnd.github.v3+json'
+              },
+              signal: controller.signal
+            })
+            clearTimeout(timeoutId)
+            if (response.ok) {
+              toast.success('GitHub API: Connected ✓')
+            } else {
+              addError('GitHub', `Connection test failed: ${response.status}`, 'network')
+            }
+          } catch (error) {
+            if (error instanceof Error && error.name === 'AbortError') {
+              addError('GitHub', 'Connection test timed out', 'timeout')
+            }
+          }
+        })()
+      )
+    }
+
+    if (tokens?.vercel) {
+      tests.push(
+        (async () => {
+          const controller = new AbortController()
+          const timeoutId = setTimeout(() => controller.abort(), 5000)
+          try {
+            const response = await fetch('https://api.vercel.com/v2/user', {
+              headers: {
+                'Authorization': `Bearer ${tokens.vercel}`
+              },
+              signal: controller.signal
+            })
+            clearTimeout(timeoutId)
+            if (response.ok) {
+              toast.success('Vercel API: Connected ✓')
+            } else {
+              addError('Vercel', `Connection test failed: ${response.status}`, 'network')
+            }
+          } catch (error) {
+            if (error instanceof Error && error.name === 'AbortError') {
+              addError('Vercel', 'Connection test timed out', 'timeout')
+            }
+          }
+        })()
+      )
+    }
+
+    await Promise.all(tests)
+    setIsRefreshing(false)
   }
 
   useEffect(() => {
@@ -248,6 +420,16 @@ export function PipelineMonitor({ onClose }: { onClose: () => void }) {
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
               <Button
+                onClick={testConnections}
+                disabled={isRefreshing || !hasAnyToken}
+                variant="outline"
+                size="sm"
+                className="gap-2"
+              >
+                <Heartbeat size={16} />
+                Test Connections
+              </Button>
+              <Button
                 variant={autoRefresh ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setAutoRefresh(!autoRefresh)}
@@ -290,6 +472,49 @@ export function PipelineMonitor({ onClose }: { onClose: () => void }) {
                     Please configure your API tokens in the API Tokens Manager to start monitoring pipelines.
                   </p>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {errors.length > 0 && (
+          <Card className="mb-6 border-red-200 bg-red-50">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-red-900 flex items-center gap-2">
+                <XCircle size={20} />
+                Recent Errors
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {errors.map((error, index) => (
+                  <div key={index} className="flex items-start gap-3 text-sm">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Badge variant="destructive" className="text-xs">
+                          {error.provider}
+                        </Badge>
+                        <Badge variant="outline" className="text-xs">
+                          {error.type}
+                        </Badge>
+                        <span className="text-xs text-red-600">
+                          {error.timestamp.toLocaleTimeString()}
+                        </span>
+                      </div>
+                      <p className="text-red-700">{error.message}</p>
+                      {error.type === 'timeout' && (
+                        <p className="text-xs text-red-600 mt-1">
+                          💡 Try checking your firewall, network connectivity, or server status
+                        </p>
+                      )}
+                      {error.type === 'auth' && (
+                        <p className="text-xs text-red-600 mt-1">
+                          💡 Verify your token is correct and has the required permissions
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>
@@ -582,6 +807,51 @@ export function PipelineMonitor({ onClose }: { onClose: () => void }) {
             </CardContent>
           </Card>
         </div>
+
+        {errors.some(e => e.type === 'timeout') && (
+          <Card className="mt-6 border-blue-200 bg-blue-50">
+            <CardHeader>
+              <CardTitle className="text-blue-900 flex items-center gap-2">
+                <Heartbeat size={20} />
+                Troubleshooting Timeout Issues
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-sm text-blue-800 space-y-2">
+                <p className="font-semibold">If you're experiencing timeouts, try these steps:</p>
+                <ul className="list-disc list-inside space-y-1 ml-2">
+                  <li>Check if the API services (GitHub, Vercel) are operational</li>
+                  <li>Verify your network connection is stable</li>
+                  <li>Check if your firewall is blocking API requests</li>
+                  <li>Ensure your tokens haven't expired</li>
+                  <li>Try disabling VPN or proxy if enabled</li>
+                  <li>Check your browser's console for CORS or network errors</li>
+                </ul>
+                <div className="mt-4 flex gap-3">
+                  <Button
+                    onClick={testConnections}
+                    disabled={isRefreshing}
+                    size="sm"
+                    variant="outline"
+                    className="gap-2 bg-white"
+                  >
+                    <Heartbeat size={16} />
+                    Re-test Connections
+                  </Button>
+                  <Button
+                    onClick={() => setErrors([])}
+                    size="sm"
+                    variant="outline"
+                    className="gap-2 bg-white"
+                  >
+                    <XCircle size={16} />
+                    Clear Errors
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   )

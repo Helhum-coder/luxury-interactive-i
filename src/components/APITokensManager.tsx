@@ -50,28 +50,46 @@ export function APITokensManager({ onClose }: { onClose: () => void }) {
   }
 
   const verifyGitHubToken = async (token: string): Promise<boolean> => {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 10000)
+    
     try {
       const response = await fetch('https://api.github.com/user', {
         headers: {
           'Authorization': `token ${token}`,
           'Accept': 'application/vnd.github.v3+json'
-        }
+        },
+        signal: controller.signal
       })
+      clearTimeout(timeoutId)
       return response.ok
     } catch (error) {
+      clearTimeout(timeoutId)
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new Error('Request timed out after 10 seconds')
+      }
       return false
     }
   }
 
   const verifyVercelToken = async (token: string): Promise<boolean> => {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 10000)
+    
     try {
       const response = await fetch('https://api.vercel.com/v2/user', {
         headers: {
           'Authorization': `Bearer ${token}`
-        }
+        },
+        signal: controller.signal
       })
+      clearTimeout(timeoutId)
       return response.ok
     } catch (error) {
+      clearTimeout(timeoutId)
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new Error('Request timed out after 10 seconds')
+      }
       return false
     }
   }
@@ -130,7 +148,12 @@ export function APITokensManager({ onClose }: { onClose: () => void }) {
           error
         }
       }))
-      toast.error(`Error verifying ${provider} token`)
+      
+      if (error.includes('timed out')) {
+        toast.error(`${provider} verification timed out - check your connection`)
+      } else {
+        toast.error(`Error verifying ${provider} token`)
+      }
     } finally {
       setIsVerifying(false)
     }
