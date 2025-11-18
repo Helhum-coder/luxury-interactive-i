@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
-import { MagnifyingGlass, BookOpen, Folder, GlobeHemisphereWest, Lightning, Brain, Globe, FileCode, HardDrives, Heartbeat, MapTrifold, Broadcast, Key, ChartLine, Activity } from '@phosphor-icons/react'
+import { MagnifyingGlass, BookOpen, Folder, GlobeHemisphereWest, Lightning, Brain, Globe, FileCode, HardDrives, Heartbeat, MapTrifold, Broadcast, Key, ChartLine, Activity, Package } from '@phosphor-icons/react'
 import { motion } from 'framer-motion'
 import { DocumentCard } from '@/components/DocumentCard'
 import { DocumentViewer } from '@/components/DocumentViewer'
@@ -19,6 +19,7 @@ import { APITokensManager } from '@/components/APITokensManager'
 import { PipelineMonitor } from '@/components/PipelineMonitor'
 import { RealtimePipelineDashboard } from '@/components/RealtimePipelineDashboard'
 import { RealtimeStatusFeed } from '@/components/RealtimeStatusFeed'
+import { PackageDiagnostic } from '@/components/PackageDiagnostic'
 import { useRecentDocuments } from '@/hooks/use-recent-documents'
 import { 
   DOCUMENT_FILES, 
@@ -46,6 +47,7 @@ function App() {
   const [showAPITokens, setShowAPITokens] = useState(false)
   const [showPipelineMonitor, setShowPipelineMonitor] = useState(false)
   const [showRealtimeDashboard, setShowRealtimeDashboard] = useState(false)
+  const [showPackageDiagnostic, setShowPackageDiagnostic] = useState(false)
   const [networkCheckResults, setNetworkCheckResults] = useState<any[]>([])
   const { addToRecent } = useRecentDocuments()
 
@@ -108,6 +110,10 @@ function App() {
       return matchesSearch && matchesCategory
     })
   }, [documents, searchQuery, selectedCategory])
+
+  if (showPackageDiagnostic) {
+    return <PackageDiagnostic onClose={() => setShowPackageDiagnostic(false)} />
+  }
 
   if (showAIDiagnostics) {
     return (
@@ -241,6 +247,13 @@ function App() {
               </p>
             </div>
             <div className="ml-auto flex items-center gap-3">
+              <button
+                onClick={() => setShowPackageDiagnostic(true)}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10 hover:from-violet-500/20 hover:to-fuchsia-500/20 transition-colors border-2 border-violet-500/30"
+              >
+                <Package size={20} weight="duotone" className="text-violet-600" />
+                <span className="text-sm font-semibold text-violet-600">Package Diagnostic</span>
+              </button>
               <button
                 onClick={() => setShowPipelineMonitor(true)}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-blue-500/10 to-purple-500/10 hover:from-blue-500/20 hover:to-purple-500/20 transition-colors border-2 border-blue-500/30"
