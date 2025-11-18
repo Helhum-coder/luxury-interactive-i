@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
-import { MagnifyingGlass, BookOpen, Folder, GlobeHemisphereWest, Lightning, Brain, Globe, FileCode, HardDrives, Heartbeat, MapTrifold } from '@phosphor-icons/react'
+import { MagnifyingGlass, BookOpen, Folder, GlobeHemisphereWest, Lightning, Brain, Globe, FileCode, HardDrives, Heartbeat, MapTrifold, Broadcast } from '@phosphor-icons/react'
 import { motion } from 'framer-motion'
 import { DocumentCard } from '@/components/DocumentCard'
 import { DocumentViewer } from '@/components/DocumentViewer'
@@ -14,6 +14,7 @@ import { FileConverterInterface } from '@/components/FileConverterInterface'
 import { EnterpriseServerConnection } from '@/components/EnterpriseServerConnection'
 import { ServerDiagnostic } from '@/components/ServerDiagnostic'
 import { NetworkPathTracer } from '@/components/NetworkPathTracer'
+import { LiveConnectivityDashboard } from '@/components/LiveConnectivityDashboard'
 import { useRecentDocuments } from '@/hooks/use-recent-documents'
 import { 
   DOCUMENT_FILES, 
@@ -37,6 +38,7 @@ function App() {
   const [showEnterpriseServer, setShowEnterpriseServer] = useState(false)
   const [showServerDiagnostic, setShowServerDiagnostic] = useState(false)
   const [showPathTracer, setShowPathTracer] = useState(false)
+  const [showLiveConnectivity, setShowLiveConnectivity] = useState(false)
   const [networkCheckResults, setNetworkCheckResults] = useState<any[]>([])
   const { addToRecent } = useRecentDocuments()
 
@@ -148,6 +150,10 @@ function App() {
     return <NetworkPathTracer onClose={() => setShowPathTracer(false)} />
   }
 
+  if (showLiveConnectivity) {
+    return <LiveConnectivityDashboard onClose={() => setShowLiveConnectivity(false)} />
+  }
+
   if (showNetworkDiagnostics) {
     return (
       <div className="min-h-screen bg-background p-6">
@@ -220,6 +226,13 @@ function App() {
               </p>
             </div>
             <div className="ml-auto flex items-center gap-3">
+              <button
+                onClick={() => setShowLiveConnectivity(true)}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-500/10 to-indigo-500/10 hover:from-purple-500/20 hover:to-indigo-500/20 transition-colors border-2 border-purple-500/30"
+              >
+                <Broadcast size={20} weight="duotone" className="text-purple-600" />
+                <span className="text-sm font-semibold text-purple-600">Live Connectivity</span>
+              </button>
               <button
                 onClick={() => setShowPathTracer(true)}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-teal-500/10 to-cyan-500/10 hover:from-teal-500/20 hover:to-cyan-500/20 transition-colors border-2 border-teal-500/30"
