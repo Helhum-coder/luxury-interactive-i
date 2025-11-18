@@ -78,15 +78,15 @@ interface APIError {
 export function PipelineMonitor({ onClose }: PipelineMonitorProps) {
   const [tokens] = useKV<APITokens>('api-tokens', {})
   const [githubWorkflows, setGithubWorkflows] = useState<WorkflowRun[]>([])
-  const [vercelDeployments, setVercelDeployments] = useState<VercelDeployment[]>([])
+    try {VercelDeployment[]>([])
   const [firebaseDeployments, setFirebaseDeployments] = useState<FirebaseDeployment[]>([])
-  const [isRefreshing, setIsRefreshing] = useState(false)
-  const [autoRefresh, setAutoRefresh] = useState(true)
-  const [lastRefresh, setLastRefresh] = useState<Date | null>(null)
-  const [errors, setErrors] = useState<APIError[]>([])
+        headers: {sRefreshing] = useState(false)
+          'Authorization': `token ${tokens.github}`,
+          'Accept': 'application/vnd.github.v3+json'e | null>(null)
+        },s] = useState<APIError[]>([])
 
-  const addError = (provider: string, message: string, type: APIError['type']) => {
-    setErrors((current) => [
+      })
+
       {
         provider,
         message,
@@ -118,40 +118,6 @@ export function PipelineMonitor({ onClose }: PipelineMonitorProps) {
         if (response.status === 401) {
           addError('GitHub', 'Invalid or expired token', 'auth')
           toast.error('GitHub: Invalid token')
-        } else if (response.status === 403) {
-          addError('GitHub', 'Rate limit exceeded', 'auth')
-          toast.error('GitHub: Rate limit exceeded')
-        } else {
-          throw new Error(`GitHub API error: ${response.status} ${response.statusText}`)
-        }
-        return
-      }
-
-      const repos = await response.json()
-      
-      if (!repos || repos.length === 0) {
-        setGithubWorkflows([])
-        return
-      }
-
-      const repo = repos[0]
-      const [owner, repoName] = [repo.owner.login, repo.name]
-
-      const workflowController = new AbortController()
-      const workflowTimeoutId = setTimeout(() => workflowController.abort(), 10000)
-
-      const workflowResponse = await fetch(`https://api.github.com/repos/${owner}/${repoName}/actions/runs?per_page=10`, {
-        headers: {
-          'Authorization': `token ${tokens.github}`,
-          'Accept': 'application/vnd.github.v3+json'
-        },
-        signal: workflowController.signal
-      })
-
-      clearTimeout(workflowTimeoutId)
-
-      if (workflowResponse.ok) {
-        const data = await workflowResponse.json()
         const runs: WorkflowRun[] = data.workflow_runs?.map((run: any) => ({
           id: run.id.toString(),
           name: run.name,
@@ -170,10 +136,8 @@ export function PipelineMonitor({ onClose }: PipelineMonitorProps) {
     } catch (error) {
       if (error instanceof Error) {
         if (error.name === 'AbortError') {
-          addError('GitHub', 'Request timed out after 10 seconds', 'timeout')
-          toast.error('GitHub API request timed out')
+          toast.error('GitHub API request timed out. Check your network connection.')
         } else {
-          addError('GitHub', error.message, 'network')
           toast.error(`GitHub API error: ${error.message}`)
         }
       }
@@ -186,6 +150,42 @@ export function PipelineMonitor({ onClose }: PipelineMonitorProps) {
   const fetchVercelDeployments = async () => {
     if (!tokens?.vercel) return
 
+    try {
+      const response = await fetch('https://api.vercel.com/v6/deployments?limit=10', {
+        headers: {
+          'Authorization': `Bearer ${tokens.vercel}`
+        }
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        const deployments: VercelDeployment[] = data.deployments?.map((dep: any) => ({
+          createdAt: new Date(run.created_at),
+          updatedAt: new Date(run.updated_at),
+          duration: run.conclusion ? Math.floor((new Date(run.updated_at).getTime() - new Date(run.created_at).getTime()) / 1000) : undefined,
+          url: run.html_url
+        })) || []
+        setGithubWorkflows(runs)
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          addError('GitHub', 'Request timed out after 10 seconds', 'timeout')
+          toast.error('GitHub API request timed out')
+        } else {
+          addError('GitHub', error.message, 'network')
+          toast.error(`GitHub API error: ${error.message}`)
+        }
+
+  const generateMockFirebaseData = () => {
+    const statuses: FirebaseDeployment['status'][] = ['success', 'running', 'pending', 'failed']
+    const types: FirebaseDeployment['type'][] = ['hosting', 'functions', 'both']
+    
+    const deployments: FirebaseDeployment[] = Array.from({ length: 5 }, (_, i) => ({
+      id: `firebase-${Date.now()}-${i}`,
+  const fetchVercelDeployments = async () => {
+      status: statuses[i % statuses.length],
+      type: types[i % types.length],
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 10000)
 
