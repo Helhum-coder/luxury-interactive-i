@@ -394,6 +394,7 @@ export function PipelineMonitor({ onClose }: PipelineMonitorProps) {
   }
 
   const hasAnyToken = !!(tokens?.github || tokens?.vercel || tokens?.firebase)
+  const hasAnyData = githubWorkflows.length > 0 || vercelDeployments.length > 0 || firebaseDeployments.length > 0
 
   return (
     <div className="min-h-screen bg-background p-6">
@@ -454,15 +455,45 @@ export function PipelineMonitor({ onClose }: PipelineMonitorProps) {
           </div>
         )}
 
-        {!hasAnyToken && (
+        {!hasAnyToken && !hasAnyData && (
           <Card className="mb-6 border-orange-200 bg-orange-50">
             <CardContent className="pt-6">
               <div className="flex items-center gap-3">
                 <Warning size={24} className="text-orange-600" />
-                <div>
+                <div className="flex-1">
                   <p className="font-semibold text-orange-900">No API tokens configured</p>
                   <p className="text-sm text-orange-700">
-                    Please configure your API tokens in the API Tokens Manager to start monitoring pipelines.
+                    Configure your API tokens in the API Tokens Manager to start monitoring real pipelines.
+                  </p>
+                </div>
+                <Button
+                  onClick={() => {
+                    onClose()
+                    setTimeout(() => {
+                      const apiTokensBtn = document.querySelector('[data-api-tokens-btn]') as HTMLButtonElement
+                      apiTokensBtn?.click()
+                    }, 100)
+                  }}
+                  variant="outline"
+                  size="sm"
+                  className="bg-white hover:bg-orange-100"
+                >
+                  Configure Tokens
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {hasAnyToken && !hasAnyData && (
+          <Card className="mb-6 border-blue-200 bg-blue-50">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3">
+                <Heartbeat size={24} className="text-blue-600" />
+                <div>
+                  <p className="font-semibold text-blue-900">Tokens configured, fetching data...</p>
+                  <p className="text-sm text-blue-700">
+                    Connecting to your pipeline providers. This may take a moment.
                   </p>
                 </div>
               </div>
