@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
-import { MagnifyingGlass, BookOpen, Folder, GlobeHemisphereWest, Lightning, Brain, Globe, FileCode, HardDrives, Heartbeat, MapTrifold, Broadcast, Key, ChartLine, Activity, Package } from '@phosphor-icons/react'
+import { MagnifyingGlass, BookOpen, Folder, GlobeHemisphereWest, Lightning, Brain, Globe, FileCode, HardDrives, Heartbeat, MapTrifold, Broadcast, Key, ChartLine, Activity, Package, Clock } from '@phosphor-icons/react'
 import { motion } from 'framer-motion'
 import { DocumentCard } from '@/components/DocumentCard'
 import { DocumentViewer } from '@/components/DocumentViewer'
@@ -21,6 +21,7 @@ import { RealtimePipelineDashboard } from '@/components/RealtimePipelineDashboar
 import { RealtimeStatusFeed } from '@/components/RealtimeStatusFeed'
 import { PackageDiagnostic } from '@/components/PackageDiagnostic'
 import { VersionCompatibilityMatrix } from '@/components/VersionCompatibilityMatrix'
+import { VersionHistoryTimeline } from '@/components/VersionHistoryTimeline'
 import { useRecentDocuments } from '@/hooks/use-recent-documents'
 import { 
   DOCUMENT_FILES, 
@@ -50,6 +51,7 @@ function App() {
   const [showRealtimeDashboard, setShowRealtimeDashboard] = useState(false)
   const [showPackageDiagnostic, setShowPackageDiagnostic] = useState(false)
   const [showVersionMatrix, setShowVersionMatrix] = useState(false)
+  const [showVersionHistory, setShowVersionHistory] = useState(false)
   const [networkCheckResults, setNetworkCheckResults] = useState<any[]>([])
   const { addToRecent } = useRecentDocuments()
 
@@ -112,6 +114,10 @@ function App() {
       return matchesSearch && matchesCategory
     })
   }, [documents, searchQuery, selectedCategory])
+
+  if (showVersionHistory) {
+    return <VersionHistoryTimeline onClose={() => setShowVersionHistory(false)} />
+  }
 
   if (showVersionMatrix) {
     return <VersionCompatibilityMatrix onClose={() => setShowVersionMatrix(false)} />
@@ -253,6 +259,13 @@ function App() {
               </p>
             </div>
             <div className="ml-auto flex items-center gap-3">
+              <button
+                onClick={() => setShowVersionHistory(true)}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-indigo-500/10 to-purple-500/10 hover:from-indigo-500/20 hover:to-purple-500/20 transition-colors border-2 border-indigo-500/30"
+              >
+                <Clock size={20} weight="duotone" className="text-indigo-600" />
+                <span className="text-sm font-semibold text-indigo-600">Version History</span>
+              </button>
               <button
                 onClick={() => setShowVersionMatrix(true)}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-500/10 to-pink-500/10 hover:from-purple-500/20 hover:to-pink-500/20 transition-colors border-2 border-purple-500/30"
