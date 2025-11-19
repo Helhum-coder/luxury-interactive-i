@@ -195,9 +195,9 @@ export default function RepositoryViewer({ accessToken }: RepositoryViewerProps)
         description: 'Scanning package.json for version information'
       })
 
-      let cliVersion = '1.0.0'
-      let appVersion = '1.0.0'
-      let frameworkVersion = 'React 19.0.0'
+      const cliVersion = '1.0.0'
+      const appVersion = '1.0.0'
+      const frameworkVersion = 'React 19.0.0'
 
       const versionData: ProjectVersion = {
         projectId: `repo-${repo.id}`,

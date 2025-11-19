@@ -204,7 +204,7 @@ export function FileConverterInterface({ onClose }: { onClose?: () => void }) {
   }
 
   const htmlToJsx = (html: string): string => {
-    let jsx = html
+    const jsx = html
       .replace(/class=/g, 'className=')
       .replace(/for=/g, 'htmlFor=')
       .replace(/onclick=/gi, 'onClick=')
@@ -299,7 +299,7 @@ export function FileConverterInterface({ onClose }: { onClose?: () => void }) {
   }
 
   const javascriptToTypeScript = (js: string): string => {
-    let ts = js
+    const ts = js
       .replace(/function\s+(\w+)\s*\(([^)]*)\)\s*{/g, (match, name, params) => {
         const typedParams = params.split(',').map((p: string) => p.trim() ? `${p.trim()}: any` : '').join(', ')
         return `function ${name}(${typedParams}): any {`
@@ -378,7 +378,7 @@ export function FileConverterInterface({ onClose }: { onClose?: () => void }) {
   }
 
   const typescriptToJavascript = (ts: string): string => {
-    let js = ts
+    const js = ts
       .replace(/:\s*\w+(\[\])?/g, '')
       .replace(/interface\s+\w+\s*{[^}]*}/g, '')
       .replace(/type\s+\w+\s*=\s*[^;]+;/g, '')
@@ -390,7 +390,7 @@ export function FileConverterInterface({ onClose }: { onClose?: () => void }) {
   }
 
   const jsxToHtml = (jsx: string): string => {
-    let html = jsx
+    const html = jsx
       .replace(/className=/g, 'class=')
       .replace(/htmlFor=/g, 'for=')
       .replace(/onClick=/g, 'onclick=')
@@ -556,7 +556,7 @@ ${htmlContent}
       const result: any = {}
       const stack: Array<{ obj: any; indent: number }> = [{ obj: result, indent: -1 }]
       
-      for (let line of lines) {
+      for (const line of lines) {
         if (line.trim().startsWith('#') || line.trim() === '') continue
         
         const indent = line.search(/\S/)

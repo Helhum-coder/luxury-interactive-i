@@ -90,7 +90,7 @@ export function MultiFormatConverter() {
   }
 
   const htmlToJsx = (html: string): string => {
-    let jsx = html
+    const jsx = html
       .replace(/class=/g, 'className=')
       .replace(/for=/g, 'htmlFor=')
       .replace(/onclick=/gi, 'onClick=')
@@ -158,7 +158,7 @@ export function MultiFormatConverter() {
   }
 
   const javascriptToTypeScript = (js: string): string => {
-    let ts = js
+    const ts = js
       .replace(/function\s+(\w+)\s*\(([^)]*)\)/g, 'function $1($2): any')
       .replace(/const\s+(\w+)\s*=/g, 'const $1: any =')
       .replace(/let\s+(\w+)\s*=/g, 'let $1: any =')
