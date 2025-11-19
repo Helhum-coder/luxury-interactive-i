@@ -9,7 +9,13 @@
         "build": "tsc -b --noCheck && vite build",
         "lint": "eslint .",
         "optimize": "vite optimize",
-        "preview": "vite preview"
+        "preview": "vite preview",
+        "start:server": "node server.mjs",
+        "start:server:host": "HOST=0.0.0.0 PORT=3000 node server.mjs",
+        "open:server": "\"$BROWSER\" http://localhost:3000/",
+        "start:server:open": "HOST=0.0.0.0 PORT=3000 node server.mjs & sleep 1 && \"$BROWSER\" http://localhost:3000/",
+        "firebase:seed-studio:copy": "bash scripts/seed-studio-firebase.sh --copy \"$HOME/studio\"",
+        "firebase:seed-studio:link": "bash scripts/seed-studio-firebase.sh --link \"$HOME/studio\""
     },
     "dependencies": {
         "@github/spark": "^0.39.0",
