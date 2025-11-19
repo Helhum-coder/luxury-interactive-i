@@ -1,7 +1,4 @@
 // Firebase Authentication utilities with error handling
-// Note: Firebase packages are not installed and not compatible with Spark runtime
-// These imports are commented out to prevent errors
-/*
 import { auth } from './firebase'
 import { 
   signInWithEmailAndPassword,
@@ -21,6 +18,7 @@ export class FirebaseAuthService {
   
   // Sign in with email and password
   static async signIn(email: string, password: string): Promise<User> {
+    if (!auth) throw new Error('Firebase Auth not initialized. Add Firebase config to .env.local')
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password)
       return userCredential.user
@@ -35,6 +33,7 @@ export class FirebaseAuthService {
 
   // Create new user with email and password
   static async signUp(email: string, password: string): Promise<User> {
+    if (!auth) throw new Error('Firebase Auth not initialized. Add Firebase config to .env.local')
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password)
       return userCredential.user
@@ -49,6 +48,7 @@ export class FirebaseAuthService {
 
   // Sign in with Google
   static async signInWithGoogle(): Promise<User> {
+    if (!auth) throw new Error('Firebase Auth not initialized. Add Firebase config to .env.local')
     try {
       const result = await signInWithPopup(auth, googleProvider)
       return result.user
@@ -62,6 +62,7 @@ export class FirebaseAuthService {
 
   // Sign out user
   static async signOut(): Promise<void> {
+    if (!auth) throw new Error('Firebase Auth not initialized')
     try {
       await signOut(auth)
     } catch (error) {
@@ -74,19 +75,32 @@ export class FirebaseAuthService {
 
   // Listen to auth state changes
   static onAuthStateChanged(callback: (user: User | null) => void) {
+    if (!auth) {
+      console.warn('Firebase Auth not initialized')
+      return () => {}
+    }
     return onAuthStateChanged(auth, callback)
   }
 
   // Get current user
   static getCurrentUser(): User | null {
+    if (!auth) return null
     return auth.currentUser
   }
 
   // Check if user is authenticated
   static isAuthenticated(): boolean {
+    if (!auth) {
+      console.warn('Firebase Auth not initialized')
+      return false
+    }
     return !!auth.currentUser
+  }
+
+  // Check if Firebase is available
+  static isAvailable(): boolean {
+    return !!auth
   }
 }
 
 export default FirebaseAuthService
-*/

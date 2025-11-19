@@ -1,13 +1,10 @@
 // Firebase Configuration for TypeScript/React
-// Note: Firebase packages are not installed and not compatible with Spark runtime
-// These imports are commented out to prevent errors
-// import { initializeApp } from 'firebase/app'
-// import { getAuth } from 'firebase/auth'
-// import { getFirestore } from 'firebase/firestore'
-// import { getStorage } from 'firebase/storage'
+import { initializeApp, FirebaseApp } from 'firebase/app'
+import { getAuth, Auth } from 'firebase/auth'
+import { getFirestore, Firestore } from 'firebase/firestore'
+import { getStorage, FirebaseStorage } from 'firebase/storage'
 
 // Firebase configuration using environment variables
-/*
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -17,13 +14,33 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID
 }
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig)
+// Check if Firebase is configured
+const isFirebaseConfigured = () => {
+  return !!(firebaseConfig.apiKey && firebaseConfig.projectId)
+}
 
-// Get Firebase services
-export const auth = getAuth(app)
-export const db = getFirestore(app)
-export const storage = getStorage(app)
+// Initialize Firebase only if configured
+let app: FirebaseApp | null = null
+let auth: Auth | null = null
+let db: Firestore | null = null
+let storage: FirebaseStorage | null = null
+
+if (isFirebaseConfigured()) {
+  try {
+    app = initializeApp(firebaseConfig)
+    auth = getAuth(app)
+    db = getFirestore(app)
+    storage = getStorage(app)
+    console.log('✅ Firebase initialized successfully')
+  } catch (error) {
+    console.warn('⚠️ Firebase initialization failed:', error)
+  }
+} else {
+  console.info('ℹ️ Firebase not configured. Add environment variables to enable.')
+}
+
+// Export services (may be null if not configured)
+export { auth, db, storage }
 
 // Team configuration - integrated with your environment system
 export const TEAM_CONFIG = {
@@ -37,5 +54,5 @@ export const TEAM_CONFIG = {
   }
 }
 
+export { isFirebaseConfigured }
 export default app
-*/
