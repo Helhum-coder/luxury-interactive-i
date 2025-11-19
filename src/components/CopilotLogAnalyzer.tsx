@@ -61,28 +61,28 @@ export default function CopilotLogAnalyzer() {
       {
         name: 'copilot/fix-5501681c-36cf-43cf-a621',
         lastCommit: 'e4f5g6h',
-        lastAuthor: 'GitHub Copilot',
+        lastAuthor: 'Helhum-coder',
         lastDate: new Date(Date.now() - 3600000).toISOString(),
         isCopilot: true
       },
       {
         name: 'copilot/fix-91e08103-e406-4a3c-abd4',
         lastCommit: 'i7j8k9l',
-        lastAuthor: 'GitHub Copilot',
+        lastAuthor: 'Helhum-coder',
         lastDate: new Date(Date.now() - 7200000).toISOString(),
         isCopilot: true
       },
       {
         name: 'copilot/domain-setup-cloudshell',
         lastCommit: 'c9d8e7f',
-        lastAuthor: 'GitHub Copilot',
+        lastAuthor: 'Helhum-coder',
         lastDate: new Date(Date.now() - 10800000).toISOString(),
         isCopilot: true
       },
       {
         name: 'copilot/port-8000-backend',
         lastCommit: 'f6g5h4i',
-        lastAuthor: 'GitHub Copilot',
+        lastAuthor: 'Helhum-coder',
         lastDate: new Date(Date.now() - 14400000).toISOString(),
         isCopilot: true
       },
@@ -96,21 +96,21 @@ export default function CopilotLogAnalyzer() {
       {
         name: 'copilot/feature-b439c4',
         lastCommit: 'q3r4s5t',
-        lastAuthor: 'GitHub Copilot',
+        lastAuthor: 'Helhum-coder',
         lastDate: new Date(Date.now() - 259200000).toISOString(),
         isCopilot: true
       },
       {
         name: 'copilot/google-accounts-integration',
         lastCommit: 'x1y2z3a',
-        lastAuthor: 'GitHub Copilot',
+        lastAuthor: 'Helhum-coder',
         lastDate: new Date(Date.now() - 345600000).toISOString(),
         isCopilot: true
       },
       {
         name: 'copilot/403-error-fix',
         lastCommit: 'b4c5d6e',
-        lastAuthor: 'GitHub Copilot',
+        lastAuthor: 'Helhum-coder',
         lastDate: new Date(Date.now() - 432000000).toISOString(),
         isCopilot: true
       }
@@ -119,7 +119,7 @@ export default function CopilotLogAnalyzer() {
     const mockLogs: GitLog[] = [
       {
         hash: 'e4f5g6h7890',
-        author: 'GitHub Copilot',
+        author: 'Helhum-coder',
         date: new Date(Date.now() - 3600000).toISOString(),
         message: 'Implement ElMayordomo2025 file processing system',
         branch: 'copilot/fix-5501681c-36cf-43cf-a621',
@@ -128,7 +128,7 @@ export default function CopilotLogAnalyzer() {
       },
       {
         hash: 'f6g5h4i3210',
-        author: 'GitHub Copilot',
+        author: 'Helhum-coder',
         date: new Date(Date.now() - 5000000).toISOString(),
         message: 'Configure port 8000 backend forwarding - Unable to forward request',
         branch: 'copilot/port-8000-backend',
@@ -137,7 +137,7 @@ export default function CopilotLogAnalyzer() {
       },
       {
         hash: 'i7j8k9l0123',
-        author: 'GitHub Copilot',
+        author: 'Helhum-coder',
         date: new Date(Date.now() - 7200000).toISOString(),
         message: 'Merge pull request #5 from Helhum-coder/copilot/fix',
         branch: 'copilot/fix-91e08103-e406-4a3c-abd4',
@@ -146,7 +146,7 @@ export default function CopilotLogAnalyzer() {
       },
       {
         hash: 'c9d8e7f6543',
-        author: 'GitHub Copilot',
+        author: 'Helhum-coder',
         date: new Date(Date.now() - 10800000).toISOString(),
         message: 'Setup cloudshell domain: cs-1026435675871-default.cs-europe-west1-haha.cloudshell.dev',
         branch: 'copilot/domain-setup-cloudshell',
@@ -164,7 +164,7 @@ export default function CopilotLogAnalyzer() {
       },
       {
         hash: 'x1y2z3a4567',
-        author: 'GitHub Copilot',
+        author: 'Helhum-coder',
         date: new Date(Date.now() - 100000000).toISOString(),
         message: 'Integrate Google accounts.google.com authentication',
         branch: 'copilot/google-accounts-integration',
@@ -173,7 +173,7 @@ export default function CopilotLogAnalyzer() {
       },
       {
         hash: 'b4c5d6e7890',
-        author: 'GitHub Copilot',
+        author: 'Helhum-coder',
         date: new Date(Date.now() - 150000000).toISOString(),
         message: 'Fix 403 error: "You do not have access to this page"',
         branch: 'copilot/403-error-fix',
@@ -182,7 +182,7 @@ export default function CopilotLogAnalyzer() {
       },
       {
         hash: 'q3r4s5t6789',
-        author: 'GitHub Copilot',
+        author: 'Helhum-coder',
         date: new Date(Date.now() - 259200000).toISOString(),
         message: 'Add security audit and network monitoring',
         branch: 'copilot/feature-b439c4',
@@ -200,7 +200,7 @@ export default function CopilotLogAnalyzer() {
       },
       {
         hash: 'u4v5w6x7890',
-        author: 'GitHub Copilot',
+        author: 'Helhum-coder',
         date: new Date(Date.now() - 345600000).toISOString(),
         message: 'Fix: wine-cellar git copilot block issue',
         branch: 'copilot/fix-5501681c',
@@ -209,7 +209,7 @@ export default function CopilotLogAnalyzer() {
       },
       {
         hash: 'g8h9i0j1234',
-        author: 'GitHub Copilot',
+        author: 'Helhum-coder',
         date: new Date(Date.now() - 200000000).toISOString(),
         message: 'Hidden: Install xcode-select command line tools for macOS',
         branch: 'copilot/xcode-setup',
@@ -218,7 +218,7 @@ export default function CopilotLogAnalyzer() {
       },
       {
         hash: 'k2l3m4n5678',
-        author: 'GitHub Copilot',
+        author: 'Helhum-coder',
         date: new Date(Date.now() - 300000000).toISOString(),
         message: 'Block sudo commands and password authentication',
         branch: 'copilot/security-lockdown',
