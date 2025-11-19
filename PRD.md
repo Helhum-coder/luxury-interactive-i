@@ -1,266 +1,128 @@
 # Planning Guide
 
-A comprehensive document viewer that provides organized access to all markdown documentation files in the project, enabling users to quickly find, read, and navigate through technical guides, API documentation, setup instructions, and troubleshooting resources.
+A streamlined onboarding interface that guides users through API integration setup in under 30 seconds, making the complex process of connecting GitHub and Linear APIs feel effortless and secure.
 
-**Experience Qualities**:
-1. **Efficient** - Quick navigation and search functionality to find specific documents instantly
-2. **Organized** - Clear categorization and visual hierarchy that makes browsing intuitive
-3. **Readable** - Beautiful typography and layout optimized for reading technical content
+**Experience Qualities**: 
+1. **Swift** - Users should complete the entire setup process in under a minute with clear, linear progression
+2. **Reassuring** - Security indicators and clear messaging should eliminate concerns about token safety
+3. **Delightful** - Small moments of visual feedback transform mundane setup into a satisfying experience
 
 **Complexity Level**: Light Application (multiple features with basic state)
-- A document viewer with categorization, search, and markdown rendering capabilities
+  - The app manages API token storage, connection testing, and data retrieval across two services, but remains focused on a single onboarding flow with straightforward state management.
 
 ## Essential Features
 
-### Document Browser
-- **Functionality**: Display all markdown files organized by category with preview cards
-- **Purpose**: Provide quick access to all documentation in one central location
-- **Trigger**: User opens the app
-- **Progression**: App loads → Documents categorized automatically → User sees organized grid/list → Click to view full document
-- **Success criteria**: All markdown files visible, properly categorized, and clickable
+### GitHub Token Setup
+- **Functionality**: Accepts GitHub personal access token and validates connection
+- **Purpose**: Enables repository and organization data access through GitHub API
+- **Trigger**: User clicks "Connect GitHub" or navigates to GitHub setup section
+- **Progression**: View instructions → Click link to GitHub settings → Generate token with required scopes → Copy token → Paste in app → Click connect → See success confirmation
+- **Success criteria**: Connection indicator turns green, test API call succeeds, "Load Repositories" button becomes available
 
-### Search & Filter
-- **Functionality**: Real-time search across document titles and optionally content
-- **Purpose**: Help users quickly find specific documentation
-- **Trigger**: User types in search input
-- **Progression**: User types query → Results filter in real-time → Matching documents highlighted → Click to view
-- **Success criteria**: Search responds instantly, shows relevant results, handles empty states
+### Linear API Key Setup
+- **Functionality**: Accepts Linear API key and validates connection
+- **Purpose**: Enables team and issue data access through Linear API
+- **Trigger**: User clicks "Connect Linear" or navigates to Linear setup section
+- **Progression**: View instructions → Click link to Linear settings → Generate API key → Copy key → Paste in app → Click connect → See success confirmation
+- **Success criteria**: Connection indicator turns green, teams list populates, issue browsing becomes available
 
-### Document Viewer
-- **Functionality**: Render markdown content with proper formatting, syntax highlighting, and navigation
-- **Purpose**: Display full document content in a readable format
-- **Trigger**: User clicks on a document card
-- **Progression**: Click document → Content loads → Markdown rendered beautifully → Scroll to read → Navigate back or to another doc
-- **Success criteria**: Markdown renders correctly, code blocks highlighted, images display, links work
+### Connection Testing
+- **Functionality**: Validates API credentials with real API calls
+- **Purpose**: Confirms tokens work before user attempts to use features
+- **Trigger**: User clicks "Test Connection" button after entering credentials
+- **Progression**: Click test button → Loading state appears → API call executes → Success or error message displays with specific feedback
+- **Success criteria**: User receives clear feedback about connection status with actionable next steps
 
-### Category Navigation
-- **Functionality**: Group documents by type (API, Git, Deployment, Security, etc.)
-- **Purpose**: Make it easy to browse related documentation
-- **Trigger**: Automatic on load, filterable by user
-- **Progression**: Documents auto-categorized → User sees category tabs/filters → Click category → View filtered list
-- **Success criteria**: Clear categories, accurate grouping, easy switching between categories
-
-### Reading Experience
-- **Functionality**: Optimized layout for reading with table of contents, breadcrumbs, and navigation
-- **Purpose**: Make long technical documents easy to navigate and read
-- **Trigger**: Document opened
-- **Progression**: Document opens → TOC generated → User clicks TOC item → Smooth scroll to section → Return to top/navigate
-- **Success criteria**: Smooth scrolling, clear navigation, responsive layout
-
-### Network Auto-Monitoring
-- **Functionality**: Continuous automatic network diagnostics that run periodically in the background
-- **Purpose**: Proactively detect network issues without manual intervention
-- **Trigger**: User enables auto-monitor toggle
-- **Progression**: Toggle enabled → Scans run every 60 seconds → Issues detected → User notified → Review diagnostics
-- **Success criteria**: Scans run reliably, minimal performance impact, settings persist
-
-### Diagnostics Export
-- **Functionality**: Download complete network diagnostics report as JSON file
-- **Purpose**: Share or archive network status for troubleshooting and documentation
-- **Trigger**: User clicks "Export Report" button
-- **Progression**: Click export → Report generated → File downloaded → Confirmation shown
-- **Success criteria**: Complete data exported, proper file naming, success feedback
-
-### Network Notifications
-- **Functionality**: Real-time toast notifications when network issues are detected
-- **Purpose**: Immediate awareness of connectivity problems
-- **Trigger**: Network scan completes with errors or warnings
-- **Progression**: Scan runs → Issues detected → Toast appears → User clicks to view → Navigate to diagnostics
-- **Success criteria**: Notifications appear promptly, can be dismissed, not intrusive
-
-### Automated Fix Scripts
-- **Functionality**: One-click automated solutions for common network, cache, DNS, and browser issues
-- **Purpose**: Enable users to resolve problems quickly without technical knowledge
-- **Trigger**: User navigates to Fix Scripts or clicks from Network Diagnostics panel
-- **Progression**: View script library → Select category filter → Read script description → Click "Run Script" → See real-time progress → View success/error result → Check execution history
-- **Success criteria**: Scripts execute reliably, provide clear feedback, log results, handle failures gracefully
-
-### Fix Script Categories
-- **Functionality**: Organized collection of 12+ automated fix scripts grouped by type
-- **Purpose**: Help users find the right solution for their specific problem
-- **Trigger**: User browses fix scripts interface
-- **Progression**: See all scripts → Filter by category (Network/Cache/Browser/Security/DNS) → View estimated time & severity → Run selected script
-- **Success criteria**: Clear categorization, accurate execution times, appropriate severity levels
-
-### Fix Execution History
-- **Functionality**: Persistent log of all executed fix scripts with timestamps, results, and details
-- **Purpose**: Track what fixes have been tried and their outcomes for troubleshooting
-- **Trigger**: Any script execution
-- **Progression**: Script runs → Result logged automatically → View history panel → See success/failure with details → Export if needed
-- **Success criteria**: All executions logged, history persists across sessions, shows last 50 entries
-
-### AI-Powered Diagnostic Engine
-- **Functionality**: Machine learning-based error pattern analysis that generates intelligent recommendations
-- **Purpose**: Automatically identify root causes and suggest targeted solutions for recurring issues
-- **Trigger**: User clicks "AI Diagnostics" or from Network Diagnostics via "AI Analysis" button
-- **Progression**: Click AI analysis → LLM analyzes error patterns → Patterns categorized by type & severity → AI generates recommendations with confidence scores → View detailed reasoning → Execute automated actions → Track results
-- **Success criteria**: Accurate pattern detection, relevant recommendations, high confidence scores (>75%), actionable insights
-
-### Error Pattern Recognition
-- **Functionality**: Intelligent classification of errors into types (CORS, DNS, SSL, Cache, Network, Port, Timeout)
-- **Purpose**: Identify recurring issues and their frequency to prioritize fixes
-- **Trigger**: AI analysis runs on network check results
-- **Progression**: Collect diagnostics → Detect patterns → Count occurrences → Determine severity → Track timeline → Display organized list
-- **Success criteria**: Accurate categorization, severity levels appropriate, occurrence tracking reliable
-
-### AI Recommendation Generation
-- **Functionality**: LLM-powered recommendation engine that provides step-by-step fixes
-- **Purpose**: Transform technical errors into actionable solutions for any skill level
-- **Trigger**: Error patterns detected during analysis
-- **Progression**: Pattern identified → Send to LLM with context → Receive structured recommendation → Parse actions → Mark automated vs manual → Display with confidence score → User executes action
-- **Success criteria**: Clear recommendations, 2-4 actionable steps per issue, estimated fix times accurate, automated actions work reliably
-
-### Satellite Connection Monitor
-- **Functionality**: Real-time browser satellite network connection monitoring with live metrics
-- **Purpose**: Monitor satellite network connectivity status, latency, bandwidth, and signal strength
-- **Trigger**: User clicks "Satellite Monitor" button or from diagnostics panel
-- **Progression**: Open monitor → Start monitoring → View real-time metrics (latency, bandwidth, packet loss, signal strength) → Track uptime → Review connection history → Stop monitoring
-- **Success criteria**: Updates every second, accurate metrics display, color-coded status indicators, connection history logged
-
-### Real-time WebSocket Status Updates
-- **Functionality**: Live status feed showing real-time updates from all monitoring tools via WebSocket connection
-- **Purpose**: Provide instant visibility into all system activities, diagnostics, and pipeline events in one unified stream
-- **Trigger**: Automatically active when monitoring tools are running
-- **Progression**: Connect to WebSocket → Receive real-time updates → Display in feed with timestamps → Filter by source → Color-code by severity → Clear history
-- **Success criteria**: Sub-second latency, reliable connection with auto-reconnect, filterable by source, shows connection status with latency metrics
-
-### Real-time Pipeline Dashboard
-- **Functionality**: Live monitoring of GitHub Actions, Vercel, and Firebase pipelines with streaming status updates
-- **Purpose**: Track deployment pipelines in real-time without manual refresh, see logs as they stream
-- **Trigger**: User clicks "Real-time Status" button
-- **Progression**: Open dashboard → Connect to pipeline sources → Display running/queued/completed jobs → Stream build logs → Update status badges → Show duration and completion time → Navigate back
-- **Success criteria**: Updates within 3 seconds of status change, shows live logs, accurate status badges, proper cleanup on unmount
-
-### Multi-Format File Converter
-- **Functionality**: Convert files between multiple formats (JSON↔TypeScript, HTML↔JSX, CSS↔Tailwind, JS↔TS, XML↔JSON)
-- **Purpose**: Quickly transform code between different formats for development workflows
-- **Trigger**: User clicks "File Converter" button
-- **Progression**: Select conversion type → Paste source code → Click convert → View output → Copy or download result
-- **Success criteria**: All 5 conversion types work accurately, handles syntax errors gracefully, provides copy and download options
+### Quick Actions Dashboard
+- **Functionality**: Displays available actions once APIs are connected
+- **Purpose**: Helps users immediately see value from their connected APIs
+- **Trigger**: Automatically appears when at least one API is successfully connected
+- **Progression**: API connects → Dashboard appears with action cards → User clicks action → Feature executes → Results display
+- **Success criteria**: Users can successfully load repositories or view Linear issues with one click
 
 ## Edge Case Handling
-- **No Documents Found**: Display helpful empty state with instructions
-- **Search No Results**: Show "no matches found" with suggestion to refine search
-- **Markdown Parse Errors**: Gracefully handle malformed markdown, show raw text if needed
-- **Large Documents**: Implement virtual scrolling or pagination for performance
-- **Broken Links**: Handle relative links, external links, and missing assets gracefully
-- **Script Execution Failures**: Show clear error messages, suggest alternatives, don't break UI
-- **Concurrent Script Runs**: Prevent multiple scripts running simultaneously to avoid conflicts
-- **Browser Compatibility**: Check API support before executing (caches, clipboard, etc.)
-- **AI Analysis Failures**: Fallback to pre-defined recommendations if LLM is unavailable
-- **No Error Patterns**: Display helpful message encouraging network scan first
-- **Low Confidence Recommendations**: Clearly mark recommendations below 60% confidence
-- **Duplicate Patterns**: Merge similar error patterns to avoid noise
-- **Satellite Connection Lost**: Show disconnected state, attempt auto-reconnect, log disconnection time
-- **Invalid Conversion Input**: Display clear error messages with format examples
-- **Large File Conversions**: Show loading state, handle memory limits gracefully
-- **Unsupported Conversion Types**: Clearly indicate which conversions are supported
-- **Clipboard Access Denied**: Fallback to manual copy with instructions
-- **WebSocket Connection Lost**: Show disconnected state, attempt auto-reconnect with exponential backoff
-- **Status Update Flooding**: Rate limit updates to prevent UI overload, queue and batch updates
-- **Memory Leaks from Listeners**: Proper cleanup of all event listeners on component unmount
-- **Cross-origin WebSocket**: Handle CORS and security restrictions gracefully
+
+- **Invalid Token Format**: Detect common formatting issues (extra spaces, incomplete tokens) and show helpful correction hints
+- **Expired Tokens**: Catch authentication errors and guide user to regenerate with fresh instructions
+- **Missing Scopes**: Detect insufficient permissions and display which specific scopes are missing
+- **Network Failures**: Distinguish between network issues and credential problems with appropriate retry options
+- **Empty Results**: When connected APIs return no data, explain why (no repos, no teams) with encouraging next steps
+- **Disconnection Flow**: Allow users to easily disconnect and clear stored credentials with confirmation
 
 ## Design Direction
-The design should feel professional and documentation-focused, with a clean, minimalist interface that prioritizes readability and efficient information access, using a rich interface with clear visual hierarchy to handle the volume of content.
+
+The design should feel modern and trustworthy with a focus on clarity over decoration—using clean layouts and purposeful animations to guide attention through the setup flow while security indicators provide constant reassurance.
 
 ## Color Selection
-Complementary (opposite colors) with gradient accents - Using deep blues for navigation/structure, warm amber for actions, and purple-to-pink gradients for AI features, creating a professional yet modern diagnostic experience.
 
-- **Primary Color**: Deep Blue `oklch(0.35 0.15 250)` - Communicates trust, stability, and professionalism for navigation and headers
-- **Secondary Colors**: Slate Blue `oklch(0.55 0.08 250)` for secondary UI elements and muted backgrounds
-- **Accent Color**: Warm Amber `oklch(0.75 0.15 70)` - Highlights interactive elements, CTAs, and important information
-- **AI Gradient**: Purple `oklch(0.55 0.20 300)` to Pink `oklch(0.65 0.25 350)` - Represents intelligent, cutting-edge AI features
+Triadic color scheme creates visual distinction between different API services and interaction states while maintaining harmony.
+
+- **Primary Color**: `oklch(0.55 0.22 260)` - Professional blue-violet that communicates trust and technology
+- **Secondary Colors**: 
+  - GitHub: `oklch(0.45 0.15 240)` - Deep blue representing GitHub's brand territory
+  - Linear: `oklch(0.58 0.18 280)` - Purple-blue for Linear's distinct identity
+- **Accent Color**: `oklch(0.68 0.20 160)` - Vibrant teal for success states and CTAs, drawing eye to important actions
 - **Foreground/Background Pairings**:
-  - Background (White `oklch(1 0 0)`): Foreground Dark Gray `oklch(0.20 0.01 250)` - Ratio 16.2:1 ✓
-  - Card (Soft White `oklch(0.98 0.005 250)`): Foreground Dark Gray `oklch(0.20 0.01 250)` - Ratio 15.1:1 ✓
-  - Primary (Deep Blue `oklch(0.35 0.15 250)`): White text `oklch(1 0 0)` - Ratio 8.9:1 ✓
-  - Secondary (Slate Blue `oklch(0.55 0.08 250)`): White text `oklch(1 0 0)` - Ratio 4.7:1 ✓
-  - Accent (Warm Amber `oklch(0.75 0.15 70)`): Dark Gray `oklch(0.20 0.01 250)` - Ratio 10.2:1 ✓
-  - Muted (Light Gray `oklch(0.95 0.01 250)`): Medium Gray `oklch(0.45 0.02 250)` - Ratio 7.8:1 ✓
-  - AI Purple: White text `oklch(1 0 0)` - Ratio 6.1:1 ✓
+  - Background (Light Gray `oklch(0.98 0.002 260)`): Dark text `oklch(0.20 0.03 260)` - Ratio 12.5:1 ✓
+  - Card (White `oklch(1.0 0 0)`): Dark text `oklch(0.20 0.03 260)` - Ratio 13.8:1 ✓
+  - Primary (Blue-Violet `oklch(0.55 0.22 260)`): White text `oklch(0.98 0.002 260)` - Ratio 7.2:1 ✓
+  - Secondary (Muted Blue `oklch(0.90 0.05 260)`): Dark text `oklch(0.25 0.04 260)` - Ratio 9.4:1 ✓
+  - Accent (Teal `oklch(0.68 0.20 160)`): White text `oklch(0.98 0.002 260)` - Ratio 5.1:1 ✓
 
 ## Font Selection
-Clear, highly readable sans-serif for body text combined with a monospace font for code blocks, conveying professionalism and technical precision.
 
-- **Typographic Hierarchy**:
-  - H1 (Page Title): Inter Bold/32px/tight letter spacing/-0.02em
-  - H2 (Category/Section): Inter SemiBold/24px/tight letter spacing/-0.01em
-  - H3 (Document Title): Inter SemiBold/20px/normal letter spacing
-  - H4 (Subsection): Inter Medium/18px/normal letter spacing
-  - Body (Main Content): Inter Regular/16px/relaxed line height 1.7
-  - Caption (Metadata): Inter Regular/14px/normal line height 1.5
-  - Code Blocks: JetBrains Mono Regular/14px/line height 1.6
+Typography should balance technical precision with approachability, using a clean geometric sans-serif for interface elements and a monospace font for API tokens.
+
+- **Typographic Hierarchy**: 
+  - H1 (Page Title): Inter Bold/32px/tight letter-spacing (-0.02em) - Establishes authority
+  - H2 (Section Headers): Inter SemiBold/24px/normal letter-spacing - Clear hierarchy
+  - H3 (Card Titles): Inter Medium/18px/normal letter-spacing - Organized content
+  - Body Text: Inter Regular/15px/relaxed line-height (1.6) - Easy reading
+  - Code/Tokens: JetBrains Mono Regular/14px/normal line-height (1.5) - Technical clarity
+  - Labels: Inter Medium/13px/uppercase/wide letter-spacing (0.05em) - Clear identification
+  - Button Text: Inter SemiBold/15px/normal letter-spacing - Confident actions
 
 ## Animations
-Subtle and functional, focused on smooth transitions between document views, gentle hover states on cards, and smooth scrolling within documents to guide attention without distraction.
 
-- **Purposeful Meaning**: Smooth page transitions communicate spatial relationships between browse and read modes; card hover effects invite exploration
-- **Hierarchy of Movement**: Document transitions (300ms), card hovers (150ms), search filtering (200ms), scroll navigation (400ms smooth)
+Animations should feel snappy and purposeful, confirming actions without creating delays—subtle state changes keep the interface feeling responsive while success moments deserve brief celebration.
+
+- **Purposeful Meaning**: Success confirmations use a gentle bounce to create satisfaction, while connection status changes use smooth color transitions to feel reliable rather than jarring
+- **Hierarchy of Movement**: 
+  - High Priority: Connection status changes, success/error states (300ms with spring physics)
+  - Medium Priority: Card reveals, section transitions (250ms ease-out)
+  - Low Priority: Hover states, focus indicators (150ms ease-in-out)
 
 ## Component Selection
+
 - **Components**: 
-  - `Card` for document preview cards with hover states
-  - `Input` for search with icon
-  - `Tabs` for category filtering
-  - `ScrollArea` for document content with custom scrollbar
-  - `Badge` for document metadata (category tags)
-  - `Breadcrumb` for navigation context
-  - `Button` for actions (back, copy, etc.)
-  - `Separator` for visual section breaks
-  - `Sheet` or `Dialog` for full document view (mobile consideration)
-  
+  - Card for API service containers with distinct visual states
+  - Input with password toggle for secure token entry
+  - Button with loading states for connection actions
+  - Badge for connection status indicators (connected/disconnected)
+  - Alert for error messages and security notes
+  - Tabs for switching between GitHub/Linear/Quick Actions
+  - Accordion for expandable instruction sections
+  - Separator for visual breathing room between sections
 - **Customizations**: 
-  - Custom markdown renderer component with syntax highlighting
-  - Table of contents generator for long documents
-  - Document preview cards with gradient overlays
-  - Search highlight component for matching text
-  
+  - Custom "Copy to clipboard" button component with confirmation feedback
+  - Custom connection status indicator with animated state transitions
+  - Custom action card component with icon, title, description, and CTA
 - **States**: 
-  - Cards: default, hover (lift + shadow), active (pressed state)
-  - Search input: empty, typing, results found, no results
-  - Document viewer: loading skeleton, content loaded, error state
-  - Navigation: active category, inactive category
-  
+  - Buttons: Default (solid primary), Hover (slight lift with shadow), Active (pressed down), Loading (spinner + disabled), Disabled (muted with reduced opacity)
+  - Inputs: Default (subtle border), Focus (accent border with glow), Error (destructive border), Success (accent border), Disabled (muted background)
+  - Cards: Default (subtle shadow), Hover (elevated shadow), Active/Connected (accent border glow)
 - **Icon Selection**: 
-  - `MagnifyingGlass` for search
-  - `FileText` for documents
-  - `Folder` for categories
-  - `ArrowLeft` for back navigation
-  - `List` for table of contents
-  - `BookOpen` for reading mode
-  - `Copy` for copy code blocks
-  - `Lightning` for fix scripts
-  - `Play` for execute action
-  - `CheckCircle` for success states
-  - `XCircle` for error states
-  - `Wrench` for tools/fixes
-  - `GlobeHemisphereWest` for network
-  - `Brain` for AI diagnostics
-  - `Sparkle` for AI features
-  - `Lightbulb` for recommendations
-  - `Bug` for error patterns
-  - `ChartBar` for analytics
-  - `Globe` for satellite monitoring
-  - `FileCode` for file conversion
-  - `ArrowRight` for conversion flow
-  - `Copy` for copy actions
-  - `Download` for download actions
-  - `WifiHigh`/`WifiSlash` for connection status
-  - `Activity` for monitoring activity
-  - `WifiHigh`/`WifiSlash` for WebSocket connection status
-  - `Clock` for pending/loading states
-  - `Trash` for clear/delete actions
-  
+  - @phosphor-icons/react: Key (API tokens), CheckCircle (success), Warning (errors), Copy (clipboard actions), Eye/EyeSlash (password toggle), GithubLogo, Plug (connection), Lightning (quick actions), ListBullets (repositories), Kanban (issues)
 - **Spacing**: 
-  - Container padding: `p-6` (24px)
-  - Card gap: `gap-4` (16px)
-  - Section spacing: `space-y-6` (24px)
-  - Content margin: `my-8` (32px)
-  
+  - Card padding: p-6 (24px) for comfortable content space
+  - Section gaps: gap-8 (32px) between major sections
+  - Element gaps: gap-4 (16px) within related groups
+  - Tight gaps: gap-2 (8px) for closely related items
+  - Page margins: px-6 py-8 on mobile, px-12 py-12 on desktop
 - **Mobile**: 
-  - Stack cards vertically on mobile
-  - Hide category sidebar, use dropdown or tabs
-  - Full-screen document view on mobile
-  - Floating TOC button for small screens
-  - Touch-optimized card sizes (min 44px)
+  - Stack tabs vertically on small screens
+  - Full-width cards with reduced padding (p-4)
+  - Sticky header with compact title
+  - Action buttons become full-width
+  - Instructions use accordion to save space
+  - Reduce spacing scale by 25% (gap-6 → gap-4, etc.)
