@@ -8,74 +8,33 @@
 }
 
 :root {
-  --background: oklch(0.96 0.005 270);
-  --foreground: oklch(0.12 0.02 270);
+  --background: oklch(0.98 0.002 260);
+  --foreground: oklch(0.20 0.03 260);
 
-  --card: oklch(0.98 0.003 270);
-  --card-foreground: oklch(0.12 0.02 270);
-  --popover: oklch(1.00 0 0);
-  --popover-foreground: oklch(0.12 0.02 270);
+  --card: oklch(1.0 0 0);
+  --card-foreground: oklch(0.20 0.03 260);
+  --popover: oklch(1.0 0 0);
+  --popover-foreground: oklch(0.20 0.03 260);
 
-  --primary: oklch(0.60 0.25 320);
-  --primary-foreground: oklch(0.98 0.003 270);
-  --secondary: oklch(0.88 0.08 280);
-  --secondary-foreground: oklch(0.20 0.03 270);
-  --accent: oklch(0.70 0.22 180);
-  --accent-foreground: oklch(0.12 0.02 270);
-  --destructive: oklch(0.65 0.25 15);
-  --destructive-foreground: oklch(0.98 0.003 270);
+  --primary: oklch(0.55 0.22 260);
+  --primary-foreground: oklch(0.98 0.002 260);
+  --secondary: oklch(0.90 0.05 260);
+  --secondary-foreground: oklch(0.25 0.04 260);
+  --accent: oklch(0.68 0.20 160);
+  --accent-foreground: oklch(0.98 0.002 260);
+  --destructive: oklch(0.60 0.24 25);
+  --destructive-foreground: oklch(0.98 0.002 260);
 
-  --muted: oklch(0.92 0.01 270);
-  --muted-foreground: oklch(0.40 0.02 270);
-  --border: oklch(0.85 0.02 270);
-  --input: oklch(0.85 0.02 270);
-  --ring: oklch(0.60 0.25 320);
+  --muted: oklch(0.95 0.01 260);
+  --muted-foreground: oklch(0.45 0.02 260);
+  --border: oklch(0.88 0.01 260);
+  --input: oklch(0.88 0.01 260);
+  --ring: oklch(0.55 0.22 260);
 
-  --radius: 0.25rem;
+  --radius: 0.5rem;
 
-  --chart-1: oklch(0.60 0.25 320);
-
-  --chart-2: oklch(0.70 0.22 180);
-
-  --chart-3: oklch(0.55 0.28 60);
-
-  --chart-4: oklch(0.65 0.20 240);
-
-  --chart-5: oklch(0.75 0.15 360);
-
-  --sidebar: oklch(0.94 0.005 270);
-
-  --sidebar-foreground: oklch(0.12 0.02 270);
-
-  --sidebar-primary: oklch(0.60 0.25 320);
-
-  --sidebar-primary-foreground: oklch(0.98 0.003 270);
-
-  --sidebar-accent: oklch(0.88 0.08 280);
-
-  --sidebar-accent-foreground: oklch(0.20 0.03 270);
-
-  --sidebar-border: oklch(0.85 0.02 270);
-
-  --sidebar-ring: oklch(0.60 0.25 320);
-
-  --shadow-color: oklch(0.60 0.25 320);
-
-  --shadow-opacity: 0.25;
-
-  --shadow-blur: 12px;
-
-  --shadow-spread: 0px;
-
-  --shadow-offset-x: 2px;
-
-  --shadow-offset-y: 6px;
-
-  --font-sans: Outfit;
-
-  --font-serif: Cormorant;
-
-  --font-mono: Fira Code;
+  --github: oklch(0.45 0.15 240);
+  --linear: oklch(0.58 0.18 280);
 }
 
 @theme {
@@ -99,6 +58,9 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
 
+  --color-github: var(--github);
+  --color-linear: var(--linear);
+
   --radius-sm: calc(var(--radius) * 0.5);
   --radius-md: var(--radius);
   --radius-lg: calc(var(--radius) * 1.5);
@@ -108,140 +70,11 @@
 }
 
 body {
-  font-family: var(--font-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-  line-height: 1.7;
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
+  letter-spacing: -0.01em;
 }
 
 .font-mono {
-  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
-}
-
-.prose {
-  max-width: 65ch;
-  color: var(--foreground);
-}
-
-.prose h1 {
-  font-size: 2rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  margin-top: 2rem;
-  margin-bottom: 1rem;
-  color: var(--foreground);
-}
-
-.prose h2 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  margin-top: 2rem;
-  margin-bottom: 0.75rem;
-  color: var(--foreground);
-}
-
-.prose h3 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin-top: 1.5rem;
-  margin-bottom: 0.5rem;
-  color: var(--foreground);
-}
-
-.prose h4 {
-  font-size: 1.125rem;
-  font-weight: 500;
-  margin-top: 1.25rem;
-  margin-bottom: 0.5rem;
-  color: var(--foreground);
-}
-
-.prose p {
-  margin-top: 0.75rem;
-  margin-bottom: 0.75rem;
-}
-
-.prose ul, .prose ol {
-  margin-top: 0.75rem;
-  margin-bottom: 0.75rem;
-  padding-left: 1.5rem;
-}
-
-.prose li {
-  margin-top: 0.25rem;
-  margin-bottom: 0.25rem;
-}
-
-.prose code {
-  background-color: var(--muted);
-  padding: 0.125rem 0.375rem;
-  border-radius: 0.25rem;
-  font-size: 0.875em;
-  font-family: 'JetBrains Mono', monospace;
-  color: var(--accent-foreground);
-}
-
-.prose pre {
-  background-color: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1rem;
-  overflow-x: auto;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-}
-
-.prose pre code {
-  background-color: transparent;
-  padding: 0;
-  border-radius: 0;
-  font-size: 0.875rem;
-  line-height: 1.6;
-}
-
-.prose blockquote {
-  border-left: 4px solid var(--accent);
-  padding-left: 1rem;
-  margin: 1rem 0;
-  font-style: italic;
-  color: var(--muted-foreground);
-}
-
-.prose a {
-  color: var(--primary);
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-.prose a:hover {
-  color: var(--accent);
-}
-
-.prose table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 1rem 0;
-}
-
-.prose th, .prose td {
-  border: 1px solid var(--border);
-  padding: 0.5rem;
-  text-align: left;
-}
-
-.prose th {
-  background-color: var(--muted);
-  font-weight: 600;
-}
-
-.prose img {
-  max-width: 100%;
-  height: auto;
-  border-radius: var(--radius);
-  margin: 1rem 0;
-}
-
-.prose hr {
-  border: none;
-  border-top: 1px solid var(--border);
-  margin: 2rem 0;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
 }
