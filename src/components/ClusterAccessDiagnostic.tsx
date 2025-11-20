@@ -363,7 +363,6 @@ export default function ClusterAccessDiagnostic() {
 
                     <Button className="w-full font-orbitron mt-4" onClick={() => {
                       if (index === 0) {
-                        window.open('https://gitkraken.dev/register?source=gitlens&state=9f0c8a1a-4b0c-4be0-b520-eae4812abd16&redirect_uri=https%3A%2F%2Ffirebase-developer-documentat-1762941395929.cluster-fbfjltn375c6wqxlhoehbz44sk.cloudworkstations.dev%2Fcde-c03b0d878c4bfc82293ab90104c97849f0b2631e%2Fcallback%3Fvscode-reqid%3D2%26vscode-scheme%3Dcode-oss%26vscode-authority%3Deamodio.gitlens%26vscode-path%3D%252Fdid-authenticate', '_blank')
                       } else if (index === 1) {
                         window.open('https://console.cloud.google.com/iam-admin/iam?project=device-streaming-f6c287f6', '_blank')
                       } else if (index === 2) {
