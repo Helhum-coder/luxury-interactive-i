@@ -8,6 +8,7 @@ import { motion } from 'framer-motion'
 import { GitHubSetup } from '@/components/GitHubSetup'
 import { LinearSetup } from '@/components/LinearSetup'
 import { QuickActions } from '@/components/QuickActions'
+import { GitHubActionsManager } from '@/components/GitHubActionsManager'
 
 interface APICredentials {
   github?: {
@@ -96,7 +97,7 @@ function App() {
 
       <div className="max-w-7xl mx-auto px-6 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 gap-1">
+          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-7 gap-1">
             <TabsTrigger value="overview" className="text-xs">
               <Activity size={14} className="mr-1" />
               <span className="hidden sm:inline">Overview</span>
@@ -104,6 +105,10 @@ function App() {
             <TabsTrigger value="github" className="text-xs">
               <GithubLogo size={14} className="mr-1" />
               <span className="hidden sm:inline">GitHub</span>
+            </TabsTrigger>
+            <TabsTrigger value="workflows" disabled={!isGitHubConnected} className="text-xs">
+              <GitBranch size={14} className="mr-1" />
+              <span className="hidden sm:inline">Workflows</span>
             </TabsTrigger>
             <TabsTrigger value="linear" className="text-xs">
               <Kanban size={14} className="mr-1" />
@@ -173,6 +178,13 @@ function App() {
               token={credentials?.github?.token}
               onConnect={handleGitHubConnect}
               onDisconnect={handleGitHubDisconnect}
+            />
+          </TabsContent>
+
+          <TabsContent value="workflows" className="mt-6">
+            <GitHubActionsManager
+              githubToken={credentials?.github?.token}
+              repository="HelbsLozRoj/elmayordomo2025"
             />
           </TabsContent>
 
